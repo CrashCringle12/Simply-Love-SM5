@@ -25,6 +25,7 @@ return Def.Actor{
 		end
 		-- reset this to nil now so values don't accidentally persist into the next game cycle
 		SL.Global.PlayersToRejoin = nil
+
 		-- and proceed to whatever the next screen should be
 		SCREENMAN:SetNewScreen( Branch.AllowScreenSelectColor() )
 	end

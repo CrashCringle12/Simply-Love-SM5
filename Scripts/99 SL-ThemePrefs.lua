@@ -70,14 +70,6 @@ SL_CustomPrefs.Get = function()
 			},
 			Values = { "none", "single", "versus", "double" }
 		},
-		RandomVisualStyle = {
-			Default = false,
-			Choices = {
-				THEME:GetString("ThemePrefs", "On"),
-				THEME:GetString("ThemePrefs", "Off")
-			},
-			Values 	= { true , false }
-		},
 		VisualStyle =
 		{
 			Default = "PSU",
@@ -107,6 +99,27 @@ SL_CustomPrefs.Get = function()
 			Default = 3,
 			Choices = { 1,2,3,4,5,6,7,8,9,10,11,12 },
 			Values  = { 1,2,3,4,5,6,7,8,9,10,11,12 }
+		},
+
+		-- - - - - - - - - - - - - - - - - - - -
+		-- Save the last seen song in Edit Mode to disk so that ScreenEditMenu
+		-- can load with it already selected, instead of the first song in the
+		-- first pack.  See: ./BGAnimations/ScreenEditMenu underlay.lua
+		EditModeLastSeenSong =
+		{
+			Default = "",
+		},
+		EditModeLastSeenStepsType =
+		{
+			Default = "",
+		},
+		EditModeLastSeenStyleType =
+		{
+			Default = "",
+		},
+		EditModeLastSeenDifficulty =
+		{
+			Default = "",
 		},
 
 		-- - - - - - - - - - - - - - - - - - - -
@@ -212,6 +225,10 @@ SL_CustomPrefs.Get = function()
 			Choices = range(0, 22, 1),
 			Values  = range(0, 22, 1),
 		},
+		LastActiveEvent =
+		{
+			Default = "",
+		},
 	}
 end
 
@@ -225,10 +242,14 @@ SL_CustomPrefs.Validate = function()
 		-- loop through key/value pairs retrieved and do some basic validation
 		for k,v in pairs( file[theme_name] ) do
 			if sl_prefs[k] then
-				-- if we reach here, the setting exists in both the master definition as well as the user's ThemePrefs.ini
-				-- so perform some rudimentary validation; check for both type mismatch and presence in sl_prefs
+				-- if we reach here, the setting exists in both the master definition as well
+				-- as the user's ThemePrefs.ini so perform some rudimentary validation; check
+				-- for both type mismatch and presence in sl_prefs
+
+				local values = sl_prefs[k].Values or sl_prefs[k].Choices
+
 				if type( v ) ~= type( sl_prefs[k].Default )
-				or not FindInTable(v, (sl_prefs[k].Values or sl_prefs[k].Choices))
+				or (values and not FindInTable(v, values))
 				then
 					-- overwrite the user's erroneous setting with the default value
 					ThemePrefs.Set(k, sl_prefs[k].Default)

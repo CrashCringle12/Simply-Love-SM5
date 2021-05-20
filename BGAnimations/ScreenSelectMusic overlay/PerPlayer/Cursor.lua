@@ -41,12 +41,11 @@ return Def.Sprite{
 		self:bounce():effectclock("beatnooffset")
 
 		if player == PLAYER_1 then
-			self:x( IsUsingWideScreen() and _screen.cx-330 or 0)
+			self:x( IsUsingWideScreen() and _screen.cx-53 or 267)
 			self:effectmagnitude(-3,0,0)
-
 		elseif player == PLAYER_2 then
 			self:rotationz(180)
-			self:x(IsUsingWideScreen() and _screen.cx-28 or 276)
+			self:x(IsUsingWideScreen() and _screen.cx-17 or 303)
 			self:effectmagnitude(3,0,0)
 		end
 
@@ -62,8 +61,7 @@ return Def.Sprite{
 
 	OnCommand=function(self) self:queuecommand("Set") end,
 	CurrentSongChangedMessageCommand=function(self) self:queuecommand("Set") end,
-	CurrentStepsP1ChangedMessageCommand=function(self) self:queuecommand("Set") end,
-	CurrentStepsP2ChangedMessageCommand=function(self) self:queuecommand("Set") end,
+	["CurrentSteps"..pn.."ChangedMessageCommand"]=function(self) self:queuecommand("Set") end,
 
 	SetCommand=function(self)
 		local song = GAMESTATE:GetCurrentSong()
@@ -87,7 +85,7 @@ return Def.Sprite{
 		local sdl = self:GetParent():GetParent():GetChild("StepsDisplayList")
 		if sdl then
 			local grid = sdl:GetChild("Grid")
-			self:y(sdl:GetY() + grid:GetY() + grid:GetChild("Blocks_"..RowIndex):GetY() + 1 )
+			self:y(sdl:GetY() + grid:GetY() + grid:GetChild("Meter_"..RowIndex):GetY() + 1 )
 		end
 	end
 }

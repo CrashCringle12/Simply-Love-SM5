@@ -9,7 +9,7 @@ local sort_wheel = setmetatable({}, sick_wheel_mt)
 -- is large enough that I moved it to its own file
 local sortmenu_input = LoadActor("SortMenu_InputHandler.lua", sort_wheel)
 local testinput_input = LoadActor("TestInput_InputHandler.lua")
-
+local leaderboard_input = LoadActor("Leaderboard_InputHandler.lua")
 -- "MT" is my personal means of denoting that this thing (the file, the variable, whatever)
 -- has something to do with a Lua metatable.
 --
@@ -28,9 +28,129 @@ local testinput_input = LoadActor("TestInput_InputHandler.lua")
 -- results in programming tutorials so abstract they don't seem applicable to this world,
 -- but its prose was approachable enough for wastes-of-space like me, so I guess I'll
 -- recommend it until I find a more helpful one.
+--                                      -quietly
 local wheel_item_mt = LoadActor("WheelItemMT.lua")
 
 local sortmenu = { w=210, h=160 }
+
+local hasSong = GAMESTATE:GetCurrentSong() and true or false
+
+local FilterTable = function(arr, func)
+	local new_index = 1
+	local size_orig = #arr
+	for v in ivalues(arr) do
+		if func(v) then
+			arr[new_index] = v
+			new_index = new_index + 1
+		end
+	end
+	for i = new_index, size_orig do arr[i] = nil end
+end
+
+local GetBpmTier = function(bpm)
+	return math.floor((bpm + 0.5) / 10) * 10
+end
+
+local SongSearchSettings = {
+	Question="'pack/song' format will search for songs in specific packs\n'[###]' format will search for BPMs/Difficulties",
+	InitialAnswer="",
+	MaxInputLength=30,
+	OnOK=function(input)
+		if #input == 0 then return end
+
+		-- Lowercase the input text for comparison
+		local searchText = input:lower()
+
+		-- First extract out the "numbers".
+		-- Anything <= 35 is considered a difficulty, otherwise it's a bpm.
+		local difficulty = nil
+		local bpmTier = nil
+
+		for match in searchText:gmatch("%[(%d+)]") do
+			local value = tonumber(match)
+			if value <= 35 then
+				difficulty = value
+			else
+				-- Determine the "tier".
+				bpmTier = GetBpmTier(value)
+			end
+		end
+
+		-- Remove the parsed atoms, and then strip leading/trailing whitespace.
+		searchText = searchText:gsub("%[%d+]", ""):gsub("^%s*(.-)%s*$", "%1")
+
+		-- The we separate out the pack and song into their own search terms.
+		local packName = nil
+		local songName = nil
+
+		local forwardSlashIdx = searchText:find('/')
+		if not forwardSlashIdx then
+			songName = searchText
+		else
+			packName = searchText:sub(1, forwardSlashIdx - 1)
+			songName = searchText:sub(forwardSlashIdx + 1)
+		end
+
+		-- Normalize empty strings to nil.
+		if packName and #packName == 0 then packName = nil end
+		if songName and #songName == 0 then songName = nil end
+
+		-- If we have no search criteria, then return early.
+		if not (packName or songName or difficulty or bpmTier) then return end
+
+		-- Start with the complete song list.
+		local candidates = SONGMAN:GetAllSongs()
+		local stepsType = GAMESTATE:GetCurrentStyle():GetStepsType()
+
+		-- Only add valid candidates if there are steps in the current mode.
+		FilterTable(candidates, function(song) return song:HasStepsType(stepsType) end)
+
+		if songName then
+			FilterTable(candidates, function(song)
+				return (song:GetDisplayFullTitle():lower():find(songName) ~= nil or
+						song:GetTranslitFullTitle():lower():find(songName) ~= nil)
+			end)
+		end
+
+		if packName then
+			FilterTable(candidates, function(song) return song:GetGroupName():lower():find(packName) end)
+		end
+
+		if difficulty then
+			FilterTable(candidates, function(song)
+				local allSteps = song:GetStepsByStepsType(stepsType)
+				for steps in ivalues(allSteps) do
+					-- Don't consider edits.
+					if steps:GetDifficulty() ~= "Difficulty_Edit" then
+						if steps:GetMeter() == difficulty then
+							return true
+						end
+					end
+				end
+				return false
+			end)
+		end
+
+		if bpmTier then
+			FilterTable(candidates, function(song)
+				-- NOTE(teejusb): Not handling split bpms now, sorry.
+				local bpms = song:GetDisplayBpms()
+				if bpms[2]-bpms[1] == 0 then
+					-- If only one BPM, then check to see if it's in the same tier.
+					return bpmTier == GetBpmTier(bpms[1])
+				else
+					-- Otherwise check and see if the bpm is in the span of the tier.
+					local lowTier = GetBpmTier(bpms[1])
+					local highTier = GetBpmTier(bpms[2])
+					return lowTier <= bpmTier and bpmTier <= highTier
+				end
+			end)
+		end
+
+		-- Even if we don't have any results, we want to show that to the player.
+		MESSAGEMAN:Broadcast("DisplaySearchResults", {searchText=input, candidates=candidates})
+	end,
+}
 
 ------------------------------------------------------------
 
@@ -46,8 +166,17 @@ local t = Def.ActorFrame {
 	OnCommand=function(self) self:playcommand("AssessAvailableChoices") end,
 	-- We'll want to (re)assess available choices in the SortMenu if a player late-joins
 	PlayerJoinedMessageCommand=function(self, params) self:queuecommand("AssessAvailableChoices") end,
-
-
+	-- We'll also (re)asses if we want to display the leaderboard depending on if we're actually hovering over a song.
+	CurrentSongChangedMessageCommand=function(self)
+		if IsServiceAllowed(SL.GrooveStats.Leaderboard) then
+			local curSong = GAMESTATE:GetCurrentSong()
+			-- Only reasses if we go from song->group or group->song
+			if (curSong and not hasSong) or (not curSong and hasSong) then
+				self:queuecommand("AssessAvailableChoices")
+			end
+			hasSong = curSong and true or false
+		end
+	end,
 	ShowSortMenuCommand=function(self) self:visible(true) end,
 	HideSortMenuCommand=function(self) self:visible(false) end,
 
@@ -56,6 +185,7 @@ local t = Def.ActorFrame {
 		local overlay = self:GetParent()
 
 		screen:RemoveInputCallback(testinput_input)
+		screen:RemoveInputCallback(leaderboard_input)
 		screen:AddInputCallback(sortmenu_input)
 
 		for player in ivalues(PlayerNumber) do
@@ -63,6 +193,7 @@ local t = Def.ActorFrame {
 		end
 		self:playcommand("ShowSortMenu")
 		overlay:playcommand("HideTestInput")
+		overlay:playcommand("HideLeaderboard")
 	end,
 	DirectInputToTestInputCommand=function(self)
 		local screen = SCREENMAN:GetTopScreen()
@@ -75,21 +206,53 @@ local t = Def.ActorFrame {
 			SCREENMAN:set_input_redirected(player, true)
 		end
 		self:playcommand("HideSortMenu")
+		
 		overlay:playcommand("ShowTestInput")
+	end,
+	DirectInputToLeaderboardCommand=function(self)
+		local screen = SCREENMAN:GetTopScreen()
+		local overlay = self:GetParent()
+		screen:RemoveInputCallback(sortmenu_input)
+		screen:AddInputCallback(leaderboard_input)
+		for player in ivalues(PlayerNumber) do
+			SCREENMAN:set_input_redirected(player, true)
+		end
+		self:playcommand("HideSortMenu")
+		
+		overlay:playcommand("ShowLeaderboard")
 	end,
 	-- this returns input back to the engine and its ScreenSelectMusic
 	DirectInputToEngineCommand=function(self)
 		local screen = SCREENMAN:GetTopScreen()
 		local overlay = self:GetParent()
+		screen:RemoveInputCallback(sortmenu_input)
+		screen:RemoveInputCallback(testinput_input)
+		screen:RemoveInputCallback(leaderboard_input)
+		for player in ivalues(PlayerNumber) do
+			SCREENMAN:set_input_redirected(player, false)
+		end
+		self:playcommand("HideSortMenu")
+		overlay:playcommand("HideTestInput")
+		overlay:playcommand("HideLeaderboard")
+	end,
+	DirectInputToEngineForSongSearchCommand=function(self)
+		local screen = SCREENMAN:GetTopScreen()
+		local overlay = self:GetParent()
 
 		screen:RemoveInputCallback(sortmenu_input)
 		screen:RemoveInputCallback(testinput_input)
+		screen:RemoveInputCallback(leaderboard_input)
 
 		for player in ivalues(PlayerNumber) do
 			SCREENMAN:set_input_redirected(player, false)
 		end
 		self:playcommand("HideSortMenu")
 		overlay:playcommand("HideTestInput")
+		overlay:playcommand("HideLeaderboard")
+
+		-- Then add the ScreenTextEntry on top.
+		SCREENMAN:AddNewScreenToTop("ScreenTextEntry")
+		SCREENMAN:GetTopScreen():Load(SongSearchSettings)
 	end,
 
 
@@ -136,18 +299,20 @@ local t = Def.ActorFrame {
 
 		table.insert(wheel_options, {"SortBy", "Popularity"})
 		table.insert(wheel_options, {"SortBy", "Recent"})
-
 		-- This is here purely for quick testing purposes, I know this is garbage code
 		local magicvalue = false
 		for player in ivalues(PlayerNumber) do
+
 			if PROFILEMAN:IsPersistentProfile(player) then
+
 				magicvalue = true
+
 			end
 		end
 		if magicvalue then
+
 			table.insert(wheel_options, {"SortBy", "Preferred"})
 		end
-
 
 
 		-- Allow players to switch from single to double and from double to single
@@ -190,6 +355,23 @@ local t = Def.ActorFrame {
 		local game = GAMESTATE:GetCurrentGame():GetName()
 		if (game=="dance" or game=="pump" or game=="techno") and GAMESTATE:IsEventMode() then
 			table.insert(wheel_options, {"FeelingSalty", "TestInput"})
+		end
+		-- The relevant Leaderboard.lua actor is only added if these same conditions are met.
+		if IsServiceAllowed(SL.GrooveStats.Leaderboard) then
+			-- Also only add this if we're actually hovering over a song.
+			if GAMESTATE:GetCurrentSong() then
+				table.insert(wheel_options, {"GrooveStats", "Leaderboard"})
+			end
+		end
+
+		if not GAMESTATE:IsCourseMode() then
+			for device in ivalues(INPUTMAN:GetDescriptions()) do
+				-- Only display this option if a Keyboard is actually connected.
+				if device == "Keyboard" then
+					table.insert(wheel_options, {"WhereforeArtThou", "SongSearch"})
+					break
+				end
+			end
 		end
 
 		-- Override sick_wheel's default focus_pos, which is math.floor(num_items / 2)

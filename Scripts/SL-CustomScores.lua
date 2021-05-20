@@ -8,8 +8,8 @@ end
 function WriteScores()
 	local template = {
 		Version = 1,
-		Theme = 'Simply Love',
-		ThemeVersion = GetThemeVersion(),
+		Theme = THEME:GetThemeDisplayName(),
+		ThemeVersion = tostring(GetThemeVersion()),
 		ProductID = ProductID(),
 		ProductVersion = ProductVersion(),
 		MachineGuid = PROFILEMAN:GetMachineProfile():GetGUID(),
@@ -154,8 +154,8 @@ function WriteScores()
 			}
 		end
 
-		-- Don't store scores for guest profiles
-		if PROFILEMAN:IsPersistentProfile(player) then
+		-- Don't store scores for guest profiles or autoplay
+		if PROFILEMAN:IsPersistentProfile(player) and GAMESTATE:IsSideJoined(player) and not IsAutoplay(player) then
 			local profileSlot = {
 				[PLAYER_1] = "ProfileSlot_Player1",
 				[PLAYER_2] = "ProfileSlot_Player2"

@@ -141,6 +141,35 @@ local Overrides = {
 						"retrobar-o2jam", "retrobar-razor", "retrobar-razor_o2"
 					}
 				}
+
+				-- additional SM 5.3 stock note skins
+				if IsSMVersion(5, 3) then
+					local stockOutfox = {
+						dance = {
+							"defaultsm5", "delta2019", "outfox-itg", "outfox-note",
+							"paw"
+						},
+						pump = {
+							"defaultsm5", "pawprint", "rhythmsm5"
+						},
+						global = {
+							"broadhead", "crystal", "crystal4k", "exact3d", "fourv2",
+							"glider-note", "paws", "shadowtip"
+						}
+					}
+
+					if stockOutfox[game] then
+						for name in ivalues(stockOutfox[game]) do
+							table.insert(stock[game], name)
+						end
+					end
+					if stock[game] then
+						for name in ivalues(stockOutfox.global) do
+							table.insert(stock[game], name)
+						end
+					end
+				end
+
 				if stock[game] then
 					for stock_noteskin in ivalues(stock[game]) do
 						for i=1,#all do
@@ -463,6 +492,14 @@ local Overrides = {
 		SelectType = "SelectMultiple",
 		Values = { "MissBecauseHeld", "NPSGraphAtTop" }
 	},
+	ErrorBar = {
+		Values = { "None", "Colorful", "Monochrome", "Text" },
+	},
+	-------------------------------------------------------------------------
+	ErrorBarOptions = {
+		SelectType = "SelectMultiple",
+		Values = { "ErrorBarUp", "ErrorBarMultiTick" },
+	},
 	-------------------------------------------------------------------------
 	MeasureCounter = {
 		Values = { "None", "8th", "12th", "16th", "24th", "32nd" },
@@ -508,7 +545,7 @@ local Overrides = {
 			for i=1,#list do
 				if list[i] then
 					gmods.TimingWindows = self.Values[i]
-					for w=1,5 do
+					for w=1,NumJudgmentsAvailable() do
 						if self.Values[i][w] then
 							PREFSMAN:SetPreference("TimingWindowSecondsW"..w, SL.Preferences[SL.Global.GameMode]["TimingWindowSecondsW"..w])
 						else

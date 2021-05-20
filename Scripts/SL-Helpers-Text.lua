@@ -17,7 +17,9 @@ DiffuseEmojis = function(bmt, text)
 	for i=1, text:utf8len() do
 		-- FIXME: Similar to _wrapwidthpixels(), if you can implement a proper utf8-friendly fix,
 		--        please submit a pull request because I certainly don't know what I'm doing.
-		if text:utf8sub(i,i):byte() >= 240 then
+		-- utf8 encoded emojis start with a 0xe2 or 0xf0 byte, see
+		-- https://apps.timwhitlock.info/emoji/tables/unicode
+		if text:utf8sub(i, i):byte() == 0xe2 or text:utf8sub(i, i):byte() == 0xf0 then
 			bmt:AddAttribute(i-1, { Length=1, Diffuse={1,1,1,1} } )
 		end
 	end
@@ -76,7 +78,8 @@ BitmapText._wrapwidthpixels = function(bmt, w)
 	if not is8bit(text) then
 		-- a range of bytes I'm considering to indicate JP characters,
 		-- mostly derived from empirical observation and guesswork
-		-- >= 240 seems to be emojis, the glyphs for which are as wide as Miso in SL, so don't include those
+		-- >= 240 seems to be emojis, the glyphs for which are as wide as Miso Light in SL,
+		-- so don't include those
 		-- FIXME: If you know more about how this actually works, please submit a pull request.
 		local lower = 200
 		local upper = 240
@@ -124,12 +127,13 @@ BitmapText.Truncate = function(bmt, m)
 	local text = bmt:GetText()
 	local l = text:len()
 
-	-- With SL's Miso and JP fonts, english characters (Miso) tend to render 2-3x less wide
-	-- than JP characters. If the text includes JP characters, it is (probably) desired to
-	-- truncate the string earlier to achieve the same effect.
-	-- Here, we are arbitrarily "weighting" JP characters to count 4x as much as one Miso
-	-- character and then scaling the point at which we truncate accordingly.
-	-- This is a wildly broad over-generalization, but It Works For Now™.
+	-- With SL's Miso Light and JP fonts, english characters (Miso Light) tend to render 2-3x
+	-- less wide (pixel width) than JP characters. If the text includes JP characters, it's
+	-- probably desired to truncate the string earlier to achieve the same effect.
+	--
+	-- Here, we're arbitrarily "weighting" JP characters to count 4x as much as one
+	-- Miso Light character and then scaling the point at which we truncate
+	-- accordingly. This is a wildly broad over-generalization, but It Works For Now™.
 	if not is8bit(text) then
 		l = 0
 

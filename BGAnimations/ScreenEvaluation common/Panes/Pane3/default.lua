@@ -84,11 +84,10 @@ if (not EarnedMachineRecord and EarnedTop2Personal) then
 		InitCommand=function(self) self:y(args.RowHeight*9) end
 	}
 
-
 -- the player did not meet the conditions to show the 8+2 HighScores
--- just show top 10 machine HighScores
+-- Just show top 10 machine HighScores
+-- We can also hijack the 10 rows of high scores to display those ones fetched from GrooveStats.
 else
-
 	-- top 10 machine HighScores
 	args.NumHighScores = 10
 	pane[#pane+1] = LoadActor(THEME:GetPathB("", "_modules/HighScoreList.lua"), args)

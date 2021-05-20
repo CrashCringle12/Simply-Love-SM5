@@ -10,7 +10,7 @@ local slc = SL.Global.ActiveColorIndex
 -- semitransparent black quad as background for 7 decorative arrows
 af[#af+1] = Def.Quad{
 	InitCommand=function(self) self:zoomto(_screen.w,0):diffuse(Color.Black) end,
-	OnCommand=function(self) self:accelerate(0.3):zoomtoheight(128):diffusealpha(0.9):sleep(2.5) end,
+	OnCommand=function(self) self:accelerate(0.3):zoomtoheight(128):diffusealpha(0.9):sleep(2.1) end,
 	OffCommand=function(self) self:accelerate(0.3):zoomtoheight(0) end
 }
 
@@ -37,7 +37,7 @@ for i=1,7 do
 
 	-- desaturated SM5 logo
 	arrow[#arrow+1] = LoadActor("logo.png")..{
-		InitCommand=function(self) self:zoom(0.1):diffuse(GetHexColor(slc-i-3, true)) end,
+		InitCommand=function(self) self:zoom(0.1):diffuse(GetHexColor(slc-i-4, true)) end,
 	}
 
 	-- only add Thonk asset if needed
@@ -49,12 +49,5 @@ for i=1,7 do
 
 	af[#af+1] = arrow
 end
-
-af[#af+1] = LoadFont("Common Normal")..{
-	Text=ScreenString("ThemeDesign"),
-	InitCommand=function(self) self:diffuse(GetHexColor(slc)):diffusealpha(0) end,
-	OnCommand=function(self) self:sleep(3):linear(0.25):diffusealpha(1) end,
-	OffCommand=function(self) self:linear(0.25):diffusealpha(0) end,
-}
 
 return af

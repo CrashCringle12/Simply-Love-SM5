@@ -7,46 +7,59 @@
 -- For now, this table is local to this file, but might be moved into the SL table (or something)
 -- in the future to facilitate type checking in ./Scripts/SL-PlayerOptions.lua and elsewhere.
 
-local profile_whitelist = {
-	SpeedModType = "string",
-	SpeedMod = "number",
-	Mini = "string",
-	NoteSkin = "string",
-	JudgmentGraphic = "string",
-	ComboFont = "string",
-	HoldJudgment = "string",
+local permitted_profile_settings = {
+
+	----------------------------------
+	-- "Main Modifiers"
+	-- OptionRows that appear in SL's first page of PlayerOptions
+
+	SpeedModType     = "string",
+	SpeedMod         = "number",
+	Mini             = "string",
+	NoteSkin         = "string",
+	JudgmentGraphic  = "string",
+	ComboFont        = "string",
+	HoldJudgment     = "string",
 	BackgroundFilter = "string",
 	BackgroundColor = "string",
-	HideTargets = "boolean",
-	HideSongBG = "boolean",
-	HideCombo = "boolean",
-	HideLifebar = "boolean",
-	HideScore = "boolean",
-	HideDanger = "boolean",
-	HideComboExplosions = "boolean",
 
-	LifeMeterType = "string",
-	DataVisualizations = "string",
-	TargetScore = "number",
+	----------------------------------
+	-- "Advanced Modifiers"
+	-- OptionRows that appear in SL's second page of PlayerOptions
+
+	HideTargets          = "boolean",
+	HideSongBG           = "boolean",
+	HideCombo            = "boolean",
+	HideLifebar          = "boolean",
+	HideScore            = "boolean",
+	HideDanger           = "boolean",
+	HideComboExplosions  = "boolean",
+
+	LifeMeterType        = "string",
+	DataVisualizations   = "string",
+	TargetScore          = "number",
 	ActionOnMissedTarget = "string",
 
-	MeasureCounter = "string",
-	MeasureCounterLeft = "boolean",
-	MeasureCounterUp = "boolean",
-	HideLookahead = "boolean",
+	MeasureCounter       = "string",
+	MeasureCounterLeft   = "boolean",
+	MeasureCounterUp     = "boolean",
+	HideLookahead        = "boolean",
 
-	ColumnFlashOnMiss = "boolean",
-	SubtractiveScoring = "boolean",
-	Pacemaker = "boolean",
-	MissBecauseHeld = "boolean",
-	NPSGraphAtTop = "boolean",
+	ColumnFlashOnMiss    = "boolean",
+	SubtractiveScoring   = "boolean",
+	Pacemaker            = "boolean",
+	MissBecauseHeld      = "boolean",
+	NPSGraphAtTop        = "boolean",
+	ErrorBar             = "string",
+	ErrorBarUp           = "boolean",
+	ErrorBarMultiTick    = "boolean",
 
 	ReceptorArrowsPosition = "string",
 
 	PlayerOptionsString = "string",
 
-	EvalPanePrimary   = "number",
-	EvalPaneSecondary = "number",
+	EvalPanePrimary     = "number",
+	EvalPaneSecondary   = "number",
 }
 
 -- -----------------------------------------------------------------------
@@ -75,10 +88,10 @@ LoadProfileCustom = function(profile, dir)
 
 		-- for each key/value pair read in from the player's profile
 		for k,v in pairs(filecontents) do
-			-- ensure that the key has a corresponding key in profile_whitelist
-			if profile_whitelist[k]
-			--  ensure that the datatype of the value matches the datatype specified in profile_whitelist
-			and type(v)==profile_whitelist[k] then
+			-- ensure that the key has a corresponding key in permitted_profile_settings
+			if permitted_profile_settings[k]
+			--  ensure that the datatype of the value matches the datatype specified in permitted_profile_settings
+			and type(v)==permitted_profile_settings[k] then
 				-- if the datatype is string and this key corresponds with an OptionRow in ScreenPlayerOptions
 				-- ensure that the string read in from the player's profile
 				-- is a valid value (or choice) for the corresponding OptionRow
@@ -108,9 +121,9 @@ LoadProfileCustom = function(profile, dir)
 					GAMESTATE:GetPlayerState(player):GetPlayerOptions("ModsLevel_Preferred"):FailSetting( GetDefaultFailType() )
 				end
 
-				if k=="EvalPaneSecondary" and type(v)==profile_whitelist.EvalPaneSecondary then
+				if k=="EvalPaneSecondary" and type(v)==permitted_profile_settings.EvalPaneSecondary then
 					SL[pn].EvalPaneSecondary = v
-				elseif k=="EvalPanePrimary" and type(v)==profile_whitelist.EvalPanePrimary then
+				elseif k=="EvalPanePrimary" and type(v)==permitted_profile_settings.EvalPanePrimary then
 					SL[pn].EvalPanePrimary   = v
 				end
 			end
@@ -130,7 +143,7 @@ SaveProfileCustom = function(profile, dir)
 			local pn = ToEnumShortString(player)
 			local output = {}
 			for k,v in pairs(SL[pn].ActiveModifiers) do
-				if profile_whitelist[k] and type(v)==profile_whitelist[k] then
+				if permitted_profile_settings[k] and type(v)==permitted_profile_settings[k] then
 					output[k] = v
 				end
 			end
@@ -162,7 +175,7 @@ GetAvatarPath = function(profileDirectory, displayName)
 	-- prefer png first, then jpg, then jpeg, etc.
 	-- (note that SM5 does not support animated gifs at this time, so SL doesn't either)
 	-- TODO: investigate effects (memory footprint, fps) of allowing movie files as avatars in SL
-	local extensions = { "png", "jpg", "jpeg", "bmp", "gif", "mp4" }
+	local extensions = { "png", "jpg", "jpeg", "bmp", "gif" }
 
 	-- prefer an avatar named:
 	--    "avatar" in the player's profile directory (preferred by Simply Love)
@@ -179,8 +192,7 @@ GetAvatarPath = function(profileDirectory, displayName)
 			local avatar_path = ("%s.%s"):format(path, extension)
 
 			if FILEMAN:DoesFileExist(avatar_path)
-			and (ActorUtil.GetFileType(avatar_path)   == "FileType_Bitmap"
-			    or ActorUtil.GetFileType(avatar_path) == "FileType_Movie")
+			and ActorUtil.GetFileType(avatar_path) == "FileType_Bitmap"
 			then
 				-- return the first valid avatar path that is found
 				return avatar_path
