@@ -7,6 +7,7 @@ local EventOverlayInputHandler = nil
 if ThemePrefs.Get("WriteCustomScores") then
 	WriteScores()
 end
+
 local t = Def.ActorFrame{Name="ScreenEval Common"}
 
 if SL.Global.GameMode ~= "Casual" then
@@ -46,6 +47,9 @@ end
 
 -- code for triggering a screenshot and animating a "screenshot" texture
 t[#t+1] = LoadActor("./Shared/ScreenshotHandler.lua")
+
+-- code for immediately retrying the song that was just played
+t[#t+1] = LoadActor("./Shared/RestartHandler.lua")
 
 -- the title of the song and its graphical banner, if there is one
 t[#t+1] = LoadActor("./Shared/TitleAndBanner.lua")
@@ -94,13 +98,6 @@ t[#t+1] = LoadActor("./Panes/default.lua", NumPanes)
 -- This is only added in "dance" mode and if the service is available.
 -- Since this actor also spawns the event overlay it must go on top of everything else
 t[#t+1] = LoadActor("./Shared/AutoSubmitScore.lua")
-t[#t+1] = Def.Quad {
-	CodeMessageCommand=function(self, params)
-		if params.Name == "SneakPeak" then
-			SCREENMAN:GetTopScreen():SetNextScreenName("ScreenUPSRTPreview")
-			--SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen")
-		end
-	end
-} 
+
 
 return t

@@ -32,21 +32,14 @@ local af = Def.ActorFrame{
 	CodeMessageCommand=function(self, params)
 		if params.Name == "Favorite1" or params.Name == "Favorite2" then
 			addOrRemoveFavorite(params.PlayerNumber)
-			-- Nudge the wheel a bit so that that the icon is correctly updated.
-			local screen = SCREENMAN:GetTopScreen()
-			screen:GetMusicWheel():Move(1)
-			screen:GetMusicWheel():Move(-1)
-			screen:GetMusicWheel():Move(0)
 		end
 	end,
-
 	-- ---------------------------------------------------
 	--  first, load files that contain no visual elements, just code that needs to run
 
 	-- MenuTimer code for preserving SSM's timer value when going 
 	-- from SSM to a different screen and back to SSM (i.e. returning from PlayerOptions).
 	LoadActor("./PreserveMenuTimer.lua"),
-
 	-- Apply player modifiers from profile
 	LoadActor("./PlayerModifiers.lua"),
 
@@ -69,7 +62,6 @@ local af = Def.ActorFrame{
 	-- elements we need two of (one for each player) that draw underneath the StepsDisplayList
 	-- this includes the stepartist boxes, the density graph, and the cursors.
 	LoadActor("./PerPlayer/default.lua"),
-
 	-- Banner Art
 	LoadActor("./Banner.lua"),
 
@@ -93,7 +85,6 @@ local af = Def.ActorFrame{
 	LoadActor("./EscapeFromEventMode.lua"),
 
 	LoadActor("./SongSearch/default.lua"),
-	--LoadActor("./apple/default.lua"),
 }
 
 return af

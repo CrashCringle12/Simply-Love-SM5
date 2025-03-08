@@ -177,28 +177,6 @@ local function AddFavorites()
     end
     return nil
 end
-local function GetPlaylists()
-	local playlists = {}
-	table.insert(playlists, {{"View", "Trials"}})
-	for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-		local path = getFavoritesPath(player)
-		if FILEMAN:DoesFileExist(path) then
-			table.insert(playlists, {{"View", "Preferred"}})
-			break
-		end
-	end
-	-- Get the name of every file in the Other/Playlists directory
-	local files = FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory().."Other/Playlists/")
-	-- Add each file to the wheel options
-	for i=1, #files do
-		local file = files[i]
-		if file:match("%.txt$") then
-			local playlist = file:gsub("%.txt$", "")
-			table.insert(playlists, {{"Playlist", playlist}})
-		end
-	end
-	return playlists
-end
 
 -- Only display the View Downloads option if we're connected to
 -- GrooveStats and Auto-Downloads are enabled.
@@ -211,10 +189,48 @@ local function AddPlayerSortOptions()
     for player in ivalues(GAMESTATE:GetHumanPlayers()) do
         if PROFILEMAN:IsPersistentProfile(player) then
             table.insert(player_sort_options, {"SortBy", "Top" .. ToEnumShortString(player) .. "Grades"})
-            table.insert(player_sort_options, {"SortBy", "Recent" .. ToEnumShortString(player) .. "Played"})
         end
     end
     return player_sort_options
+end
+
+local function AddPlaylists()
+
+	-- First add the machine playlists
+	local player_sort_options = {}
+	-- Get the name of every file in the Other/Playlists directory
+	local files = FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory().."Other/Playlists/")
+	-- Add each file to the wheel options
+	for i=1, #files do
+		local file = files[i]
+		if file:match("%.txt$") then
+			local playlist = file:gsub("%.txt$", "")
+			table.insert(player_sort_options, {{"MachinePlaylist", playlist}})
+		end
+	end
+
+	-- Then add the personal playlists
+	for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+		local playlistPath = PROFILEMAN:GetProfileDir(ProfileSlot[PlayerNumber:Reverse()[player] + 1]) .."/Playlists/";
+		local playerPlaylists = FILEMAN:GetDirListing(playlistPath)
+		for i=1, #playerPlaylists do
+			local file = playerPlaylists[i]
+			if file:match("%.txt$") then
+				local playlist = file:gsub("%.txt$", "")
+				table.insert(player_sort_options, {{"PersonalPlaylist", playlist}})
+			end
+		end
+	end
+	
+	-- Favorites are basically a playlist so include those too
+	for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+		local path = getFavoritesPath(player)
+		if FILEMAN:DoesFileExist(path) then
+			table.insert(player_sort_options, {{"MixTape", "Preferred"}})
+			break
+		end
+	end
+	return player_sort_options
 end
 
 local function GetChangeableStyles(style)
@@ -248,7 +264,6 @@ local function GetChangeableStyles(style)
 		-- This can be uncommented at that time to allow switching from versus into routine.
 		-- elseif style == "versus" then
 		-- 	table.insert(available_styles, {"ChangeStyle", "Routine"})
-
 		end
 		return available_styles
 	end
@@ -280,7 +295,7 @@ local wheel_options = {
 	{ 
 		{"", "CategorySorts"}, 
 		{
-			{ {"SortBy", "Group"} },
+			{{"SortBy", "Group"} },
 			{ {"SortBy", "Title"} },
 			{ {"SortBy", "Artist"} },
 			{ {"SortBy", "Genre"} },
@@ -290,8 +305,13 @@ local wheel_options = {
 			{ {"SortBy", "Popularity"} },
 			{ {"SortBy", "Recent"} },
 			{ {"SortBy", "TopGrades"} },
-			{ {"SortBy", "TopP1Grades"}, PROFILEMAN:IsPersistentProfile(PLAYER_1) },
-			{ {"SortBy", "TopP2Grades"}, PROFILEMAN:IsPersistentProfile(PLAYER_2) },
+			{ {"SortBy", "PopularityP1"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_1) end },
+			{ {"SortBy", "RecentP1"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_1) end },
+			{ {"SortBy", "TopP1Grades"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_1) end },
+			{ {"SortBy", "PopularityP2"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
+			{ {"SortBy", "RecentP2"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
+			{ {"SortBy", "TopP2Grades"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
+
 		}
 	},
 	{
@@ -313,8 +333,8 @@ local wheel_options = {
 		}
 	},
 	{
-		{"", "CategoryPlaylists"}, 
-		GetPlaylists()
+		{"", "CategoryPlaylists"},
+		AddPlaylists(),
 	},
 	{ {"SortBy", "Group"} },
 	{ {"SortBy", "Title"} },
@@ -331,7 +351,7 @@ local wheel_options = {
 	{ {"ChangeMode", "Casual"}, SL.Global.Stages.PlayedThisGame == 0 and SL.Global.GameMode ~= "Casual" },
 	{ {"ImLovinIt", "AddFavorite"}, function() return GAMESTATE:GetCurrentSong() ~= nil end},
 	AddFavorites(),
-	{ {"View", "Leaderboard"}, function() return IsServiceAllowed(SL.GrooveStats.Leaderboard) and GAMESTATE:GetCurrentSong() ~= nil end },	
+	{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
 }
 
 

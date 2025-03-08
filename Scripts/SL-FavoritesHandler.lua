@@ -51,7 +51,6 @@ addOrRemoveFavorite = function(player)
                 SOUND:PlayOnce(THEME:GetPathS("", "Common invalid.ogg"))
             else
                 favoritesString = favoritesString .. arr[3] .. "/" .. arr[4] .. "\n";
-
                 SCREENMAN:SystemMessage(songTitle .. " added to " .. profileName .. "'s Favorites.")
                 SOUND:PlayOnce(THEME:GetPathS("", "_unlock.ogg"))
             end

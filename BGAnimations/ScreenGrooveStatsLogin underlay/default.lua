@@ -75,11 +75,11 @@ local af = Def.ActorFrame{
   end,
 
   LoadFont("Common Normal")..{
-    Text="Scan the QR code to log in to GrooveStats!",
+    Text=THEME:GetString("ScreenSelectProfile", "LoginInstructions"),
     InitCommand=function(self) self:y(-150) end,
   },
   LoadFont("Common Normal")..{
-    Text="Visit www.groovestats.com to create an account.",
+    Text=THEME:GetString("ScreenSelectProfile", "VisitWebsite"),
     InitCommand=function(self) self:y(-120) end,
   },
 
@@ -112,7 +112,7 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
     },
 
     LoadFont("Common Normal")..{
-      Text=SL[pn].ApiKey and "Profile already\nconnected!" or "",
+      Text=SL[pn].ApiKey and THEME:GetString("ScreenSelectProfile", "ProfileConnected") or "",
       HideQrMessageCommand=function(self, params)
         if params.pn == pn then
           WriteGrooveStatsIni(player)
@@ -132,7 +132,7 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
     childAf[#childAf+1] = LoadActor( qrModulePath , {url, qrcodeSize} )..{
       Name="QRCode",
       InitCommand=function(self) self:xy(-84, -84) end,
-      HideQrMessageCommand=function(self, params) 
+      HideQrMessageCommand=function(self, params)
         if params.pn == pn then
           self:visible(false)
         end

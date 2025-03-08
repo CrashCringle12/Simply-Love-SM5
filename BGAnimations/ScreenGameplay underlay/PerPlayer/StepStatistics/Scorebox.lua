@@ -12,6 +12,8 @@ local IsUltraWide = (GetScreenAspectRatio() > 21/9)
 local NoteFieldIsCentered = (GetNotefieldX(player) == _screen.cx)
 local NumEntries = 5
 
+local style = GAMESTATE:GetCurrentStyle():GetName()
+
 local border = 5
 local width = 162
 local height = 80
@@ -221,16 +223,21 @@ end
 local af = Def.ActorFrame{
 	Name="ScoreBox"..pn,
 	InitCommand=function(self)
-		self:xy(70 * (player==PLAYER_1 and 1 or -1), -115)
-		-- offset a bit more when NoteFieldIsCentered
-		if NoteFieldIsCentered and IsUsingWideScreen() then
-			self:addx( 2 * (player==PLAYER_1 and 1 or -1) )
-		end
+		if style ~= "double" then
+			self:xy(70 * (player==PLAYER_1 and 1 or -1), -115)
+			-- offset a bit more when NoteFieldIsCentered
+			if NoteFieldIsCentered and IsUsingWideScreen() then
+				self:addx( 2 * (player==PLAYER_1 and 1 or -1) )
+			end
 
-		-- ultrawide and both players joined
-		if IsUltraWide and #GAMESTATE:GetHumanPlayers() > 1 then
-			self:x(self:GetX() * -1)
+			-- ultrawide and both players joined
+			if IsUltraWide and #GAMESTATE:GetHumanPlayers() > 1 then
+				self:x(self:GetX() * -1)
+			end
+		else
+			self:xy(GetNotefieldWidth() - 140, -115)
 		end
+		
 		self.isFirst = true
 	end,
 	CheckScoreboxCommand=function(self)
@@ -293,7 +300,7 @@ local af = Def.ActorFrame{
 			-- both players will have their own individual scoreboxes.
 			-- Should be fine though.
 			if sendRequest then
-				self:GetParent():GetChild("Name1"):settext("Loading...")
+				self:GetParent():GetChild("Name1"):settext(THEME:GetString("Groovestats", "Loading"))
 				self:playcommand("MakeGrooveStatsRequest", {
 					endpoint="player-leaderboards.php?"..NETWORK:EncodeQueryParameters(query),
 					method="GET",

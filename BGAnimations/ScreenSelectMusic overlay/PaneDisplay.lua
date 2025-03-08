@@ -178,6 +178,24 @@ local GetScoresRequestProcessor = function(res, params)
 								playerScore
 							)
 							personalRecordSet = true
+						else
+							-- Let's check if the GS high score is higher than the local high score
+							local player = PlayerNumber[i]
+							local localScore = GetScoreForPlayer(player)
+							-- GS's score entry is a value like 9823, so we need to divide it by 100 to get 98.23
+							local gsScore = gsEntry["score"] / 100
+
+							-- GetPercentDP() returns a value like 0.9823, so we need to multiply it by 100 to get 98.23
+							if not localScore or gsScore >= localScore:GetPercentDP() * 100 then
+								-- It is! Let's use it instead of the local one.
+								SetNameAndScore(
+									GetMachineTag(gsEntry),
+									string.format("%.2f%%", gsScore),
+									playerName,
+									playerScore
+								)
+								personalRecordSet = true
+							end
 						end
 					end
 
@@ -335,37 +353,7 @@ af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 	P2ChartParsingMessageCommand=function(self)	self.IsParsing[2] = true end,
 	P1ChartParsedMessageCommand=function(self)
 		self.IsParsing[1] = false
-		if GAMESTATE:GetCurrentSong() == nil then return end
-		-- local groupInfo = ""
-		-- -- ADD_METHOD( GetGroupName );
-		-- -- ADD_METHOD( GetSortTitle );
-		-- -- ADD_METHOD( GetDisplayTitle );
-		-- -- ADD_METHOD( GetTranslitTitle );
-		-- -- ADD_METHOD( GetSeries );
-		-- -- ADD_METHOD( GetSyncOffset );
-		-- -- ADD_METHOD( HasGroupIni );
-		-- -- ADD_METHOD( GetSongs );
-		-- -- ADD_METHOD( GetBannerPath );
-		-- -- ADD_METHOD( GetStepArtistCredits );
-		-- -- ADD_METHOD( GetAuthorsNotes );
-        -- -- ADD_METHOD( GetYearReleased );
-		-- apple = "GroupName: " .. GAMESTATE:GetCurrentSong():GetGroupName()
-		-- apple = apple .. "\nSortTitle: " .. GAMESTATE:GetCurrentSong():GetGroup():GetSortTitle()
-		-- apple = apple .. "\nDisplayTitle: " .. GAMESTATE:GetCurrentSong():GetGroup():GetDisplayTitle()
-		-- apple = apple .. "\nTranslitTitle: " .. GAMESTATE:GetCurrentSong():GetGroup():GetTranslitTitle()
-		-- apple = apple .. "\nSeries: " .. GAMESTATE:GetCurrentSong():GetGroup():GetSeries()
-		-- apple = apple .. "\nSyncOffset: " .. GAMESTATE:GetCurrentSong():GetGroup():GetSyncOffset()
-		-- apple = apple .. "\nHasGroupIni: " .. (GAMESTATE:GetCurrentSong():GetGroup():HasGroupIni() and "true" or "false")
-		-- apple = apple .. "\nBannerPath: " .. GAMESTATE:GetCurrentSong():GetGroup():GetBannerPath()
-		-- apple = apple .. "\nStepArtistCredits: "
-		-- for i, v in ipairs(GAMESTATE:GetCurrentSong():GetGroup():GetStepArtistCredits()) do
-		-- 	apple = apple .. v .. ", "
-		-- end
-		-- apple = apple .. "\nAuthorsNotes: " .. GAMESTATE:GetCurrentSong():GetGroup():GetAuthorsNotes()
-		-- apple = apple .. "\nYearReleased: " .. GAMESTATE:GetCurrentSong():GetGroup():GetYearReleased()
-		-- -- Number of songs
-		-- apple = apple .. "\nSongs: " .. #GAMESTATE:GetCurrentSong():GetGroup():GetSongs()
-		--SM(apple)
+
 		self:queuecommand("ChartParsed")
 	end,
 	P2ChartParsedMessageCommand=function(self)
@@ -381,7 +369,7 @@ af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 				-- If we disable the service from a previous request, surface it to the user here.
 				for i=1,2 do
 					local loadingText = master:GetChild("PaneDisplayP"..i):GetChild("Loading")
-					loadingText:settext("Disabled")
+					loadingText:settext(THEME:GetString("Groovestats", "Disabled"))
 					loadingText:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 				end
 			end
@@ -409,7 +397,7 @@ af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 				worldScore:visible(false)
 				worldName:visible(false)
 				loadingText:visible(true)
-				loadingText:settext("Loading ...")
+				loadingText:settext(THEME:GetString("Groovestats", "Loading"))
 				sendRequest = true
 			end
 		end

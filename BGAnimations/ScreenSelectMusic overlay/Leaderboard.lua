@@ -345,7 +345,7 @@ local af = Def.ActorFrame{
 					local leaderboardList = self:GetParent()[pn]["Leaderboards"]
 					local localData = getLocalLeaderboard(pn)
 					leaderboardList[#leaderboardList + 1] = {
-						Name="Machine's  Bests",
+						Name="Machine's  Best",
 						Data=DeepCopy(localData),
 						IsEX=false
 					}
@@ -577,7 +577,7 @@ for player in ivalues( PlayerNumber ) do
 
 			LoadFont("Common Normal").. {
 				Name="Text",
-				Text="More Leaderboards",
+				Text=THEME:GetString("Groovestats", "MoreLeaderboards"),
 				InitCommand=function(self)
 					self:diffuse(Color.White)
 				end,
@@ -633,7 +633,7 @@ for player in ivalues( PlayerNumber ) do
 
 			LoadFont("Common Normal").. {
 				Name="Name",
-				Text=(i==1 and "Loading" or ""),
+				Text=(i==1 and THEME:GetString("Groovestats", "Loading") or ""),
 				InitCommand=function(self)
 					self:horizalign(center)
 					self:maxwidth(130)
@@ -641,7 +641,7 @@ for player in ivalues( PlayerNumber ) do
 					self:diffuse(Color.White)
 				end,
 				ResetEntryMessageCommand=function(self)
-					self:settext(i==1 and "Loading" or "")
+					self:settext(i==1 and THEME:GetString("Groovestats", "Loading") or "")
 					self:diffuse(Color.White)
 				end
 			},

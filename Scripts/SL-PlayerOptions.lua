@@ -505,12 +505,8 @@ local Overrides = {
 			local IsUltraWide = (GetScreenAspectRatio() > 21/9)
 			local mpn = GAMESTATE:GetMasterPlayerNumber()
 
-			-- Never available in double
-			if style and style:GetName() == "double"
-			-- In 4:3 versus mode
-			or (not IsUsingWideScreen() and style and style:GetName() == "versus")
-			-- if the notefield takes up more than half the screen width
-			or (notefieldwidth and notefieldwidth > _screen.w/2)
+			-- Not in 4:3 versus mode
+			if (not IsUsingWideScreen() and style and style:GetName() == "versus")
 			-- if the notefield is centered with 4:3 aspect ratio
 			or (mpn and GetNotefieldX(mpn) == _screen.cx and not IsUsingWideScreen())
 			-- Tournament Mode always enforces whether to display/hide step stats so remove that as an option.
@@ -590,9 +586,36 @@ local Overrides = {
 			return vals
 		end
 	},
+	TiltMultiplier = {
+		Choices = function()
+			local first	= 1
+			local last 	= 3
+			local step 	= 0.5
+
+			return stringify(range(first, last, step), "%g")
+		end,
+		LoadSelections = function(self, list, pn)
+			local mods =SL[ToEnumShortString(pn)].ActiveModifiers
+			local tiltMultiplier = ("%g"):format(mods.TiltMultiplier)
+			local i = FindInTable(tiltMultiplier, self.Choices) or 1
+			list[i] = true
+			return list
+		end,
+		SaveSelections = function(self, list, pn)
+			local mods =SL[ToEnumShortString(pn)].ActiveModifiers
+
+			for i=1,#self.Choices do
+				if list[i] then
+					mods.TiltMultiplier = tonumber( self.Choices[i] )
+				end
+			end
+		end
+	},
+	-------------------------------------------------------------------------
 	ErrorBar = {
 		Values = { "None", "Colorful", "Monochrome", "Text" },
-	},-------------------------------------------------------------------------
+	},
+	-------------------------------------------------------------------------
 	ErrorBarTrim = {
 		Values = { "Off", "Great", "Excellent" },
 		Choices = function()

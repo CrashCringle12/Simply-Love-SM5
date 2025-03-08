@@ -75,11 +75,23 @@ SL_CustomPrefs.Get = function()
 			Choices = {
 				THEME:GetString("ScreenSelectPlayMode", "Casual"),
 				THEME:GetString("ScreenSelectPlayMode", "ITG"),
-
 			},
 			Values = { "Casual", "ITG" }
 		},
-
+		DefaultFailType =
+		{
+			Default = "Immediate",
+			Choices = {
+					"Immediate",
+					"ImmediateContinue",
+					"Off",
+			},
+			Values = {
+					"Immediate",
+					"ImmediateContinue",
+					"Off",
+			},
+		},
 		SortPlayer =
 		{
 			Default = PLAYER_1,
@@ -343,6 +355,7 @@ SL_CustomPrefs.Get = function()
 			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
 		},
+
 		QRLogin = {
 			Default = "Sometimes",
 			Choices = {

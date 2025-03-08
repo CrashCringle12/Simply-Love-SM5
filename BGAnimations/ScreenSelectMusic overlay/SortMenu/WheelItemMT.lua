@@ -74,7 +74,6 @@ return {
 			if self.kind == "SortBy" then
 				self.sort_by = info[2]
 
-
 			elseif self.kind == "ChangeMode" or self.kind == "ChangeStyle" then
 				self.change = info[2]
 
@@ -83,7 +82,7 @@ return {
 			end
 			
 			local toptext    = self.kind ~= "" and THEME:GetString("ScreenSelectMusic", self.kind) or ""
-			local bottomtext = self.kind == "Playlist" and info[2] or THEME:GetString(self.kind == "ChangeMode" and "ScreenSelectPlayMode" or "ScreenSelectMusic", info[2])
+			local bottomtext =  string.match(self.kind, "Playlist") and info[2] or THEME:GetString(self.kind == "ChangeMode" and "ScreenSelectPlayMode" or "ScreenSelectMusic", info[2])
 
 			self.top_text:settext(toptext)
 			self.bottom_text:settext(bottomtext)

@@ -221,7 +221,7 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 						end
 
 						QRPane:GetChild("QRCode"):queuecommand("Hide")
-						QRPane:GetChild("HelpText"):settext("Score has already been submitted :)")
+						QRPane:GetChild("HelpText"):settext(THEME:GetString("Groovestats", "ScoreAlreadySubmitted"))
 						if i == 1 and P1SubmitText then
 							P1SubmitText:queuecommand("Submit")
 						elseif i == 2 and P2SubmitText then
@@ -248,13 +248,13 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 								GSIcon:visible(true)
 								recordText:diffuseshift():effectcolor1(Color.White):effectcolor2(Color.Yellow):effectperiod(3)
 								if personalRank == 1 then
-									local worldRecordText = "World Record!"
+									local worldRecordText = THEME:GetString("Groovestats", "WorldRecord")
 									if showExScore then
 										worldRecordText = worldRecordText .. " (EX)"
 									end
 									recordText:settext(worldRecordText)
 								else
-									recordText:settext("Personal Best!")
+									recordText:settext(THEME:GetString("Groovestats", "PersonalBest"))
 								end
 								local recordTextXStart = recordText:GetX() - recordText:GetWidth()*recordText:GetZoom()/2
 								local GSIconWidth = GSIcon:GetWidth()*GSIcon:GetZoom()
@@ -393,9 +393,10 @@ local af = Def.ActorFrame {
 			-- Only send the request if it's applicable.
 			if sendRequest then
 				-- Unjoined players won't have the text displayed.
-				self:GetParent():GetChild("P1SubmitText"):settext("Submitting ...")
-				self:GetParent():GetChild("P2SubmitText"):settext("Submitting ...")
-
+             
+                self:GetParent():GetChild("P1SubmitText"):settext(THEME:GetString("Groovestats", "Submitting"))
+				self:GetParent():GetChild("P2SubmitText"):settext(THEME:GetString("Groovestats", "Submitting"))
+					
 				self:playcommand("MakeGrooveStatsRequest", {
 					endpoint="score-submit.php?"..NETWORK:EncodeQueryParameters(query),
 					method="POST",
@@ -403,7 +404,7 @@ local af = Def.ActorFrame {
 					body=JsonEncode(body),
 					timeout=30,
 					callback=AutoSubmitRequestProcessor,
-					args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("ScreenEval Common"),
+				args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("ScreenEval Common"),
 				})
 			end
 		end
@@ -427,14 +428,14 @@ af[#af+1] = LoadFont("Common Normal").. {
 		self:visible(GAMESTATE:IsSideJoined(PLAYER_1))
 	end,
 	SubmitCommand=function(self)
-		self:settext("Submitted!")
+		self:settext(THEME:GetString("Groovestats", "Submitted"))
 	end,
 	SubmitFailedCommand=function(self)
-		self:settext("Submit Failed 😞")
+		self:settext(THEME:GetString("Groovestats", "SubmitFailed"))
 		DiffuseEmojis(self)
 	end,
 	TimedOutCommand=function(self)
-		self:settext("Timed Out")
+		self:settext(THEME:GetString("Groovestats", "TimedOut"))
 	end
 }
 
@@ -449,14 +450,14 @@ af[#af+1] = LoadFont("Common Normal").. {
 		self:visible(GAMESTATE:IsSideJoined(PLAYER_2))
 	end,
 	SubmitCommand=function(self)
-		self:settext("Submitted!")
+		self:settext(THEME:GetString("Groovestats", "Submitted"))
 	end,
 	SubmitFailedCommand=function(self)
-		self:settext("Submit Failed 😞")
+		self:settext(THEME:GetString("Groovestats", "SubmitFailed"))
 		DiffuseEmojis(self)
 	end,
 	TimedOutCommand=function(self)
-		self:settext("Timed Out")
+		self:settext(THEME:GetString("Groovestats", "TimedOut"))
 	end
 }
 
