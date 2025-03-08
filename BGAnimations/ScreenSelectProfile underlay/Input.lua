@@ -28,15 +28,23 @@ local apiKey = getAPIKey()
 -- a passed-in argument, and that's tricky with how I've split
 -- ScreenSelectProfile's code across multiple files.
 local finished = false
--- Counter used to determine if both players have selected their profile. 
--- This value basically represents the amount of players that are ready to
--- move forward + 1. Each time a player presses enter this value goes up until
--- it matches the amount of human players (This sounds a little more heavy than it really is)
-local playersSelected = 1
 
---The player number of the last player to press enter. Used to prevent one player from
---incrementing the counter themself and still skipping and not letting the other player select.
-local lastPlayerNumber
+-- Table used to determine whether a player has selected their profile. 
+-- move forward.
+local readyPlayers = {
+	["P1"] = false,
+	["P2"] = false,
+}
+
+-- If a player is not joined, we'll set their readyPlayers flag to true
+-- to bypass that side
+if not GAMESTATE:IsSideJoined(PLAYER_1) then
+	readyPlayers["P1"] = true
+end
+if not GAMESTATE:IsSideJoined(PLAYER_2) then
+	readyPlayers["P2"] = true
+end
+
 
 -- we need to calculate how many dummy rows the scroller was "padded" with
 -- (to achieve the desired transform behavior since I am not mathematically
@@ -58,6 +66,9 @@ local activeGenerations = 0
 local Handle = {}
 
 Handle.Start = function(event)
+	-- Nothing to do if the player has already selected a profile
+	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and readyPlayers[ToEnumShortString(event.PlayerNumber)] then return end
+	
 	local topscreen = SCREENMAN:GetTopScreen()
 	-- if the input event came from a side that is not currently registered as a human player, we'll either
 	-- want to reject the input (we're in Pay mode and there aren't enough credits to join the player),
@@ -67,16 +78,36 @@ Handle.Start = function(event)
 		-- IsArcade() is defined in _fallback/Scripts/02 Utilities.lua
 		-- in CoinMode_Free, EnoughCreditsToJoin() will always return true
 		-- thankfully, EnoughCreditsToJoin() factors in Premium settings
-		if IsArcade() and not GAMESTATE:EnoughCreditsToJoin() then
-			-- play the InvalidChoice sound and don't go any further
-			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
-			return
+		if IsArcade() then
+			if not GAMESTATE:EnoughCreditsToJoin() then
+				-- play the InvalidChoice sound and don't go any further
+				MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
+				return
+			else
+				if (not SL.Global.FastProfileSwitchInProgress and
+						GAMESTATE:GetCoinMode() == "CoinMode_Pay" and
+						(GAMESTATE:GetPremium() ~= "Premium_2PlayersFor1Credit" or
+						GAMESTATE:GetNumPlayersEnabled()==0)) then
+					-- Consume the credit if:
+					-- 1. This side is not joined
+					-- 2. We are not fast switching (i.e. in the SelectMusic screen)
+					-- 3. We are in coin mode
+					-- 4. EITHER Each side needs its own credits
+					--    OR neither side is currently joined
+					GAMESTATE:InsertCoin(-GAMESTATE:GetCoinsNeededToJoin())
+				end
+			end
 		end
+		
+		-- unset the readyPlayers flag for this player since they now
+		-- have to make a selection
+		readyPlayers[ToEnumShortString(event.PlayerNumber)] = false
 
 		-- otherwise, pass -1 to SetProfileIndex() to join that player
 		-- see ScreenSelectProfile.cpp for details
 		topscreen:SetProfileIndex(event.PlayerNumber, -1)
 	else
+		local other_player = event.PlayerNumber == PLAYER_1 and PLAYER_2 or PLAYER_1
 		if apiKey ~= "" then
 			local raw_name = profile_data[scrollers[event.PlayerNumber]:get_info_at_focus_pos().index+1].displayname
 			-- We need to clean this name up before sending it to TTS
@@ -150,72 +181,55 @@ Handle.Start = function(event)
 		-- there are local profiles.  If there are no local profiles, there are
 		-- no scrollers to compare.
 		if PROFILEMAN:GetNumLocalProfiles() > 0
-		-- and if both players have joined and neither is using a memorycard
-		and #GAMESTATE:GetHumanPlayers() > 1 and not GAMESTATE:IsAnyHumanPlayerUsingMemoryCard() then
-			-- and both players are trying to choose the same profile
-			if scrollers[PLAYER_1]:get_info_at_focus_pos().index == scrollers[PLAYER_2]:get_info_at_focus_pos().index
-			-- and that profile they are both trying to choose isn't [GUEST]
+			-- and if both players have joined and neither is using a memorycard
+			and #GAMESTATE:GetHumanPlayers() > 1 and not GAMESTATE:IsAnyHumanPlayerUsingMemoryCard()
+			-- and if a player is trying to select a profile the other has already selected
+			and readyPlayers[ToEnumShortString(other_player)] == true
+			and scrollers[PLAYER_1]:get_info_at_focus_pos().index == scrollers[PLAYER_2]:get_info_at_focus_pos().index
+		-- and that profile they are both trying to choose isn't [GUEST]
 			and scrollers[PLAYER_1]:get_info_at_focus_pos().index ~= 0 then
 				-- broadcast an InvalidChoice message to play the "Common invalid" sound
 				-- and "shake" the playerframe for the player that just pressed start
+
 				MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
 				return
-			end
-		end
-		if (#GAMESTATE:GetHumanPlayers() > playersSelected or lastPlayerNumber == event.PlayerNumber) then
-			playersSelected = 2
-			MESSAGEMAN:Broadcast("Cursor", {PlayerNumber=event.PlayerNumber})
-			lastPlayerNumber = event.PlayerNumber
-			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
-			return
 		end
 		MESSAGEMAN:Broadcast("Cursor", {PlayerNumber=event.PlayerNumber})
-		finished = true
-		-- otherwise, play the StartButton sound
-		MESSAGEMAN:Broadcast("StartButton")
-		-- and queue the OffCommand for the entire screen
-		topscreen:queuecommand("Off"):sleep(0.4)
+		readyPlayers[ToEnumShortString(event.PlayerNumber)] = true
+		MESSAGEMAN:Broadcast("SelectedProfile", {PlayerNumber=event.PlayerNumber})
+
+		if readyPlayers["P1"] and readyPlayers["P2"] then
+			-- Set finished to true so that we don't process any more input
+			finished = true	
+			-- if we're here, both players have selected a profile
+			-- play the StartButton sound
+			MESSAGEMAN:Broadcast("StartButton")
+			-- and queue the OffCommand for the entire screen
+			topscreen:queuecommand("Off"):sleep(0.4)
+		else
+			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
+		end
+
 	end
 end
 Handle.Center = Handle.Start
 
 Handle.MenuLeft = function(event)
-
+	-- Nothing to do if the player has already selected a profile
+	if readyPlayers[ToEnumShortString(event.PlayerNumber)] then return end
+	
 	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and MEMCARDMAN:GetCardState(event.PlayerNumber) == 'MemoryCardState_none' then
 		local info = scrollers[event.PlayerNumber]:get_info_at_focus_pos()
 		local index = type(info)=="table" and info.index or 0
-		if index - 1 > -1 then
-			if SL.Global.AchievementMenuActive then
-				local data = profile_data[index+index_padding]
-				local achievements = af:GetChild('AchievementFrame')
-				if event.button == "MenuLeft" then
-					data.activePack = data.activePack == "Default" and "Trials" or "Default"
-				else
-					data.achievementIndex = data.achievementIndex - (string.match(event.button, "Up") and 8 or 1)
-					if data.achievementIndex < 1 then
-						data.achievementIndex = 1
-					end
-				end
-				achievements:playcommand("Set", data)
-			elseif SL.Global.AchievementPackMenu then
-				local achievementPacks = af:GetChild('AchievementPacksFrame')
-				data.activePack = data.activePack - (string.match(event.button, "Up") and 8 or 1)
-				if data.activePack < 1 then
-					data.activePack = 1
-				end
-				achievementPacks:playcommand("Set", data)
-			else
-				if event.button ~= "MenuLeft" then return end
-				MESSAGEMAN:Broadcast("DirectionButton")
-				scrollers[event.PlayerNumber]:scroll_by_amount(-1)
-	
-				local data = profile_data[index+index_padding-1]
-				local frame = af:GetChild(ToEnumShortString(event.PlayerNumber) .. 'Frame')
-				frame:GetChild("SelectedProfileText"):settext(data and data.displayname or "")
-				frame:playcommand("Set", data)
-				local achievements = af:GetChild('AchievementFrame')
-				achievements:playcommand("Set", data)	
-			end
+		if index - 1 >= 0 then
+			MESSAGEMAN:Broadcast("DirectionButton")
+			scrollers[event.PlayerNumber]:scroll_by_amount(-1)
+
+			local data = profile_data[index+index_padding-1]
+			local frame = af:GetChild(ToEnumShortString(event.PlayerNumber) .. 'Frame')
+			frame:GetChild("SelectedProfileText"):settext(data and data.displayname or "")
+			frame:playcommand("Set", data)
+			MESSAGEMAN:Broadcast("DirectionButton")
 		end
 	end
 end
@@ -225,55 +239,20 @@ Handle.MenuUp = Handle.MenuLeft
 Handle.DownLeft = Handle.MenuLeft
 
 Handle.MenuRight = function(event)
+	-- Nothing to do if the player has already selected a profile
+	if readyPlayers[ToEnumShortString(event.PlayerNumber)] then return end
+	
 	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and MEMCARDMAN:GetCardState(event.PlayerNumber) == 'MemoryCardState_none' then
 		local info = scrollers[event.PlayerNumber]:get_info_at_focus_pos()
 		local index = type(info)=="table" and info.index or 0
-		if index+1 < PROFILEMAN:GetNumLocalProfiles()+1 then
-			if SL.Global.AchievementMenuActive then
-				local data = profile_data[index+index_padding]
-				local achievements = af:GetChild('AchievementFrame')
-				if event.button == "MenuRight" then
-					data.activePack = data.activePack == "Default" and "Trials" or "Default"
-				else
-					data.achievementIndex = data.achievementIndex + (string.match(event.button, "Down") and 8 or 1)
-					if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-						data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-					end
-					if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-						data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-						-- if data.achievementIndex < 32 then
-						-- 	MESSAGEMAN:Broadcast("Page", {Player = event.PlayerNumber, Page = 3})
-						-- else
-						-- 	MESSAGEMAN:Broadcast("Page", {Player = event.PlayerNumber, Page = 3})
-						-- end
-					-- else
-					-- 	MESSAGEMAN:Broadcast("Page", {Player = event.PlayerNumber, Page = 1})
-					end
-				end
+		if index+1 <= PROFILEMAN:GetNumLocalProfiles() then
+			MESSAGEMAN:Broadcast("DirectionButton")
+			scrollers[event.PlayerNumber]:scroll_by_amount(1)
 
-				achievements:playcommand("Set", data)
-			elseif SL.Global.AchievementPackMenu then
-				local achievementPacks = af:GetChild('AchievementPacksFrame')
-				data.activePack = data.activePack + (string.match(event.button, "Down") and 8 or 1)
-				if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-					data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-				end
-				if data.activePack > 24 then
-					data.activePack = 24
-				end
-				achievementPacks:playcommand("Set", data)
-			else
-				if event.button ~= "MenuRight" then return end
-				MESSAGEMAN:Broadcast("DirectionButton")
-				scrollers[event.PlayerNumber]:scroll_by_amount(1)
-
-				local data = profile_data[index+index_padding+1]
-				local frame = af:GetChild(ToEnumShortString(event.PlayerNumber) .. 'Frame')
-				frame:GetChild("SelectedProfileText"):settext(data and data.displayname or "")
-				frame:playcommand("Set", data)
-				local achievements = af:GetChild('AchievementFrame')
-				achievements:playcommand("Set", data)
-			end
+			local data = profile_data[index+index_padding+1]
+			local frame = af:GetChild(ToEnumShortString(event.PlayerNumber) .. 'Frame')
+			frame:GetChild("SelectedProfileText"):settext(data and data.displayname or "")
+			frame:playcommand("Set", data)		
 		end
 	end
 end
@@ -281,39 +260,9 @@ end
 Handle.MenuDown = Handle.MenuRight
 
 Handle.DownRight = Handle.MenuRight
-Handle.EffectUp = function(event)
-	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and MEMCARDMAN:GetCardState(event.PlayerNumber) == 'MemoryCardState_none' then
-		local info = scrollers[event.PlayerNumber]:get_info_at_focus_pos()
-		local index = type(info)=="table" and info.index or 0
-		if index+1 < PROFILEMAN:GetNumLocalProfiles()+1 then
-			local data = profile_data[index+index_padding]
-			local achievements = af:GetChild('AchievementFrame')
-			data.achievementIndex = data.achievementIndex + (event.GameButton == "MenuDown" and 8 or 1)
-			if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-				data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-			end
-			if data.achievementIndex > 24 then
-				data.achievementIndex = 24
-			end
-			achievements:playcommand("Set", data)
-		end
-	end
-end
-Handle.Up = Handle.MenuUp
-Handle.Down = Handle.MenuDown
-Handle.Right = Handle.MenuRight
-Handle.Left =Handle.MenuLeft
 
 Handle.Back = function(event)
-	if SL.Global.AchievementMenuActive then
-		local achievements = af:GetChild('AchievementFrame')
-		achievements:playcommand("Hide", data)
-		SL.Global.AchievementMenuActive = false
-	elseif SL.Global.AchievementPackMenu then
-		local achievementPacks = af:GetChild('AchievementPacksFrame')
-		achievementPacks:playcommand("Hide", data)
-		SL.Global.AchievementPackMenu = false
-	elseif GAMESTATE:GetNumPlayersEnabled()==0 then
+	if GAMESTATE:GetNumPlayersEnabled()==0 then
 		if SL.Global.FastProfileSwitchInProgress then
 			-- Going back to the song wheel without any players connected doesn't
 			-- make much sense; disallow dismissing the ScreenSelectProfile
@@ -326,16 +275,50 @@ Handle.Back = function(event)
 			SCREENMAN:GetTopScreen():Cancel()
 		end
 	else
-		MESSAGEMAN:Broadcast("BackButton", {PlayerNumber=event.PlayerNumber})
-		if (playersSelected > 1) then
-			playersSelected = 1
-			lastPlayerNumber = nil
+		-- If the player is joined, has selected a profile but then pressed back, we
+		-- need to unset the readyPlayers flag and go back to the profile scoller.
+		if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and 
+				readyPlayers[ToEnumShortString(event.PlayerNumber)] then
+			readyPlayers[ToEnumShortString(event.PlayerNumber)] = false
+			MESSAGEMAN:Broadcast("BackButton", {PlayerNumber=event.PlayerNumber})
+			MESSAGEMAN:Broadcast("UnselectedProfile", {PlayerNumber=event.PlayerNumber})
 			return
 		end
+		
+		-- Otherwise they are unjoining.
+		MESSAGEMAN:Broadcast("BackButton", {PlayerNumber=event.PlayerNumber})
+
+		if (GAMESTATE:IsHumanPlayer(event.PlayerNumber) and
+				not SL.Global.FastProfileSwitchInProgress and
+				GAMESTATE:GetCoinMode() == "CoinMode_Pay" and
+			    (GAMESTATE:GetPremium() ~= "Premium_2PlayersFor1Credit" or
+				 GAMESTATE:GetNumPlayersEnabled()==1)) then
+			-- Refund credit if:
+			-- 1. This side is originally joined
+			-- 2. We are not fast switching (i.e. in the SelectMusic screen)
+			-- 3. We are in coin mode
+			-- 4. EITHER each side needs its own credits
+			--    OR we are about to have 0 players joined, thus refunding the original credit.
+			
+			-- We originally consumed the credit when the player joined, so we
+			-- should refund them if they unjoin.
+
+			-- Use the CoinsPerCredit over GetCoinsNeededToJoin because
+			-- it'll report 0 when going from 1 -> 0 players in
+			-- Premium_2PlayersFor1Credit mode since a side is currently
+			-- joined.
+			local coins = PREFSMAN:GetPreference("CoinsPerCredit")
+			GAMESTATE:InsertCoin(coins)		
+		end
+		-- set the readyPlayers flag for this player since they no longer
+		-- need to make a selection
+		readyPlayers[ToEnumShortString(event.PlayerNumber)] = true
+
 		-- ScreenSelectProfile:SetProfileIndex() will interpret -2 as
 		-- "Unjoin this player and unmount their USB stick if there is one"
 		-- see ScreenSelectProfile.cpp for details
 		SCREENMAN:GetTopScreen():SetProfileIndex(event.PlayerNumber, -2)
+
 		-- CurrentStyle has to be explicitly set to single in order to be able to
 		-- unjoin a player from a 2-player setup
 		if SL.Global.FastProfileSwitchInProgress and GAMESTATE:GetNumSidesJoined() == 1 then
@@ -344,15 +327,14 @@ Handle.Back = function(event)
 		end
 	end
 end
-
+Handle.Select = Handle.Back
 
 local InputHandler = function(event)
 	if finished then return false end
 	if not event or not event.button then return false end
 	if (PreferredStyle=="single" or PreferredStyle=="double") and event.PlayerNumber ~= mpn then return false	end
 	if event.type ~= "InputEventType_Release" then
-		if Handle[event.button] then Handle[event.button](event) end
-		
+		if Handle[event.GameButton] then Handle[event.GameButton](event) end
 	end
 end
 

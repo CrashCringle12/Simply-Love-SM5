@@ -16,6 +16,14 @@ local profile_data, guest_data = LoadActor("./PlayerProfileData.lua")
 local scrollers = {}
 scrollers[PLAYER_1] = setmetatable({disable_wrapping=true}, sick_wheel_mt)
 scrollers[PLAYER_2] = setmetatable({disable_wrapping=true}, sick_wheel_mt)
+
+-- Updated as profiles are selected/de-selected
+local readyPlayers = {
+	["P1"] = false,
+	["P2"] = false,
+}
+
+-- ----------------------------------------------------
 ------------------------------------------------------
 SL.Global.AchievementMenuActive = false
 
@@ -31,12 +39,12 @@ local HandleStateChange = function(self, Player)
 	local usbsprite = frame:GetChild('USBIcon')
 
 	if GAMESTATE:IsHumanPlayer(Player) then
-
+		local selected = readyPlayers[ToEnumShortString(Player)]
 		if MEMCARDMAN:GetCardState(Player) == 'MemoryCardState_none' then
 			-- using local profile
 			joinframe:visible(false)
 			scrollerframe:visible(true)
-			seltext:visible(true)
+			seltext:visible(selected)
 			usbsprite:visible(false)
 		else
 			-- using memorycard profile
@@ -74,38 +82,6 @@ local t = Def.ActorFrame {
 		if PREFSMAN:GetPreference("MenuTimer") then
 			self:queuecommand("CheckMenuTimer")
 		end
-		-- NETWORK:HttpRequest{
-		-- 	url = "https://github.com/CrashCringle12/CrashCringle12.github.io/blob/main/src/data/charts.json?raw=true",
-		-- 	method = "GET",
-		-- 	headers = {
-		-- 		["Accept-Language"] = "en-US",
-		-- 		["Cookie"] = "sessionId=42",
-		-- 	},
-		-- 	connectTimeout = 60,
-		-- 	transferTimeout = 1800,
-		-- 	onProgress = function(currentBytes, totalBytes)
-		-- 		--SM("Downloaded " .. currentBytes .. " of " .. totalBytes .. " bytes")
-		-- 	end,
-		-- 	onResponse = function(response)
-		-- 		SM(response)
-
-		-- 		if response.error ~= nil then
-		-- 			SM(response)
-		-- 			--SM("Error: " .. response.error)
-		-- 			return
-		-- 		end
-	
-		-- 		if response.statusCode == 200 then
-		-- 			-- if response.headers["Content-Type"] == "application/json" then
-		-- 			-- 	SM("Downloaded " .. response.body:len() .. " bytes")
-		-- 			-- else
-		-- 			-- 	SM("Attempted to download from which is not a json!")
-		-- 			-- end
-		-- 		else
-		-- 		end
-		-- 	end,
-		-- }
-
 	end,
 	InitInputCommand=function(self) 
 		SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./Input.lua", {af=self, Scrollers=scrollers, ProfileData=profile_data, GuestData=guest_data}) ) 
@@ -169,14 +145,7 @@ local t = Def.ActorFrame {
 
 				-- local profile
 				elseif index > 0 then
-					if ThemePrefs.Get("isGoodReads") then
-						-- This is deprecated behavior in itgmania, but will be toggled for stepmania
-						--LoadVirtualProfileCustom(player, index-1)
-						SCREENMAN:SetNewScreen(Branch.ScreenAfterSelectProfile())
-					else
-						SCREENMAN:GetTopScreen():SetProfileIndex(player, index)
-					end
-
+					SCREENMAN:GetTopScreen():SetProfileIndex(player, index)
 				-- 0 here is my own stupid hardcoded number, defined over in PlayerFrame.lua for use with the "[Guest]" choice
 				-- In this case, 0 is the index of the choice in the scroller.  It should not be confused the 0 passed to
 				-- SetProfileIndex() to use a USB memorycard which is a different stupid hardcoded number defined by the engine. D:
@@ -225,14 +194,14 @@ local t = Def.ActorFrame {
 					SCREENMAN:GetTopScreen():Cancel()
 				end
 			else
-				-- only attempt to unjoin the player if that side is currently joined
-				if GAMESTATE:IsSideJoined(params.PlayerNumber) then
-					MESSAGEMAN:Broadcast("BackButton")
-					-- ScreenSelectProfile:SetProfileIndex() will interpret -2 as
-					-- "Unjoin this player and unmount their USB stick if there is one"
-					-- see ScreenSelectProfile.cpp for details
-					SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, -2)
-				end
+				-- -- only attempt to unjoin the player if that side is currently joined
+				-- if GAMESTATE:IsSideJoined(params.PlayerNumber) then
+				-- 	MESSAGEMAN:Broadcast("BackButton")
+				-- 	-- ScreenSelectProfile:SetProfileIndex() will interpret -2 as
+				-- 	-- "Unjoin this player and unmount their USB stick if there is one"
+				-- 	-- see ScreenSelectProfile.cpp for details
+				-- 	SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, -2)
+				-- end
 
 				-- CurrentStyle has to be explicitly set to single in order to be able to
 				-- unjoin a player from a 2-player setup
@@ -241,7 +210,7 @@ local t = Def.ActorFrame {
 					SCREENMAN:GetTopScreen():playcommand("Update")
 				end
 			end
-			return
+
 		end
 	end,
 
@@ -250,6 +219,14 @@ local t = Def.ActorFrame {
 	StorageDevicesChangedMessageCommand=function(self) self:queuecommand('Update') end,
 	PlayerJoinedMessageCommand=function(self, params) self:playcommand('Update', {player=params.Player}) end,
 	PlayerUnjoinedMessageCommand=function(self, params) self:playcommand('Update', {player=params.Player}) end,
+	SelectedProfileMessageCommand=function(self, params)
+		readyPlayers[ToEnumShortString(params.PlayerNumber)] = true
+		HandleStateChange(self, params.PlayerNumber)
+	end,
+	UnselectedProfileMessageCommand=function(self, params)
+		readyPlayers[ToEnumShortString(params.PlayerNumber)] = false
+		HandleStateChange(self, params.PlayerNumber)
+	end,
 
 	-- there are several ways to get here, but if we're here, we'll just
 	-- punt to HandleStateChange() to reassess what is being drawn

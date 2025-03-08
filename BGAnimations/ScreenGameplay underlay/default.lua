@@ -124,36 +124,7 @@ local t = Def.ActorFrame{
 		if ThemePrefs.Get("KeyboardFeatures") and PREFSMAN:GetPreference("EventMode") and not GAMESTATE:IsCourseMode() then
 			SCREENMAN:GetTopScreen():AddInputCallback(RestartHandler)
 		end
-		GetPlayerAF(0)
-	end,
-	CodeMessageCommand=function(self, params)
-		local time = GAMESTATE:GetCurrentSong():MusicLengthSeconds()
-		local seconds = math.floor(time % 60)
-        local song_progress = GAMESTATE:GetPlayerState(pn):GetSongPosition():GetMusicSeconds() / time
-		-- The AddScrollSpeed and SubtractScrollSpeed codes allow players to modify their speed in gameplay
-		-- similar to functionality in StepManiaX. Players are only able to change their speed within the first
-		-- 10% of the song. This is to prevent players from changing their speed during "difficult" segments to pass
-		-- This is only available to players using Xmod
-		-- TODO Maybe: Check if song has speed changes? If so, don't allow speed changes
-		if song_progress < 0.10 then
-			local pn = ToEnumShortString(params.PlayerNumber)
-			if params.Name == "AddScrollSpeed" then
-				if (SL[pn].ActiveModifiers.SpeedModType == "X") then
-					SL[pn].ActiveModifiers.SpeedMod = SL[pn].ActiveModifiers.SpeedMod + 0.1
-					SM(SL[pn].ActiveModifiers.SpeedMod)
-				end
-				GAMESTATE:GetPlayerState(params.PlayerNumber):GetPlayerOptions("ModsLevel_Song"):ScrollSpeed(SL[pn].ActiveModifiers.SpeedMod, 1)
-
-			elseif params.Name == "SubtractScrollSpeed" then
-				local pn = ToEnumShortString(params.PlayerNumber)
-				if (SL[pn].ActiveModifiers.SpeedModType == "X") then
-					SL[pn].ActiveModifiers.SpeedMod = SL[pn].ActiveModifiers.SpeedMod - 0.1
-					SM(SL[pn].ActiveModifiers.SpeedMod)
-				end
-				GAMESTATE:GetPlayerState(params.PlayerNumber):GetPlayerOptions("ModsLevel_Song"):ScrollSpeed(SL[pn].ActiveModifiers.SpeedMod, 1)
-			end
-		end
-	end,
+	end
 }
 
 for player in ivalues(Players) do
