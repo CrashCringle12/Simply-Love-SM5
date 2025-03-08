@@ -67,7 +67,10 @@ local Handle = {}
 
 Handle.Start = function(event)
 	-- Nothing to do if the player has already selected a profile
-	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and readyPlayers[ToEnumShortString(event.PlayerNumber)] then return end
+	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and readyPlayers[ToEnumShortString(event.PlayerNumber)] then 
+		MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
+		return 
+	end
 	
 	local topscreen = SCREENMAN:GetTopScreen()
 	-- if the input event came from a side that is not currently registered as a human player, we'll either

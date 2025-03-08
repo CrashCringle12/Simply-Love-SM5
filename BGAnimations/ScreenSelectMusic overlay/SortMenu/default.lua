@@ -267,7 +267,6 @@ local function GetChangeableStyles(style)
 		end
 		return available_styles
 	end
-	return available_styles
 end
 local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
 local wheel_options = {
