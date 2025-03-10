@@ -13,7 +13,7 @@ local af = Def.ActorFrame{
 
 		end
 	end,
-
+	DisplayLanguageChangedMessageCommand=function(self) self:playcommand("Set") end,
 	CurrentSongChangedMessageCommand=function(self)    self:playcommand("Set") end,
 	CurrentCourseChangedMessageCommand=function(self)  self:playcommand("Set") end,
 	CurrentStepsP1ChangedMessageCommand=function(self) self:playcommand("Set") end,

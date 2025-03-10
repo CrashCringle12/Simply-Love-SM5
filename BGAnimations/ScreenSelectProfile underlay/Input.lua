@@ -30,6 +30,7 @@ local apiKey = getAPIKey()
 local finished = false
 
 -- Table used to determine whether a player has selected their profile. 
+-- This value basically represents the amount of players that are ready to
 -- move forward.
 local readyPlayers = {
 	["P1"] = false,
@@ -44,7 +45,6 @@ end
 if not GAMESTATE:IsSideJoined(PLAYER_2) then
 	readyPlayers["P2"] = true
 end
-
 
 -- we need to calculate how many dummy rows the scroller was "padded" with
 -- (to achieve the desired transform behavior since I am not mathematically
@@ -73,6 +73,7 @@ Handle.Start = function(event)
 	end
 	
 	local topscreen = SCREENMAN:GetTopScreen()
+
 	-- if the input event came from a side that is not currently registered as a human player, we'll either
 	-- want to reject the input (we're in Pay mode and there aren't enough credits to join the player),
 	-- or we'll use ScreenSelectProfile's inscrutably custom SetProfileIndex() method to join the player.
@@ -101,7 +102,7 @@ Handle.Start = function(event)
 				end
 			end
 		end
-		
+
 		-- unset the readyPlayers flag for this player since they now
 		-- have to make a selection
 		readyPlayers[ToEnumShortString(event.PlayerNumber)] = false
@@ -110,6 +111,7 @@ Handle.Start = function(event)
 		-- see ScreenSelectProfile.cpp for details
 		topscreen:SetProfileIndex(event.PlayerNumber, -1)
 	else
+
 		local other_player = event.PlayerNumber == PLAYER_1 and PLAYER_2 or PLAYER_1
 		if apiKey ~= "" then
 			local raw_name = profile_data[scrollers[event.PlayerNumber]:get_info_at_focus_pos().index+1].displayname
@@ -189,13 +191,12 @@ Handle.Start = function(event)
 			-- and if a player is trying to select a profile the other has already selected
 			and readyPlayers[ToEnumShortString(other_player)] == true
 			and scrollers[PLAYER_1]:get_info_at_focus_pos().index == scrollers[PLAYER_2]:get_info_at_focus_pos().index
-		-- and that profile they are both trying to choose isn't [GUEST]
+			-- and that profile they are both trying to choose isn't [GUEST]
 			and scrollers[PLAYER_1]:get_info_at_focus_pos().index ~= 0 then
-				-- broadcast an InvalidChoice message to play the "Common invalid" sound
-				-- and "shake" the playerframe for the player that just pressed start
-
-				MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
-				return
+			-- broadcast an InvalidChoice message to play the "Common invalid" sound
+			-- and "shake" the playerframe for the player that just pressed start
+			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
+			return
 		end
 		MESSAGEMAN:Broadcast("Cursor", {PlayerNumber=event.PlayerNumber})
 		readyPlayers[ToEnumShortString(event.PlayerNumber)] = true
@@ -212,18 +213,19 @@ Handle.Start = function(event)
 		else
 			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
 		end
-
 	end
 end
 Handle.Center = Handle.Start
 
+
 Handle.MenuLeft = function(event)
 	-- Nothing to do if the player has already selected a profile
 	if readyPlayers[ToEnumShortString(event.PlayerNumber)] then return end
-	
+
 	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and MEMCARDMAN:GetCardState(event.PlayerNumber) == 'MemoryCardState_none' then
 		local info = scrollers[event.PlayerNumber]:get_info_at_focus_pos()
 		local index = type(info)=="table" and info.index or 0
+
 		if index - 1 >= 0 then
 			MESSAGEMAN:Broadcast("DirectionButton")
 			scrollers[event.PlayerNumber]:scroll_by_amount(-1)
@@ -236,18 +238,17 @@ Handle.MenuLeft = function(event)
 		end
 	end
 end
-
 Handle.MenuUp = Handle.MenuLeft
-
 Handle.DownLeft = Handle.MenuLeft
 
 Handle.MenuRight = function(event)
 	-- Nothing to do if the player has already selected a profile
 	if readyPlayers[ToEnumShortString(event.PlayerNumber)] then return end
-	
+
 	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and MEMCARDMAN:GetCardState(event.PlayerNumber) == 'MemoryCardState_none' then
 		local info = scrollers[event.PlayerNumber]:get_info_at_focus_pos()
 		local index = type(info)=="table" and info.index or 0
+
 		if index+1 <= PROFILEMAN:GetNumLocalProfiles() then
 			MESSAGEMAN:Broadcast("DirectionButton")
 			scrollers[event.PlayerNumber]:scroll_by_amount(1)
@@ -255,13 +256,11 @@ Handle.MenuRight = function(event)
 			local data = profile_data[index+index_padding+1]
 			local frame = af:GetChild(ToEnumShortString(event.PlayerNumber) .. 'Frame')
 			frame:GetChild("SelectedProfileText"):settext(data and data.displayname or "")
-			frame:playcommand("Set", data)		
+			frame:playcommand("Set", data)
 		end
 	end
 end
-
 Handle.MenuDown = Handle.MenuRight
-
 Handle.DownRight = Handle.MenuRight
 
 Handle.Back = function(event)
@@ -311,8 +310,9 @@ Handle.Back = function(event)
 			-- Premium_2PlayersFor1Credit mode since a side is currently
 			-- joined.
 			local coins = PREFSMAN:GetPreference("CoinsPerCredit")
-			GAMESTATE:InsertCoin(coins)		
+			GAMESTATE:InsertCoin(coins)
 		end
+		
 		-- set the readyPlayers flag for this player since they no longer
 		-- need to make a selection
 		readyPlayers[ToEnumShortString(event.PlayerNumber)] = true
@@ -326,16 +326,25 @@ Handle.Back = function(event)
 		-- unjoin a player from a 2-player setup
 		if SL.Global.FastProfileSwitchInProgress and GAMESTATE:GetNumSidesJoined() == 1 then
 			GAMESTATE:SetCurrentStyle("single")
-			SCREENMAN:GetTopScreen():playcommand("Update")
+			-- If PreferredStyle is single then someone had joined during gameplay
+			-- We need to explicitly remove this player's join frame
+			if (PreferredStyle=="single") then
+				SCREENMAN:GetTopScreen():playcommand("Update", {player=event.PlayerNumber})
+			else
+				SCREENMAN:GetTopScreen():playcommand("Update")
+			end
 		end
+
 	end
 end
 Handle.Select = Handle.Back
 
+
 local InputHandler = function(event)
 	if finished then return false end
 	if not event or not event.button then return false end
-	if (PreferredStyle=="single" or PreferredStyle=="double") and event.PlayerNumber ~= mpn then return false	end
+	if (((PreferredStyle=="single" or PreferredStyle=="double") and #GAMESTATE:GetHumanPlayers() == 1) and event.PlayerNumber ~= GAMESTATE:GetMasterPlayerNumber()) then return false	end
+
 	if event.type ~= "InputEventType_Release" then
 		if Handle[event.GameButton] then Handle[event.GameButton](event) end
 	end

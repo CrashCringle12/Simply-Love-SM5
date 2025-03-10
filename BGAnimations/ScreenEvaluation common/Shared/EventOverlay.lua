@@ -101,7 +101,7 @@ local BannerAndSong = function(x, y, zoom)
 					self:LoadFromSong( GAMESTATE:GetCurrentSong() )
 				end
 			end
-			self:setsize(418, 164)
+			self:setsize(418, 164):animate(false) 
 		end
 	}
 	af[#af+1] = LoadFont("Common Normal")..{
@@ -375,7 +375,7 @@ local GetItlPaneFunctions = function(eventAf, itlData, player)
 	local steps = GAMESTATE:GetCurrentSteps(player)
 	local chartName = steps:GetChartName()
 
-	local currentPoints = itlData["curTopScorePoints"]
+	local currentPoints = itlData["topScorePoints"]
 	local previousPoints = itlData["prevTopScorePoints"]
 	local pointDelta = currentPoints - previousPoints
 
@@ -516,25 +516,25 @@ local GetItlPaneFunctions = function(eventAf, itlData, player)
 					local tier = reward["tier"]
 					if tier ~= "Default" then
 						table.insert(achievementStrings, string.format(
-							"%s Tier\n",
+							"\"%s\" Tier",
 							tier
 						))
 					end
 
 					for requirement in ivalues(reward["requirements"]) do
 						table.insert(achievementStrings, string.format(
-							"- %s\n",
+							"%s",
 							requirement
 						))
 					end
 
 					if reward["titleUnlocked"] then
 						table.insert(achievementStrings, string.format(
-							"    Unlocked the \"%s\" Title!\n",
+							"Unlocked the \"%s\" Title!",
 							reward["titleUnlocked"]
 						))
 					end
-					table.insert(achievementStrings, "\n")
+					table.insert(achievementStrings, "")
 				end
 
 				table.insert(achievements, table.concat(achievementStrings, "\n"))
@@ -619,8 +619,15 @@ local GetItlPaneFunctions = function(eventAf, itlData, player)
 				offset = j + 1
 			end
 
-			offset = 0
+			-- Have special coloring for the quoted tiers.
+			local tierMap = {
+				["Bronze"] = color("#966832"),
+				["Silver"] = color("#A1AEC1"),
+				["Gold"] = color("#F6AB2D"),
+				["Prismatic"] = color("#8731D2"),
+			}
 
+			offset = 0
 			while offset <= #text do
 				-- Search for all quoted strings.
 				local i, j = string.find(text, "\".-\"", offset)
@@ -630,11 +637,18 @@ local GetItlPaneFunctions = function(eventAf, itlData, player)
 				end
 				-- Extract the actual quoted text.
 				local substring = string.sub(text, i, j)
-
-				bodyText:AddAttribute(i-1, {
-					Length=#substring,
-					Diffuse=Color.Green
-				})
+				local text = string.sub(substring, 2, #substring-1)
+				if tierMap[text] ~= nil then
+					bodyText:AddAttribute(i-1, {
+						Length=#substring,
+						Diffuse=tierMap[text]
+					})
+				else
+					bodyText:AddAttribute(i-1, {
+						Length=#substring,
+						Diffuse=Color.Green
+					})
+				end
 
 				offset = j + 1
 			end

@@ -4,7 +4,7 @@
 -- SelectProfileFrames for both PLAYER_1 and PLAYER_2, but only the MasterPlayerNumber
 local PreferredStyle = ThemePrefs.Get("PreferredStyle")
 
--- retrieve the MasterPlayerNumber now, at initialization, so that if PreferredStyle is set
+-- retrieve the MasterPlayerNumber now, at initialization, so that if AutoStyle is set
 -- to "single" or "double" and that singular player unjoins, we still have a handle on
 -- which PlayerNumber they're supposed to be...
 local mpn = GAMESTATE:GetMasterPlayerNumber()
@@ -24,8 +24,6 @@ local readyPlayers = {
 }
 
 -- ----------------------------------------------------
-------------------------------------------------------
-SL.Global.AchievementMenuActive = false
 
 local HandleStateChange = function(self, Player)
 	local frame = self:GetChild(ToEnumShortString(Player) .. 'Frame')
@@ -40,6 +38,10 @@ local HandleStateChange = function(self, Player)
 
 	if GAMESTATE:IsHumanPlayer(Player) then
 		local selected = readyPlayers[ToEnumShortString(Player)]
+		joinframe:visible(selected)
+		scrollerframe:visible(not selected)
+		seltext:visible(selected)
+
 		if MEMCARDMAN:GetCardState(Player) == 'MemoryCardState_none' then
 			-- using local profile
 			joinframe:visible(false)
@@ -83,9 +85,7 @@ local t = Def.ActorFrame {
 			self:queuecommand("CheckMenuTimer")
 		end
 	end,
-	InitInputCommand=function(self) 
-		SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./Input.lua", {af=self, Scrollers=scrollers, ProfileData=profile_data, GuestData=guest_data}) ) 
-	end,
+	InitInputCommand=function(self) SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./Input.lua", {af=self, Scrollers=scrollers, ProfileData=profile_data}) ) end,
 
 	CheckMenuTimerCommand=function(self)
 		-- if the MenuTimer has reached 0, it's time to queue the OffCommand and force a transition to the next screen
@@ -146,6 +146,7 @@ local t = Def.ActorFrame {
 				-- local profile
 				elseif index > 0 then
 					SCREENMAN:GetTopScreen():SetProfileIndex(player, index)
+
 				-- 0 here is my own stupid hardcoded number, defined over in PlayerFrame.lua for use with the "[Guest]" choice
 				-- In this case, 0 is the index of the choice in the scroller.  It should not be confused the 0 passed to
 				-- SetProfileIndex() to use a USB memorycard which is a different stupid hardcoded number defined by the engine. D:
@@ -173,7 +174,7 @@ local t = Def.ActorFrame {
 
 	CodeMessageCommand=function(self, params)
 
-		if (PreferredStyle=="single" or PreferredStyle=="double") and params.PlayerNumber ~= mpn then return end
+		if (PreferredStyle=="single" or PreferredStyle=="double" or #GAMESTATE:GetHumanPlayers() > 1 ) and params.PlayerNumber ~= GAMESTATE:GetMasterPlayerNumber()  then return end
 
 		-- Don't allow players to unjoin from SelectProfile in CoinMode_Pay.
 		-- 1 credit has already been deducted from ScreenTitleJoin, so allowing players
@@ -194,15 +195,6 @@ local t = Def.ActorFrame {
 					SCREENMAN:GetTopScreen():Cancel()
 				end
 			else
-				-- -- only attempt to unjoin the player if that side is currently joined
-				-- if GAMESTATE:IsSideJoined(params.PlayerNumber) then
-				-- 	MESSAGEMAN:Broadcast("BackButton")
-				-- 	-- ScreenSelectProfile:SetProfileIndex() will interpret -2 as
-				-- 	-- "Unjoin this player and unmount their USB stick if there is one"
-				-- 	-- see ScreenSelectProfile.cpp for details
-				-- 	SCREENMAN:GetTopScreen():SetProfileIndex(params.PlayerNumber, -2)
-				-- end
-
 				-- CurrentStyle has to be explicitly set to single in order to be able to
 				-- unjoin a player from a 2-player setup
 				if SL.Global.FastProfileSwitchInProgress and GAMESTATE:GetNumSidesJoined() == 1 then
@@ -210,7 +202,6 @@ local t = Def.ActorFrame {
 					SCREENMAN:GetTopScreen():playcommand("Update")
 				end
 			end
-
 		end
 	end,
 
@@ -236,11 +227,11 @@ local t = Def.ActorFrame {
 			return
 		end
 
-		if PreferredStyle=="none" or PreferredStyle=="versus" or PreferredStyle=="auto" then
+		if PreferredStyle=="none" or PreferredStyle=="versus" or #GAMESTATE:GetHumanPlayers() > 1 then
 			HandleStateChange(self, PLAYER_1)
 			HandleStateChange(self, PLAYER_2)
 		else
-			HandleStateChange(self, mpn)
+			HandleStateChange(self, GAMESTATE:GetMasterPlayerNumber())
 		end
 	end,
 
@@ -293,14 +284,12 @@ if SL.Global.FastProfileSwitchInProgress then
 end
 
 -- load PlayerFrames for both
-if PreferredStyle=="none" or PreferredStyle=="auto" or PreferredStyle=="versus" then
-	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_1, Scroller=scrollers[PLAYER_1], ProfileData=profile_data, Avatars=avatars, GuestData=guest_data})
-	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_2, Scroller=scrollers[PLAYER_2], ProfileData=profile_data, Avatars=avatars, GuestData=guest_data})
-	t[#t+1] = LoadActor("Achievements.lua", {Player=PLAYER_1, Scroller=scrollers[PLAYER_1], ProfileData=profile_data, Avatars=avatars, GuestData=guest_data})
-
+if PreferredStyle=="none" or PreferredStyle=="versus" or #GAMESTATE:GetHumanPlayers() > 1 then
+	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_1, Scroller=scrollers[PLAYER_1], ProfileData=profile_data, Avatars=avatars})
+	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_2, Scroller=scrollers[PLAYER_2], ProfileData=profile_data, Avatars=avatars})
 -- load only for the MasterPlayerNumber
 else
-	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=mpn, Scroller=scrollers[mpn], ProfileData=profile_data, Avatars=avatars})
+	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=GAMESTATE:GetMasterPlayerNumber(), Scroller=scrollers[GAMESTATE:GetMasterPlayerNumber()], ProfileData=profile_data, Avatars=avatars})
 end
 
 LoadActor("./JudgmentGraphicPreviews.lua", {af=t, profile_data=profile_data})
