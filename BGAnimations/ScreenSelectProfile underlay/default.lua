@@ -85,7 +85,7 @@ local t = Def.ActorFrame {
 			self:queuecommand("CheckMenuTimer")
 		end
 	end,
-	InitInputCommand=function(self) SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./Input.lua", {af=self, Scrollers=scrollers, ProfileData=profile_data}) ) end,
+	InitInputCommand=function(self) SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./Input.lua", {af=self, Scrollers=scrollers, ProfileData=profile_data, GuestData=guest_data}) ) end,
 
 	CheckMenuTimerCommand=function(self)
 		-- if the MenuTimer has reached 0, it's time to queue the OffCommand and force a transition to the next screen
@@ -285,11 +285,11 @@ end
 
 -- load PlayerFrames for both
 if PreferredStyle=="none" or PreferredStyle=="versus" or #GAMESTATE:GetHumanPlayers() > 1 then
-	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_1, Scroller=scrollers[PLAYER_1], ProfileData=profile_data, Avatars=avatars})
-	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_2, Scroller=scrollers[PLAYER_2], ProfileData=profile_data, Avatars=avatars})
+	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_1, Scroller=scrollers[PLAYER_1], ProfileData=profile_data, Avatars=avatars, GuestData=guest_data})
+	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=PLAYER_2, Scroller=scrollers[PLAYER_2], ProfileData=profile_data, Avatars=avatars, GuestData=guest_data})
 -- load only for the MasterPlayerNumber
 else
-	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=GAMESTATE:GetMasterPlayerNumber(), Scroller=scrollers[GAMESTATE:GetMasterPlayerNumber()], ProfileData=profile_data, Avatars=avatars})
+	t[#t+1] = LoadActor("PlayerFrame.lua", {Player=GAMESTATE:GetMasterPlayerNumber(), Scroller=scrollers[GAMESTATE:GetMasterPlayerNumber()], ProfileData=profile_data, Avatars=avatars, GuestData=guest_data})
 end
 
 LoadActor("./JudgmentGraphicPreviews.lua", {af=t, profile_data=profile_data})
