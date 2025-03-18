@@ -281,7 +281,6 @@ local function GetChangeableStyles(style)
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
 			end
 			table.insert(available_styles, {{"ChangeStyle", "All"}})
-			SM(available_styles)
 
 		end
 	end
