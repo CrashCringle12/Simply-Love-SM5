@@ -83,7 +83,6 @@ af[#af+1] = Def.Sprite{
 	Texture="rightsbg.png",
 	InitCommand=function(self)
 		self:zoom(0.5):Center()
-		SM("test")
 	end,
 
 }

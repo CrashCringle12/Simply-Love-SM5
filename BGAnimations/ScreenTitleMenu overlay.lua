@@ -1,12 +1,12 @@
 local af = Def.ActorFrame{
 	OnCommand=function()
 		-- defined in ./Scripts/DD-SupportHelpers.lua
-		if not StepManiaVersionIsSupported() then
-			SM( THEME:GetString("ScreenInit", "UnsupportedSMVersion"):format(ProductID(), ProductVersion()) )
-			-- ScreenSystemOptions is the first choice in the operator menu
-			-- players can set their game, theme, default NoteSkin, etc. from it
-			SCREENMAN:SetNewScreen("ScreenSystemOptions")
-		end
+		-- if not StepManiaVersionIsSupported() then
+		-- 	SM( THEME:GetString("ScreenInit", "UnsupportedSMVersion"):format(ProductID(), ProductVersion()) )
+		-- 	-- ScreenSystemOptions is the first choice in the operator menu
+		-- 	-- players can set their game, theme, default NoteSkin, etc. from it
+		-- 	SCREENMAN:SetNewScreen("ScreenSystemOptions")
+		-- end
 
 		-- also defined in ./Scripts/DD-SupportHelpers.lua
 		if not CurrentGameIsSupported() then

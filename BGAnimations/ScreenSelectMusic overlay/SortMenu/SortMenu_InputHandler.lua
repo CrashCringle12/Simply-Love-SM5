@@ -66,10 +66,20 @@ local input = function(event)
 				if PREFSMAN:GetPreference("MenuTimer") then
 					overlay:playcommand("ShowPressStartForOptions")
 				end
-				-- Get the style we want to change to
+				-- We have to turn off autosetstyle to switch styles
+				if ThemePrefs.Get("PreferredStyle")=="auto" then
+					ThemePrefs.Set("PreferredStyle", "none")
+				end
 				local new_style = focus.change:lower()
+				if focus.change:lower() == "all" then
+					ThemePrefs.Set("PreferredStyle", "auto")
+					new_style = #GAMESTATE:GetHumanPlayers() == 1 and "single" or "versus"
+				end
+				-- Get the style we want to change to
 				-- accommodate techno game
 				if GAMESTATE:GetCurrentGame():GetName() == "techno" then new_style = new_style .. "8" end
+
+
 				-- set it in the engine
 				GAMESTATE:SetCurrentStyle(new_style)
 				-- Make sure we cancel the request if it's active before trying to switch screens.

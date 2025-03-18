@@ -57,7 +57,7 @@ local SetLeaderboardForPlayer = function(player_num, leaderboard, leaderboardDat
 					gsEntry["rank"]..".",
 					gsEntry["name"],
 					string.format("%.2f%%", gsEntry["score"]/100),
-					ParseGroovestatsDate(gsEntry["date"]),
+					ParseGrooveStatsDate(gsEntry["date"]),
 					entry
 				)
 				if gsEntry["isRival"] then
@@ -360,7 +360,7 @@ local af = Def.ActorFrame{
 						local leaderboard = self:GetParent():GetChild(pn.."Leaderboard")
 						local leaderboardList = self:GetParent()[pn]["Leaderboards"]
 						leaderboardList[#leaderboardList + 1] = {
-							Name="Groovestats",
+							Name="GrooveStats",
 							Disabled=true,
 							IsEX=false
 						}

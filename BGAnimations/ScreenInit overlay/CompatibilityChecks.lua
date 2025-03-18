@@ -15,12 +15,12 @@ return Def.Actor{
 	OnCommand=function()
 
 		-- defined in ./Scripts/SL-Helpers.lua
-		if not StepManiaVersionIsSupported() then
-			SM( THEME:GetString("ScreenInit", "UnsupportedSMVersion"):format(ProductFamily(), ProductVersion(), MinimumVersionString()) )
-			-- ScreenSystemOptions is the first choice in the operator menu
-			-- players can set their game, theme, default NoteSkin, etc. from it
-			SCREENMAN:SetNewScreen("ScreenSystemOptions")
-		end
+		-- if not StepManiaVersionIsSupported() then
+		-- 	SM( THEME:GetString("ScreenInit", "UnsupportedSMVersion"):format(ProductFamily(), ProductVersion(), MinimumVersionString()) )
+		-- 	-- ScreenSystemOptions is the first choice in the operator menu
+		-- 	-- players can set their game, theme, default NoteSkin, etc. from it
+		-- 	SCREENMAN:SetNewScreen("ScreenSystemOptions")
+		-- end
 
 		-- also defined in ./Scripts/SL-Helpers.lua
 		if not CurrentGameIsSupported() then

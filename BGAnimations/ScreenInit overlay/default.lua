@@ -1,7 +1,7 @@
 local af = Def.ActorFrame{ InitCommand=function(self) self:Center() end }
 
 -- check SM5 version, current game (dance, pump, etc.), and RTT support
-af[#af+1] = LoadActor("./CompatibilityChecks.lua")
+--af[#af+1] = LoadActor("./CompatibilityChecks.lua")
 
 -- -----------------------------------------------------------------------
 

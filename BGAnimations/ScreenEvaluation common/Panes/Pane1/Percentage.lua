@@ -15,7 +15,7 @@ local TNSTypes = {
 }
 local PercentDP = stats:GetPercentDancePoints()
 local percent = FormatPercentScore(PercentDP)
-SM(stats:GetActualDancePoints() .. " out of " ..stats:GetPossibleDancePoints() .. " = " .. (stats:GetActualDancePoints() / stats:GetPossibleDancePoints()) * 100, 20)
+--SM(stats:GetActualDancePoints() .. " out of " ..stats:GetPossibleDancePoints() .. " = " .. (stats:GetActualDancePoints() / stats:GetPossibleDancePoints()) * 100, 20)
 
 -- Format the Percentage string, removing the % symbol
 percent = percent:gsub("%%", "")

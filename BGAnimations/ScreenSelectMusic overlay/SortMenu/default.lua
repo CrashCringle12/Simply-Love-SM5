@@ -239,34 +239,54 @@ local function GetChangeableStyles(style)
 	-- but only present these options if Joint Double or Joint Premium is enabled
 	-- and we're not in "AutoSetStyle" mode (all styles presented simultaneously like PIU does)
 	
-	if THEME:GetMetric("Common", "AutoSetStyle") == false
-	and not (PREFSMAN:GetPreference("Premium") == "Premium_Off" 
-	and GAMESTATE:GetCoinMode() == "CoinMode_Pay") then
-		if style == "single" then
-			table.insert(available_styles, {"ChangeStyle", "Double"})
-			if ThemePrefs.Get("AllowDanceSolo") then
-				table.insert(available_styles, {"ChangeStyle", "Solo"})
-			end
-		elseif style == "double" then
-			table.insert(available_styles, {"ChangeStyle", "Single"})
-			if ThemePrefs.Get("AllowDanceSolo") then
-				table.insert(available_styles, {"ChangeStyle", "Solo"})
-			end
-		elseif style == "solo" then
-			table.insert(available_styles, {"ChangeStyle", "Single"})
-			table.insert(available_styles, {"ChangeStyle", "Double"})
-		-- Couple doesn't have enough content for people to be able to switch into it
-		-- However, if for some reason you end up in couples mode, you should be able to
-		-- escape
-		elseif style == "couple" then
-			table.insert(available_styles, {"ChangeStyle", "Versus"})
-		-- Routine is not ready for use yet, but it might be soon.
-		-- This can be uncommented at that time to allow switching from versus into routine.
-		-- elseif style == "versus" then
-		-- 	table.insert(available_styles, {"ChangeStyle", "Routine"})
+	if ThemePrefs.Get("PreferredStyle")=="auto" then
+		-- Check number of players
+		if ThemePrefs.Get("AllowDanceSolo") then
+			table.insert(available_styles, {{"ChangeStyle", "Solo"}, GAMESTATE:GetNumPlayersEnabled() == 1  })
 		end
-		return available_styles
+		table.insert(available_styles, {{"ChangeStyle", "Single"}, GAMESTATE:GetNumPlayersEnabled() == 1  })
+
+		table.insert(available_styles, {{"ChangeStyle", "Double"}, GAMESTATE:GetNumPlayersEnabled() == 1  })
+		table.insert(available_styles, {{"ChangeStyle", "Versus"}, not (GAMESTATE:GetNumPlayersEnabled() == 1)  })
+		table.insert(available_styles, {{"ChangeStyle", "Routine"}, not (GAMESTATE:GetNumPlayersEnabled() == 1)  })
+		table.insert(available_styles, {{"ChangeStyle", "Couple"}, not (GAMESTATE:GetNumPlayersEnabled() == 1) })
+	else 
+		if not (PREFSMAN:GetPreference("Premium") == "Premium_Off" and GAMESTATE:GetCoinMode() == "CoinMode_Pay") then
+			if style == "single" then
+				table.insert(available_styles, {{"ChangeStyle", "Double"}})
+				if ThemePrefs.Get("AllowDanceSolo") then
+					table.insert(available_styles, {{"ChangeStyle", "Solo"}})
+				end
+			elseif style == "double" then
+				table.insert(available_styles, {{"ChangeStyle", "Single"}})
+				if ThemePrefs.Get("AllowDanceSolo") then
+					table.insert(available_styles, {{"ChangeStyle", "Solo"}})
+				end
+			elseif style == "solo" then
+				table.insert(available_styles, {{"ChangeStyle", "Single"}})
+				table.insert(available_styles, {{"ChangeStyle", "Double"}})
+			-- Couple doesn't have enough content for people to be able to switch into it
+			-- However, if for some reason you end up in couples mode, you should be able to
+			-- escape
+			elseif style == "couple" then
+				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
+				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
+			elseif style == "routine" then
+				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
+				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
+			-- Routine is not ready for use yet, but it might be soon.
+			-- This can be uncommented at that time to allow switching from versus into routine.
+			elseif style == "versus" then
+				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
+				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
+			end
+			table.insert(available_styles, {{"ChangeStyle", "All"}})
+			SM(available_styles)
+
+		end
 	end
+
+	return available_styles
 end
 local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
 local wheel_options = {
@@ -327,9 +347,7 @@ local wheel_options = {
 	},
 	{
 		{"", "CategoryStyles"},
-		{
-			GetChangeableStyles(style),
-		}
+		GetChangeableStyles(style),
 	},
 	{
 		{"", "CategoryPlaylists"},

@@ -114,7 +114,7 @@ for index, RCType in ipairs(RadarCategories.Types) do
 					self:y(47)
 					self:diffuse( (controller == PLAYER_1) and Color.Blue or Color.Red)
 				end
-			}
+		}
 		else
 			t[#t+1] = LoadFont("Wendy/_wendy white")..{
 				Name="Percent",

@@ -120,23 +120,15 @@ for index, label in ipairs(RadarCategories) do
 				BeginCommand=function(self)
 					self:x( (controller == PLAYER_1 and -160) or 90 )
 					self:y(38)
-
-		t[#t+1] = LoadFont("Wendy/_wendy small")..{
-			Text=text,
-			InitCommand=function(self) self:zoom(0.5):horizalign(right) end,
-			BeginCommand=function(self)
-				self:x( (controller == PLAYER_1 and -160) or 90 )
-				self:y(38)
-
-				if SL[pn].ActiveModifiers.ShowExScore then
-					self:diffuse(Color.White)
-				else
-					self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )
+					if SL[pn].ActiveModifiers.ShowExScore then
+						self:diffuse(Color.White)
+					else
+						self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )
+					end
 				end
-			end
-		}
+			}
+		end
 	end
-
 	local performance = stats:GetRadarActual():GetValue( "RadarCategory_"..firstToUpper(EnglishRadarCategories[label]) )
 	local possible = stats:GetRadarPossible():GetValue( "RadarCategory_"..firstToUpper(EnglishRadarCategories[label]) )
 

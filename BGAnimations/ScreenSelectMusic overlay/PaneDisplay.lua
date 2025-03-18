@@ -898,7 +898,7 @@ for player in ivalues(PlayerNumber) do
 	-- Loading Text
 	af2[#af2+1] = LoadFont("Common Normal")..{
 		Name="Loading",
-		Text=THEME:GetString("Groovestats", "Loading"),
+		Text=THEME:GetString("GrooveStats", "Loading"),
 		InitCommand=function(self)
 			self:zoom(text_zoom):diffuse(Color.Black)
 			self:x(pos.col[#pos.col-1]*text_zoom-20)
@@ -906,7 +906,7 @@ for player in ivalues(PlayerNumber) do
 			self:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 		end,
 		SetCommand=function(self)
-			self:settext(THEME:GetString("Groovestats", "Loading"))
+			self:settext(THEME:GetString("GrooveStats", "Loading"))
 			self:visible(false)
 		end
 	}
