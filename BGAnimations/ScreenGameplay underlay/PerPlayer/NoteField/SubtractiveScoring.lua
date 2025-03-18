@@ -96,7 +96,7 @@ bmt.InitCommand=function(self)
 end
 
 bmt.JudgmentMessageCommand=function(self, params)
-	if player == params.Player and not mods.ShowEXScore then
+	if player == params.Player and not mods.ShowExScore then
 		tns = ToEnumShortString(params.TapNoteScore)
 		hns = params.HoldNoteScore and ToEnumShortString(params.HoldNoteScore)
 		self:queuecommand("SetScore")
@@ -105,7 +105,7 @@ end
 
 
 bmt.ExCountsChangedMessageCommand=function(self, params)
-	if player == params.Player and mods.ShowEXScore then
+	if player == params.Player and mods.ShowExScore then
 		local possible_ex_score, current_possible = GetPossibleExScore(params.ExCounts)
 		local total_possible = params.ActualPossible
 		local current_points = params.ActualPoints

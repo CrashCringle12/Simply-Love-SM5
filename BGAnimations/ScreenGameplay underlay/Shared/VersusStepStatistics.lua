@@ -78,7 +78,7 @@ for player in ivalues(Players) do
         -- Add a score to Step Stats if it's hidden by the NPS graph or we're in Tournament Mode.
         if SL[ToEnumShortString(player)].ActiveModifiers.NPSGraphAtTop or ThemePrefs.Get("EnableTournamentMode") then
             local pn = ToEnumShortString(player)
-            local IsEX = SL[pn].ActiveModifiers.ShowEXScore
+            local IsEX = SL[pn].ActiveModifiers.ShowExScore
 
             af[#af+1] = LoadFont("Wendy/_wendy monospace numbers")..{
                 Text="0.00",

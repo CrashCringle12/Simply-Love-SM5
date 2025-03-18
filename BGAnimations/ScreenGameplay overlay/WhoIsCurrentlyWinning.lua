@@ -6,14 +6,14 @@
 if #GAMESTATE:GetHumanPlayers() < 2 then return end
 
 -- if displaying different scoring mechanisms, don't bother.
-if SL["P1"].ActiveModifiers.ShowEXScore ~= SL["P2"].ActiveModifiers.ShowEXScore then return end
+if SL["P1"].ActiveModifiers.ShowExScore ~= SL["P2"].ActiveModifiers.ShowExScore then return end
 
 local p1_score, p2_score
 local p1_dp = 0
 local p2_dp = 0
 local p1_pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_1)
 local p2_pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(PLAYER_2)
-local IsEX = SL["P1"].ActiveModifiers.ShowEXScore
+local IsEX = SL["P1"].ActiveModifiers.ShowExScore
 
 -- allow for HideScore, which outright removes score actors
 local try_diffusealpha = function(af, alpha)

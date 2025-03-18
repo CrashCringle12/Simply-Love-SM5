@@ -90,7 +90,7 @@ for index, RCType in ipairs(RadarCategories.Types) do
 		-- Format the Percentage string, removing the % symbol
 		percent = percent:gsub("%%", "")
 	else
-		if SL[pn].ActiveModifiers.ShowEXScore then
+		if SL[pn].ActiveModifiers.ShowExScore then
 			local PercentDP = pss:GetPercentDancePoints()
 			percent = FormatPercentScore(PercentDP):gsub("%%", "")
 			-- Format the Percentage string, removing the % symbol
@@ -124,7 +124,7 @@ for index, RCType in ipairs(RadarCategories.Types) do
 					self:x( ((controller == PLAYER_1) and -114) or 286 )
 					self:y(47)
 					
-					if SL[pn].ActiveModifiers.ShowEXScore then
+					if SL[pn].ActiveModifiers.ShowExScore then
 						self:diffuse(Color.White)
 					else
 						self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )

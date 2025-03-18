@@ -50,7 +50,7 @@ local PlayerDefaults = {
 
 				TimingWindows = {true, true, true, true, true},
 				ShowFaPlusWindow = false,
-				ShowEXScore = false,
+				ShowExScore = false,
 				ShowFaPlusPane = true,
 
 				NoteFieldOffsetX = 0,
@@ -101,7 +101,7 @@ local PlayerDefaults = {
 			self.EvalPanePrimary   = 1 -- large score and judgment counts
 			self.EvalPaneSecondary = 5 -- offset histogram
 
-			-- The Groovestats API key loaded for this player
+			-- The GrooveStats API key loaded for this player
 			self.ApiKey = ""
 			self.GrooveStatsUsername = ""
 			-- Whether or not the player is playing on pad.
@@ -520,16 +520,7 @@ function InitializeSimplyLove()
 	SL.P1:initialize()
 	SL.P2:initialize()
 	SL.Global:initialize()
-	
-	-- Temporary fix so late joining players aren't getting the last person's profile.
-	-- This obsoletes the handling for defaulting to the DefaultLocalProfile in SelectProfile
-	-- However, the addition of the ProfileSortOrder_Recent will ensure the last used profile is
-	-- always at the top of the list anyways
-	-- If the SelectProfile screen is not being used, we should continue to use the default profiles
-	if ThemePrefs.Get("AllowScreenSelectProfile") then
-		PREFSMAN:SetPreference("DefaultLocalProfileIDP1", "")
-		PREFSMAN:SetPreference("DefaultLocalProfileIDP2", "")
-	end
+
 end
 
 InitializeSimplyLove()

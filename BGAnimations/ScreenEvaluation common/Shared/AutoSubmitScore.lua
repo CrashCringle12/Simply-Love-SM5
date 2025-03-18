@@ -176,7 +176,7 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 				-- It's better to just not display anything than display the wrong scores.
 				if SL["P"..side].Streams.Hash == data[playerStr]["chartHash"] then
 					local personalRank = nil
-					local showExScore = SL["P"..side].ActiveModifiers.ShowEXScore and data[playerStr]["exLeaderboard"]
+					local showExScore = SL["P"..side].ActiveModifiers.ShowExScore and data[playerStr]["exLeaderboard"]
 
 					local leaderboardData = nil
 					if showExScore then
@@ -194,7 +194,7 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 								gsEntry["rank"]..".",
 								GetMachineTag(gsEntry),
 								string.format("%.2f%%", gsEntry["score"]/100),
-								ParseGroovestatsDate(gsEntry["date"]),
+								ParseGrooveStatsDate(gsEntry["date"]),
 								entry
 							)
 
@@ -221,7 +221,7 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 						end
 
 						QRPane:GetChild("QRCode"):queuecommand("Hide")
-						QRPane:GetChild("HelpText"):settext(THEME:GetString("Groovestats", "ScoreAlreadySubmitted"))
+						QRPane:GetChild("HelpText"):settext(THEME:GetString("GrooveStats", "ScoreAlreadySubmitted"))
 						if i == 1 and P1SubmitText then
 							P1SubmitText:queuecommand("Submit")
 						elseif i == 2 and P2SubmitText then
@@ -248,13 +248,13 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 								GSIcon:visible(true)
 								recordText:diffuseshift():effectcolor1(Color.White):effectcolor2(Color.Yellow):effectperiod(3)
 								if personalRank == 1 then
-									local worldRecordText = THEME:GetString("Groovestats", "WorldRecord")
+									local worldRecordText = THEME:GetString("GrooveStats", "WorldRecord")
 									if showExScore then
 										worldRecordText = worldRecordText .. " (EX)"
 									end
 									recordText:settext(worldRecordText)
 								else
-									recordText:settext(THEME:GetString("Groovestats", "PersonalBest"))
+									recordText:settext(THEME:GetString("GrooveStats", "PersonalBest"))
 								end
 								local recordTextXStart = recordText:GetX() - recordText:GetWidth()*recordText:GetZoom()/2
 								local GSIconWidth = GSIcon:GetWidth()*GSIcon:GetZoom()
@@ -345,7 +345,7 @@ local af = Def.ActorFrame {
 			}
 			local body = {}
 
-			local rate = SL.Global.ActiveModifiers.MusicRate * 100
+			local rate = tonumber(string.format("%.0f", SL.Global.ActiveModifiers.MusicRate * 100))
 			for i=1,2 do
 				local player = "PlayerNumber_P"..i
 				local pn = ToEnumShortString(player)
@@ -394,8 +394,8 @@ local af = Def.ActorFrame {
 			if sendRequest then
 				-- Unjoined players won't have the text displayed.
              
-                self:GetParent():GetChild("P1SubmitText"):settext(THEME:GetString("Groovestats", "Submitting"))
-				self:GetParent():GetChild("P2SubmitText"):settext(THEME:GetString("Groovestats", "Submitting"))
+                self:GetParent():GetChild("P1SubmitText"):settext(THEME:GetString("GrooveStats", "Submitting"))
+				self:GetParent():GetChild("P2SubmitText"):settext(THEME:GetString("GrooveStats", "Submitting"))
 					
 				self:playcommand("MakeGrooveStatsRequest", {
 					endpoint="score-submit.php?"..NETWORK:EncodeQueryParameters(query),
@@ -428,14 +428,14 @@ af[#af+1] = LoadFont("Common Normal").. {
 		self:visible(GAMESTATE:IsSideJoined(PLAYER_1))
 	end,
 	SubmitCommand=function(self)
-		self:settext(THEME:GetString("Groovestats", "Submitted"))
+		self:settext(THEME:GetString("GrooveStats", "Submitted"))
 	end,
 	SubmitFailedCommand=function(self)
-		self:settext(THEME:GetString("Groovestats", "SubmitFailed"))
+		self:settext(THEME:GetString("GrooveStats", "SubmitFailed"))
 		DiffuseEmojis(self)
 	end,
 	TimedOutCommand=function(self)
-		self:settext(THEME:GetString("Groovestats", "TimedOut"))
+		self:settext(THEME:GetString("GrooveStats", "TimedOut"))
 	end
 }
 
@@ -450,14 +450,14 @@ af[#af+1] = LoadFont("Common Normal").. {
 		self:visible(GAMESTATE:IsSideJoined(PLAYER_2))
 	end,
 	SubmitCommand=function(self)
-		self:settext(THEME:GetString("Groovestats", "Submitted"))
+		self:settext(THEME:GetString("GrooveStats", "Submitted"))
 	end,
 	SubmitFailedCommand=function(self)
-		self:settext(THEME:GetString("Groovestats", "SubmitFailed"))
+		self:settext(THEME:GetString("GrooveStats", "SubmitFailed"))
 		DiffuseEmojis(self)
 	end,
 	TimedOutCommand=function(self)
-		self:settext(THEME:GetString("Groovestats", "TimedOut"))
+		self:settext(THEME:GetString("GrooveStats", "TimedOut"))
 	end
 }
 

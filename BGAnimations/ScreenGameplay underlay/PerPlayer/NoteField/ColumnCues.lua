@@ -87,10 +87,14 @@ local af = Def.ActorFrame{
 		self:SetUpdateFunction(Update)
 	end,
 	CurrentSongChangedMessageCommand=function(self)
+		playerState = GAMESTATE:GetPlayerState(player)
 		columnCues = SL[pn].Streams.ColumnCues
 		curIndex = 1
 		updatedFirstTime = false
-	end
+	end,
+	PlayingCommand=function(self)
+		curIndex = 1
+	end,
 }
 
 local IsReversedColumn = function(player, columnIndex)

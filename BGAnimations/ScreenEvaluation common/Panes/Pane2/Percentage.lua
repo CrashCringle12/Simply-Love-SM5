@@ -15,7 +15,7 @@ if (styletype == "TwoPlayersSharedSides") then
 		percent = tonumber(percent)
 		diffuse = Color.White
 	end
-elseif SL[ToEnumShortString(player)].ActiveModifiers.ShowEXScore then
+elseif SL[ToEnumShortString(player)].ActiveModifiers.ShowExScore then
 	percent = CalculateExScore(player)
 	diffuse = SL.JudgmentColors[SL.Global.GameMode][1]
 else

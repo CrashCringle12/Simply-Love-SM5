@@ -110,7 +110,7 @@ local GetScoresRequestProcessor = function(res, params)
 		local showExScore
 		-- First check to see if the leaderboard even exists.
 		if data and data[playerStr] then
-			showExScore = SL["P"..i].ActiveModifiers.ShowEXScore and data[playerStr]["exLeaderboard"] ~= nil
+			showExScore = SL["P"..i].ActiveModifiers.ShowExScore and data[playerStr]["exLeaderboard"] ~= nil
 			local leaderboardData = {GS=nil, EX=nil}
 			if showExScore then
 				leaderboardData["EX"] = data[playerStr]["exLeaderboard"]
@@ -283,13 +283,13 @@ local GetScoresRequestProcessor = function(res, params)
 					worldName:visible(true)
 					worldScore:visible(true)
 					-- Commenting this out until I think of how to display everything
-					-- if SL["P"..i].ActiveModifiers.ShowEXScore then
+					-- if SL["P"..i].ActiveModifiers.ShowExScore then
 					-- 	loadingText:settext("EX Score")
 					-- else
 					-- 	loadingText:settext("GrooveStats")
 					-- end
 				else
-					if SL["P"..i].ActiveModifiers.ShowEXScore then
+					if SL["P"..i].ActiveModifiers.ShowExScore then
 						loadingText:settext("No EX Data")
 					else
 						loadingText:settext("No Data")
@@ -369,7 +369,7 @@ af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 				-- If we disable the service from a previous request, surface it to the user here.
 				for i=1,2 do
 					local loadingText = master:GetChild("PaneDisplayP"..i):GetChild("Loading")
-					loadingText:settext(THEME:GetString("Groovestats", "Disabled"))
+					loadingText:settext(THEME:GetString("GrooveStats", "Disabled"))
 					loadingText:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 				end
 			end
@@ -397,7 +397,7 @@ af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 				worldScore:visible(false)
 				worldName:visible(false)
 				loadingText:visible(true)
-				loadingText:settext(THEME:GetString("Groovestats", "Loading"))
+				loadingText:settext(THEME:GetString("GrooveStats", "Loading"))
 				sendRequest = true
 			end
 		end
@@ -898,7 +898,7 @@ for player in ivalues(PlayerNumber) do
 	-- Loading Text
 	af2[#af2+1] = LoadFont("Common Normal")..{
 		Name="Loading",
-		Text="Loading ... ",
+		Text=THEME:GetString("Groovestats", "Loading"),
 		InitCommand=function(self)
 			self:zoom(text_zoom):diffuse(Color.Black)
 			self:x(pos.col[#pos.col-1]*text_zoom-20)
@@ -906,7 +906,7 @@ for player in ivalues(PlayerNumber) do
 			self:visible(IsServiceAllowed(SL.GrooveStats.GetScores))
 		end,
 		SetCommand=function(self)
-			self:settext("Loading ...")
+			self:settext(THEME:GetString("Groovestats", "Loading"))
 			self:visible(false)
 		end
 	}

@@ -97,7 +97,7 @@ end
 for index, label in ipairs(RadarCategories) do
 	if index == 1 then
 		text = nil
-		if SL[pn].ActiveModifiers.ShowEXScore then
+		if SL[pn].ActiveModifiers.ShowExScore then
 			text = "ITG"
 		else
 			text = "EX"
@@ -121,14 +121,20 @@ for index, label in ipairs(RadarCategories) do
 					self:x( (controller == PLAYER_1 and -160) or 90 )
 					self:y(38)
 
-					if SL[pn].ActiveModifiers.ShowEXScore then
-						self:diffuse(Color.White)
-					else
-						self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )
-					end
+		t[#t+1] = LoadFont("Wendy/_wendy small")..{
+			Text=text,
+			InitCommand=function(self) self:zoom(0.5):horizalign(right) end,
+			BeginCommand=function(self)
+				self:x( (controller == PLAYER_1 and -160) or 90 )
+				self:y(38)
+
+				if SL[pn].ActiveModifiers.ShowExScore then
+					self:diffuse(Color.White)
+				else
+					self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )
 				end
-			}
-		end
+			end
+		}
 	end
 
 	local performance = stats:GetRadarActual():GetValue( "RadarCategory_"..firstToUpper(EnglishRadarCategories[label]) )

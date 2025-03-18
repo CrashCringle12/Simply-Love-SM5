@@ -109,7 +109,7 @@ local LeaderboardRequestProcessor = function(res, master)
 		SetScoreData(2, 1, "", "No Scores", "", false, false, false, false)
 
 		local numEntries = 0
-		if SL["P"..n].ActiveModifiers.ShowEXScore then
+		if SL["P"..n].ActiveModifiers.ShowExScore then
 			-- If the player is using EX scoring, then we want to display the EX leaderboard first.
 			if data[playerStr]["exLeaderboard"] then
 				numEntries = 0
@@ -300,7 +300,7 @@ local af = Def.ActorFrame{
 			-- both players will have their own individual scoreboxes.
 			-- Should be fine though.
 			if sendRequest then
-				self:GetParent():GetChild("Name1"):settext(THEME:GetString("Groovestats", "Loading"))
+				self:GetParent():GetChild("Name1"):settext(THEME:GetString("GrooveStats", "Loading"))
 				self:playcommand("MakeGrooveStatsRequest", {
 					endpoint="player-leaderboards.php?"..NETWORK:EncodeQueryParameters(query),
 					method="GET",
