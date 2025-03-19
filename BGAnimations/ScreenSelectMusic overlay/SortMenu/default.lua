@@ -352,11 +352,20 @@ local wheel_options = {
 		{"", "CategoryPlaylists"},
 		AddPlaylists(),
 	},
+	{ 
+		{"", "CategoryViews"},
+		{
+			{{"View", "Gallery"}},
+			{{"View", "Trials"}},
+			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
+			{{"View", "Achievements"}}
+		}
+	},
 	{ {"SortBy", "Group"} },
 	{ {"SortBy", "Title"} },
 	{ {"SortBy", "Recent"} },
-	{{"View", "Gallery"}},
-	{{"View", "Trials"}},
+
+
 	-- Allow players to switch out to a different SL GameMode if no stages have been played yet,
 	-- but don't add the current SL GameMode as a choice.
 	{ {"ChangeMode", "ITG"}, SL.Global.Stages.PlayedThisGame == 0 and SL.Global.GameMode ~= "ITG" },
@@ -486,6 +495,11 @@ local t = Def.ActorFrame {
 
 		-- Then add the ScreenSelectProfile on top.
 		SCREENMAN:AddNewScreenToTop("ScreenSelectProfile")
+	end,
+	DirectInputToEngineForAchievementsCommand=function(self)
+		DirectInputToEngine(self)
+		-- Then add the ScreenAchievements on top.
+		SCREENMAN:AddNewScreenToTop("ScreenProfileAchievements")
 	end,
 
 	AssessAvailableChoicesCommand=function(self)

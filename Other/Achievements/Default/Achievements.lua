@@ -46,10 +46,12 @@ return {
             -- Check if the group contains the word DDR, this is to prevent the achievement from being unlocked on DDR songs
             local song = GAMESTATE:GetCurrentSong()
             if song == nil then return false end
-            if string.match(GAMESTATE:GetCurrentSong():GetGroupName(), "DDR") ~=
-                nil or
-                string.match(GAMESTATE:GetCurrentSong():GetGroupName(),
-                             "DanceDance") ~= nil then
+            if string.match(GAMESTATE:GetCurrentSong():GetGroupName(), "DDR") ~= nil 
+                or string.match(GAMESTATE:GetCurrentSong():GetGroupName(),"zenius") ~= nil 
+                or string.match(GAMESTATE:GetCurrentSong():GetGroupName(),"PSU") ~= nil 
+                or string.match(GAMESTATE:GetCurrentSong():GetGroupName(),"Dance Dance") ~= nil 
+                or string.match(GAMESTATE:GetCurrentSong():GetGroupName(),"DanceDance") ~= nil 
+                or string.match(GAMESTATE:GetCurrentSong():GetGroupName(), "2014 Billboard") ~= nil then
                 return false
             else
                 -- Check if the song meter is 15
@@ -126,11 +128,7 @@ return {
         Name = "Make it stop....MAKE IT STOP",
         Icon = "crab.png",
         Condition = function(pn)
-            local song = SONGMAN:FindSong(
-                             "Girls Coast Stamina 3/[14] [125] Crab Rave Marathon")
-            if not song then return false end
-            if GAMESTATE:GetCurrentSong():GetSongDir() ==
-                "Girls Coast Stamina 3/[14] [125] Crab Rave Marathon" then
+            if string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(), "[14] [125] Crab Rave Marathon") then
                 return HasPassed(pn, song)
             else
                 return false
@@ -278,7 +276,7 @@ return {
         Condition = function(pn)
             if not song then return false end
             if string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(),
-                            "Go Go Sing") ~= nil then
+                            "Go Go Sing") then
                 return true
             else
                 return false
@@ -326,8 +324,7 @@ return {
         Name = "Soul Train",
         Icon = "Soul.png",
         Condition = function(pn)
-            if string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(),
-                            "Soul Meets Body") then
+            if string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(), "Soul Meets Body") then
                 local step_data = GAMESTATE:GetCurrentSteps(pn)
                 if step_data then
                     if step_data:GetMeter() == 10 then
@@ -470,7 +467,7 @@ return {
     {
         Name = "mc^2",
         Icon = "e.png",
-        Desc = "e 3x2.png",
+        Desc = "Can you make the letter sound?",
         Difficulty = 4,
         ID = 31,
         Condition = function(pn)
@@ -480,7 +477,7 @@ return {
                 if string.match(GAMESTATE:GetCurrentSong():GetSongDir(), "E2") then
                     return PassCheck(pn)
                 end
-                return PassCheck(pn)
+                return false
             else
                 return false
             end

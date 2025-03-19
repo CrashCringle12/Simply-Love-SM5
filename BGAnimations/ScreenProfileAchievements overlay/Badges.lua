@@ -7,6 +7,7 @@ local rows = binfo.rows
 local cols = binfo.cols 
 local accolades = binfo.achievements
 local activePack = "Default"
+local rowOffset = 0
 local achievements = Def.ActorFrame {
 	Name="Badges",
 	-- Def.Quad {
@@ -72,7 +73,7 @@ for p=1,pages do
 						Texture="medal 4x3.png",
 						InitCommand=function(self)
 							self:visible(true):diffusealpha(1)
-							self:Load(SL.Accolades.Achievements[activePack][(j-1)*cols + i+pI ] and THEME:GetPathO("", "Achievements/"..activePack.."/"..SL.Accolades.Achievements[activePack][(j-1)*cols + i+pI].Icon) or "medal 4x3.png")
+							self:Load(SL.Accolades.Achievements[activePack][(j-1)*cols + i+pI+rowOffset + rowOffset ] and THEME:GetPathO("", "Achievements/"..activePack.."/"..SL.Accolades.Achievements[activePack][(j-1)*cols + i+pI+rowOffset+ rowOffset].Icon) or "medal 4x3.png")
 							self:zoomto(50,50):align(0,0):xy(-400+(90*i),-25+(68*((j-1)%rows))):diffusealpha(0)
 							self:diffuse(0.1,0,0.1,1)
 							--self:setstate(math.random(1,11))
@@ -91,14 +92,27 @@ for p=1,pages do
 						UnGlowCommand=function(self)
 							self:stopeffect()
 						end,
+						PageMessageCommand=function(self, params)
+							if (activePack == "Trial") then
+								self:Load("medal 4x3.png")
+							else
+							end
+						end,
 						MigratoMessageCommand=function(self, params)
 							-- TODO FIX THISSSS
-							if true then
-								if (activePack == "Trial") then
-									self:Load("medal 4x3.png")
-								else
-									self:Load(SL.Accolades.Achievements[params.activePack][(j-1)*cols + i+pI ] and THEME:GetPathO("", "Achievements/"..params.activePack .."/"..SL.Accolades.Achievements[params.activePack][(j-1)*cols + i+pI].Icon) or "medal 4x3.png")
+							if params.achievements then
+								-- If we exceed the number of rows * cols then increment the row offset
+								if params.achievementIndex > (rows*cols+rowOffset) then
+									rowOffset = rowOffset + cols
+								elseif params.achievementIndex <= (rows*cols+rowOffset-(rows*cols)) then
+									rowOffset = rowOffset - cols
 								end
+							end
+							if params.Page then
+								rowOffset = params.Page
+							end
+							if true then
+								self:Load(SL.Accolades.Achievements[params.activePack][(j-1)*cols + i+pI+rowOffset] and THEME:GetPathO("", "Achievements/"..params.activePack .."/"..SL.Accolades.Achievements[params.activePack][(j-1)*cols + i+pI+rowOffset].Icon) or "medal 4x3.png")
 								self:zoomto(50,50):align(0,0):xy(-400+(90*i),-25+(68*((j-1)%rows))):diffusealpha(0)
 								self:diffuse(0.1,0,0.1,1)
 								self:visible(true)
@@ -113,10 +127,10 @@ for p=1,pages do
 								end
 							end
 							if params.achievements then
-								if ((j-1)*cols + i+pI) <= #SL.Accolades.Achievements[params.activePack] then
+								if ((j-1)*cols + i+pI+rowOffset) <= #SL.Accolades.Achievements[params.activePack] then
 									if params.achievements[params.activePack     ] then
-										if params.achievements[params.activePack     ][(j-1)*cols + i+pI] then
-											if params.achievements[params.activePack     ][(j-1)*cols + i+pI].Unlocked then
+										if params.achievements[params.activePack     ][(j-1)*cols + i+pI+rowOffset] then
+											if params.achievements[params.activePack     ][(j-1)*cols + i+pI+rowOffset].Unlocked then
 												self:diffuse(1,1,1,1)
 											else
 												self:diffuse(0.1,0,0.1,0.5)
@@ -132,7 +146,7 @@ for p=1,pages do
 									self:visible(false)
 								end
 							end
-							if ( (j-1)*cols + i+pI) == params.achievementIndex then
+							if ( (j-1)*cols + i+pI+rowOffset) == params.achievementIndex then
 								self:queuecommand("Glow")
 							else
 								self:queuecommand("UnGlow")

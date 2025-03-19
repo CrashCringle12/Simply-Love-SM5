@@ -54,27 +54,26 @@ if PROFILEMAN:GetNumLocalProfiles() <= 0 then scroller.y = row_height * -4 end
 
 local initial_data = guest_data
 local pos = nil
-if SL.Global.FastProfileSwitchInProgress then
-    -- If we're fast profile switching, we want to open the profile scrollers
-    -- focused on current player profiles. Let's remember the index of the profile
-    -- so that we can scroll to it.
-    for profile in ivalues(profile_data) do
-        if profile.guid == PROFILEMAN:GetProfile(player):GetGUID() then
-            pos = profile.index
-            break
-        end
+-- If we're fast profile switching, we want to open the profile scrollers
+-- focused on current player profiles. Let's remember the index of the profile
+-- so that we can scroll to it.
+for profile in ivalues(profile_data) do
+    if profile.guid == PROFILEMAN:GetProfile(player):GetGUID() then
+        SM(PROFILEMAN:GetProfile(player):GetDisplayName())
+        pos = profile.index
+        break
     end
-
-    -- If we haven't found a matching profile looking in profile_data, this has to
-    -- be [GUEST]
-    pos = pos or 0
-
-    initial_data = pos == 0 and guest_data or profile_data[pos]
 end
+
+-- If we haven't found a matching profile looking in profile_data, this has to
+-- be [GUEST]
+pos = pos or 0
+
+initial_data = pos == 0 and guest_data or profile_data[pos]
 
 local count = 0
 
-local badges = LoadActor("_ranks/Badges.lua", binfo)
+local badges = LoadActor("Badges.lua", binfo)
 
 local FrameBackground2 = function(pad, c, player, w, h)
     w = w or frame.w
@@ -180,54 +179,36 @@ end
 
 return Def.ActorFrame {
     Name = "AchievementFrame",
-    CodeMessageCommand = function(self, params)
-        if params.Name == "Flip" and params.PlayerNumber == player then
-            if counter >= binfo.pages then
-                counter = 0;
-            else
-                counter = counter + 1;
-            end
-            MESSAGEMAN:Broadcast("Page",
-                                 {Player = params.PlayerNumber, Page = counter})
+    InitCommand = function(self)
+        if counter >= binfo.pages then
+            counter = 0;
+        else
+            counter = counter + 1;
         end
+        MESSAGEMAN:Broadcast("Page",
+                             {Player = player, Page = counter})
     end,
     SetCommand = function(self, params)
+        -- local test = params
+        -- test.achievements = {}
+        -- SM(params)
         MESSAGEMAN:Broadcast("Migrato", {
-            Player = params.PlayerNumber,
+            Player = player,
             achievementIndex = params.achievementIndex,
             achievements = params.achievements,
-            activePack = params.activePack
+            activePack = params.activePack,
+            Page = params.Page
         })
     end,
-    Def.Quad {
-        InitCommand = function(self)
-            self:xy(_screen.cx, _screen.cy + 10):diffuse(color("#000000"))
-                :diffusealpha(0.9):zoomto(SCREEN_WIDTH, SCREEN_HEIGHT)
-                :diffusealpha(0):visible(false)
-        end,
-        CodeMessageCommand = function(self, params)
-            if params.Name == "Flip" then
-                SL.Global.AchievementMenuActive = true
-                self:visible(true):smooth(0.2):diffusealpha(1)
-            elseif params.Name == "Hide" then
-                self:smooth(0.3):diffusealpha(0):queuecommand("Hide")
-            end
-        end,
-        HideCommand = function(self) self:visible(false) end
-    },
+
     Def.ActorFrame {
         InitCommand = function(self)
             self:xy(_screen.cx, _screen.cy + 10):zoom(0):diffusealpha(0)
-                :visible(false)
+            self:visible(true):smooth(0.3):diffusealpha(1):zoom(1)
         end,
-        CodeMessageCommand = function(self, params)
-            if params.Name == "Flip" then
-                self:visible(true):smooth(0.3):diffusealpha(1):zoom(1)
-            elseif params.Name == "Hide" then
-                self:smooth(0.3):diffusealpha(0):zoom(0):queuecommand("Hide")
-            end
+        HideCommand = function(self) 
+            self:smooth(0.3):diffusealpha(0):zoom(0)
         end,
-        HideCommand = function(self) self:visible(false) end,
         FrameBackground3(0, color("#575867"), player, frame.w * 3.2,
                          frame.h * 0.3),
         FrameBackground2(0, color("#f5f5f5"), player, frame.w * 3.2,
@@ -378,14 +359,14 @@ return Def.ActorFrame {
         },
         badges,
         Def.Sprite {
-            Texture = "_ranks/arrow",
+            Texture = "../ScreenSelectProfile underlay/_ranks/arrow",
             InitCommand = function(self)
                 self:xy(300, 155):zoom(0.9):diffuse(color("#c7cbd9")):rotationz(
                     -90)
             end
         },
         Def.Sprite {
-            Texture = "_ranks/arrow",
+            Texture = "../ScreenSelectProfile underlay/_ranks/arrow",
             InitCommand = function(self)
                 self:xy(325, 155):zoom(0.9):diffuse(color("#c7cbd9")):rotationz(
                     90)
@@ -403,7 +384,8 @@ return Def.ActorFrame {
                     self:settext("0 of 0 unlocked")
                 elseif not params.achievements or
                     not params.achievements[params.activePack] then
-                    self:settext("0 of "..#accolades[params.activePack].. " unlocked")
+                    self:settext("0 of " .. #accolades[params.activePack] ..
+                                     " unlocked")
                 else
                     -- self:settext(math.random(0,binfo.rows * binfo.cols) .. " of " .. binfo.rows * binfo.cols .. " unlocked.")
                     self:settext(CountUnlockedAchievements(
@@ -479,7 +461,8 @@ return Def.ActorFrame {
                         self:visible(false)
                     end
                 end
-            }
+            },
+            
         }
     }
 }

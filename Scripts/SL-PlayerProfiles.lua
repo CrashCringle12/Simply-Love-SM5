@@ -210,6 +210,14 @@ LoadAllAchievements = function()
 				-- We don't want spaces in the pack name
 				packName = packName:gsub("%s+", "_")
 				accolades[packName] = achiev
+			-- elseif FILEMAN:DoesFileExist(packPath.."Achievements.json") then
+			-- 	local achiev = JsonDecode(FILEMAN:ReadFile(packPath.."Achievements.json"))
+			-- 	-- We don't want spaces in the pack name
+			-- 	packName = packName:gsub("%s+", "_")
+			-- 	accolades[packName] = achiev
+			-- 	accolades[packName].isJson = true
+			-- else
+			-- 	--SM("No achievements found for "..packName)
 			end
 		end
 	end

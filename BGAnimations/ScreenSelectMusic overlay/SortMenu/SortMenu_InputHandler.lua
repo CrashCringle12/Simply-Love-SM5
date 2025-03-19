@@ -163,6 +163,9 @@ local input = function(event)
 						overlay:queuecommand("DirectInputToEngine")
 						SCREENMAN:GetTopScreen():GetMusicWheel():ChangeSort("SortOrder_Preferred")
 					end
+				elseif focus.new_overlay == "Achievements" then
+					SL.Global.AchievementMenuActive = true
+					overlay:queuecommand("DirectInputToEngineForAchievements")
 				elseif focus.new_overlay == "Gallery" then
 					ThemePrefs.Set("SortPlayer", event.PlayerNumber)
 					overlay:playcommand("ViewGallery")
