@@ -161,6 +161,20 @@ function GetChartFootprint(step_data)
         return author
     end
 end
+function FullComboType(pss)
+	if pss:FullComboOfScore('TapNoteScore_W1') then -- MFC
+		return 'TapNoteScore_W1'
+	elseif pss:FullComboOfScore('TapNoteScore_W2') then -- PFC
+		return 'TapNoteScore_W2'
+	elseif pss:FullComboOfScore('TapNoteScore_W3') then -- GFC
+		return 'TapNoteScore_W3'
+	elseif pss:FullComboOfScore('TapNoteScore_W5') then -- FC
+		return 'TapNoteScore_W4'
+	else
+		return nil
+	end
+end
+
 -- Copied from everyone.dance
 -- Gets all the data of the current song/selection and outputs it to a file for everyone.dance to read
 function updateDiscordGameplayStatus(pn, inEvaluation)
