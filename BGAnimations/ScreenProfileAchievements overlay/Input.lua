@@ -7,10 +7,12 @@ local spamCheck = {
     lastKey = "",
     amount = 0,
 }
+
 local finished = false
 local profiles = {}
 local profile_data = {guest_data, guest_data}
 local indexes = {}
+
 for player in ivalues(GAMESTATE:GetHumanPlayers()) do
     local profile = PROFILEMAN:GetProfile(player)
     if profile then
@@ -98,18 +100,7 @@ Handle.MenuRight = function(event)
                 if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
                     data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
                 end
-                -- if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-                --     data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-                --     -- if data.achievementIndex < 32 then
-                --     -- 	MESSAGEMAN:Broadcast("Page", {Player = event.PlayerNumber, Page = 3})
-                --     -- else
-                --     -- 	MESSAGEMAN:Broadcast("Page", {Player = event.PlayerNumber, Page = 3})
-                --     -- end
-                -- -- else
-                -- -- 	MESSAGEMAN:Broadcast("Page", {Player = event.PlayerNumber, Page = 1})
-                -- end
             end
-
             achievements:playcommand("Set", data)
         elseif SL.Global.AchievementPackMenu then
             local achievementPacks = af:GetChild('AchievementPacksFrame')
@@ -148,6 +139,7 @@ Handle.Down = Handle.MenuDown
 Handle.Right = Handle.MenuRight
 Handle.Left =Handle.MenuLeft
 
+Handle.Select = Handle.Back
 Handle.Back = function(event)
 	if SL.Global.AchievementMenuActive then
 		local achievements = af:GetChild('AchievementFrame')
