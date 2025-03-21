@@ -358,7 +358,7 @@ local wheel_options = {
 			{{"View", "Gallery"}},
 			{{"View", "Trials"}},
 			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
-			{{"View", "Achievements"}}
+			{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
 		}
 	},
 	{ {"SortBy", "Group"} },

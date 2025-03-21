@@ -139,7 +139,6 @@ Handle.Down = Handle.MenuDown
 Handle.Right = Handle.MenuRight
 Handle.Left =Handle.MenuLeft
 
-Handle.Select = Handle.Back
 Handle.Back = function(event)
 	if SL.Global.AchievementMenuActive then
 		local achievements = af:GetChild('AchievementFrame')
@@ -156,11 +155,21 @@ Handle.Back = function(event)
 		SL.Global.AchievementPackMenu = false
 	end
 end
+Handle.Select = Handle.Back
 
 
 local InputHandler = function(event)
 	if finished then return false end
 	if not event or not event.button then return false end
+    -- Check if there is a profile for this player if not Handle.Back
+    if not profile_data[event.PlayerNumber] then 
+       -- If there is one player joined or the other player also does not have a profile then Handle.Back
+        if PROFILEMAN:IsPersistentProfile(PLAYER_1) or PROFILEMAN:IsPersistentProfile(PLAYER_2) then
+        else
+            Handle.Back(event)
+        end
+        return false 
+    end
 	-- if (PreferredStyle=="single" or PreferredStyle=="double") and event.PlayerNumber ~= mpn then return false	end
 	if event.type ~= "InputEventType_Release" then
         if spamCheck.lastKey == event.button then
