@@ -18,8 +18,9 @@ af[#af+1] = Def.Sprite{
 		self:visible(params.Song and params.Song:HasEdits(stepstype) or false)
 	end
 }
+
 for player in ivalues(PlayerNumber) do
-	af[#af+1] = LoadActor("GetLamp.lua", player)
+
 	af[#af+1] = LoadActor("Favorites.lua", player)
 
 	-- Add ITL EX scores to the song wheel as well.
