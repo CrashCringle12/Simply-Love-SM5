@@ -131,7 +131,8 @@ local GlobalDefaults = {
 				PlayAgain = "ScreenEvaluationSummary",
 				PlayerOptions = "ScreenAds",
 				PlayerOptions2 = "ScreenAds",
-				PlayerOptions3 = "ScreenAds"
+				PlayerOptions3 = "ScreenAds",
+				SelectCharacter = "ScreenAds",
 			}
 			self.ContinuesRemaining = ThemePrefs.Get("NumberOfContinuesAllowed") or 0
 			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "ITG"

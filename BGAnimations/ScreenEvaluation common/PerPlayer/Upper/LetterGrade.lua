@@ -12,7 +12,8 @@ local grade = playerStats:GetGrade()
 -- "I passd with a q though."
 local title = GAMESTATE:GetCurrentSong():GetDisplayFullTitle()
 if title == "D" then grade = "Grade_Tier99" end
-if title == "e" or title == "E" then grade = "Grade_Tier89" end
+-- "eeeeeeeeeee"
+if title == "e" or title == "E" then grade = "Grade_Tier101" end
 
 -- QUINT
 local ex = CalculateExScore(player)

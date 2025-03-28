@@ -321,42 +321,278 @@ for i, row in ipairs(layout) do
 
 	end
 end
+local num_segments = 7
+local amv_reference
 
--- af3[#af3+1] = Def.GrooveRadar{
--- 	Name="GrooveRadar",
--- 	InitCommand=function(self)
--- 		self:xy(-width/2 + 40, height/2 - 20)
--- 		self:visible(true):zoom(0.5)
--- 		self:queuecommand("Redraw")
--- 	end,
--- 	HideCommand=function(self)
--- 		self:visible(false)
--- 	end,
--- 	RedrawCommand=function(self)
--- 		-- local nps = SL[pn].Streams.PeakNPS * SL.Global.ActiveModifiers.MusicRate
--- 		-- local totalTech = SL[pn].Streams.Crossovers + SL[pn].Streams.Footswitches + SL[pn].Streams.Sideswitches + SL[pn].Streams.Jacks + SL[pn].Streams.Brackets
--- 		-- self:visible(not showPatternInfo)
--- 		-- values = {0, 0, 0, 0, 0}
--- 		-- local stream = GAMESTATE:GetCurrentSteps(player):GetRadarValues(player):GetValue("RadarCategory_Stream")
--- 		-- local streamMeasures, breakMeasures = GetTotalStreamAndBreakMeasures(pn)
--- 		-- local totalMeasures = streamMeasures + breakMeasures
--- 		-- values[1] = stream
--- 		-- values[2] = SL[pn].Streams.Crossovers / totalTech
--- 		-- values[3] = SL[pn].Streams.Brackets / totalTech
--- 		-- values[4] = SL[pn].Streams.Footswitches / totalTech
--- 		-- local chaos = GAMESTATE:GetCurrentSteps(player):GetRadarValues(player):GetValue("RadarCategory_Chaos")
--- 		-- values[5] = chaos
--- 		-- -- If there are side switches this should increase crossover & footswitch counts
--- 		-- if SL[pn].Streams.Sideswitches > 0 then
--- 		-- 	values[2] = values[2] + SL[pn].Streams.Sideswitches / totalTech
--- 		-- 	values[4] = values[4] + SL[pn].Streams.Sideswitches / totalTech
--- 		-- end
+local ComputeVertices = function()
+	local verts = {}
+	local angle = (math.pi*2) / num_segments
+	for i=1, num_segments+1 do
+	  --                                   x,                  y,   z,   Color.White
+	  table.insert(verts, {{math.sin(i*angle),  math.cos(i*angle),  1},  {1,1,1,1}})
+	end
+	return verts
+  end
+  
+-- Helper function to compute vertices from raw tech counts with a cap.
+local function ComputeVerticesFromRawValues(rawValues)
+    local verts = {}
+    local num_segments = #rawValues
+    local angleIncrement = (math.pi * 2) / num_segments
+    local baseline = 5         -- Minimum radius for each vertex (adjust as needed)
+    local scalingFactor = 2    -- Multiplier for the raw tech count
+    local maxRadius = 80      -- Maximum radius cap; change this single variable to control the cap.
+    for i = 1, num_segments do
+        local angle = (i - 1) * angleIncrement  -- Start at angle 0 for first category
+        local computedRadius = baseline + rawValues[i] * scalingFactor
+        local radius = math.min(computedRadius, maxRadius)
+        local x = math.sin(angle) * radius
+        local y = math.cos(angle) * radius
+        table.insert(verts, { { x, y, 0 }, { 1, 1, 1, 1 } })
+    end
+    -- Repeat the first vertex to close the polygon.
+    table.insert(verts, verts[1])
+    return verts
+end
 
--- 		-- self:SetFromValues(player, values)
--- 		--SM(values)
--- 		-- Use Streams, Brackets, Footswitches, Chaos, Crossovers
+local lineColor = color("#cccccc")
+af3[#af3+1] = Def.ActorFrame{
+	InitCommand=function(self)
+		if #GAMESTATE:GetHumanPlayers() == 2 then
+			self:xy(width/2 +40, height/2 - (pn == "P1" and 30 or -45)):rotationz(77):zoom(0.55)
 
--- 	end
--- }
+		else
+			self:xy(width/2 +40, height/2 - 35):rotationz(77):zoom(0.55)
 
+		end
+	end,
+	RedrawCommand=function(self)
+		self:visible(true)
+	end,
+	HideCommand=function(self)
+		self:visible(false)
+	end,
+	Def.ActorMultiVertex{
+		InitCommand=function(self)
+			-- these coordinates aren't neat and tidy, but they do create three triangles
+			-- that fit together to approximate hurtpiggypig's original png asset
+			local verts = {}
+			-- Set verts to an empty table then lets use it to draw a circle with for loops
+			for i=1,360 do
+				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+			end
+			self:SetDrawState({Mode=6}):SetVertices(verts)
+			self:diffuse(Color.Black):diffusealpha(0.01)
+			self:zoom(7.75)
+		end
+	},
+	Def.ActorMultiVertex{
+		InitCommand=function(self)
+			-- these coordinates aren't neat and tidy, but they do create three triangles
+			-- that fit together to approximate hurtpiggypig's original png asset
+			local verts = {}
+			-- Set verts to an empty table then lets use it to draw a circle with for loops
+			for i=1,360 do
+				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+			end
+			self:SetDrawState({Mode=6}):SetVertices(verts)
+			self:diffuse(color("f5f5f5")):diffusealpha(0.05)
+			self:zoom(7)
+		end
+	},
+	Def.ActorMultiVertex{
+		Name="LifeLine_AMV",
+		InitCommand=function(self)
+		amv_reference = self
+			self:SetDrawState({Mode="DrawMode_Fan"})
+				:SetLineWidth( 1 ):zoom(65):diffuse(color("f6e8c9")):diffusealpha(0.25)
+				:queuecommand("SetVertices")
+			
+		end,
+		SetVerticesCommand=function(self)
+			local verts = ComputeVertices()
+			self:SetNumVertices(#verts):SetVertices(verts)
+		end
+	},
+	Def.ActorMultiVertex{
+		Name="LifeLine_AMV",
+		InitCommand=function(self)
+		amv_reference = self
+			self:SetDrawState({Mode="DrawMode_LineStrip"})
+				:SetLineWidth( 1 ):zoom(65):diffuse(lineColor)
+				:queuecommand("SetVertices")
+			
+		end,
+		SetVerticesCommand=function(self)
+			local verts = ComputeVertices()
+			self:SetNumVertices(#verts):SetVertices(verts)
+		end
+	},
+	Def.ActorMultiVertex{
+		Name="LifeLine_AMV",
+		InitCommand=function(self)
+		amv_reference = self
+			self:SetDrawState({Mode="DrawMode_LineStrip"})
+				:SetLineWidth( 1 ):zoom(50):diffuse(lineColor)
+				:queuecommand("SetVertices")
+			
+		end,
+		SetVerticesCommand=function(self)
+			local verts = ComputeVertices()
+			self:SetNumVertices(#verts):SetVertices(verts)
+		end
+	},
+	Def.ActorMultiVertex{
+		Name="LifeLine_AMV",
+		InitCommand=function(self)
+		amv_reference = self
+			self:SetDrawState({Mode="DrawMode_LineStrip"})
+				:SetLineWidth( 1 ):zoom(35):diffuse(lineColor)
+				:queuecommand("SetVertices")
+		end,
+	  SetVerticesCommand=function(self)
+		local verts = ComputeVertices()
+		self:SetNumVertices(#verts):SetVertices(verts)
+	  end
+	},
+	Def.ActorMultiVertex{
+		Name="LifeLine_AMV",
+		InitCommand=function(self)
+		amv_reference = self
+			self:SetDrawState({Mode="DrawMode_LineStrip"})
+				:SetLineWidth( 1 ):zoom(20):diffuse(lineColor)
+				:queuecommand("SetVertices")
+		end,
+	  SetVerticesCommand=function(self)
+		local verts = ComputeVertices()
+		self:SetNumVertices(#verts):SetVertices(verts)
+	  end
+	},
+	Def.ActorMultiVertex{
+		Name = "GrooveRadar_AMV",
+		InitCommand = function(self)
+			self:zoom(0.85)
+				:SetDrawState({ Mode = 2})
+				:SetLineWidth(1):diffuse(color("#ff6384")):diffusealpha(0.5)
+				:queuecommand("Redraw")
+		end,
+		RedrawCommand = function(self)
+			-- Gather raw tech counts.
+			local rawValues = { 0, 0, 0, 0, 0, 0, 0 }
+			if GAMESTATE:GetCurrentSong() and GAMESTATE:GetCurrentSteps(player) then
+				local techCounts = GAMESTATE:GetCurrentSteps(player):CalculateTechCounts(player)
+				local crossovers    = techCounts:GetValue("TechCountsCategory_Crossovers")    or 0
+				local footswitches  = techCounts:GetValue("TechCountsCategory_Footswitches")    or 0
+				local sideswitches  = techCounts:GetValue("TechCountsCategory_Sideswitches")    or 0
+				local jacks         = techCounts:GetValue("TechCountsCategory_Jacks")           or 0
+				local brackets      = techCounts:GetValue("TechCountsCategory_Brackets")        or 0
+				local doublesteps   = techCounts:GetValue("TechCountsCategory_Doublesteps")     or 0
+				local streamMeasures, breakMeasures = GetTotalStreamAndBreakMeasures(pn)
+				local stream = streamMeasures or 0
+				
+				rawValues = {
+					crossovers,
+					sideswitches,
+					footswitches,
+					jacks,
+					doublesteps,
+					brackets,
+					stream
+				}
+			end
+			local verts = ComputeVerticesFromRawValues(rawValues)
+			self:SetNumVertices(#verts):SetVertices(verts)
+		end
+	},
+}
+
+
+
+af3[#af3+1] = Def.ActorFrame{
+	InitCommand=function(self)
+		if #GAMESTATE:GetHumanPlayers() == 2 then
+			self:xy(width/2 -100, height/2 - (pn == "P1" and 30 or -45)):rotationz(77):zoom(0.55)
+
+		else
+			self:xy(width/2 -100, height/2 - 35):rotationz(77):zoom(0.55)
+
+		end
+	end,
+	RedrawCommand=function(self)
+		self:visible(true)
+	end,
+	HideCommand=function(self)
+		self:visible(false)
+	end,
+	Def.ActorMultiVertex{
+		InitCommand=function(self)
+			-- these coordinates aren't neat and tidy, but they do create three triangles
+			-- that fit together to approximate hurtpiggypig's original png asset
+			local verts = {}
+			-- Set verts to an empty table then lets use it to draw a circle with for loops
+			for i=1,360 do
+				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+			end
+			self:SetDrawState({Mode=6}):SetVertices(verts)
+			self:diffuse(Color.Black):diffusealpha(0.01)
+			self:zoom(7.75)
+		end
+	},
+	Def.ActorMultiVertex{
+		InitCommand=function(self)
+			-- these coordinates aren't neat and tidy, but they do create three triangles
+			-- that fit together to approximate hurtpiggypig's original png asset
+			local verts = {}
+			-- Set verts to an empty table then lets use it to draw a circle with for loops
+			for i=1,360 do
+				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+			end
+			self:SetDrawState({Mode=6}):SetVertices(verts)
+			self:diffuse(color("f5f5f5")):diffusealpha(0.05)
+			self:zoom(7)
+		end
+	},
+	Def.ActorMultiVertex{
+		Name="LifeLine_AMV",
+		InitCommand=function(self)
+		amv_reference = self
+			self:SetDrawState({Mode="DrawMode_Fan"})
+				:SetLineWidth( 1 ):zoom(65):diffuse(color("f6e8c9")):diffusealpha(0.25)
+				:queuecommand("SetVertices")
+			
+		end,
+		SetVerticesCommand=function(self)
+			local verts = ComputeVertices()
+			self:SetNumVertices(#verts):SetVertices(verts)
+		end
+	},
+	Def.GrooveRadar{
+		Name="GrooveRadar",
+		InitCommand=function(self)
+			self:visible(true):zoom(3)
+			self:queuecommand("Redraw")
+		end,
+
+		RedrawCommand=function(self)
+			if GAMESTATE:GetCurrentSong() and
+				GAMESTATE:GetCurrentSteps(player) then
+					local radarValues = GAMESTATE:GetCurrentSteps(player):GetRadarValues(player)
+					self:SetFromRadarValues(player, radarValues)
+				end
+		end
+	}
+}
+
+
+-- XO Skill:  XS count + 20.6 · (BPM – 100)
+
+-- JA Skill:  JS count + 0.9 · (BPM – 100)
+
+-- FS Skill:  FS count + (BPM – 100) · [≈0.48 for high BPM; ≈1.0 when BPM ≈105]
+
+-- DS Skill:  (hidden DS count) + 0.5 · (BPM – 100)
+
+-- BR Skill:  BR count + (11 – Peak NPS) · ≈7.2
+
+-- Stamina Skill: (stream count) · (BPM ÷ ~27)
 return af

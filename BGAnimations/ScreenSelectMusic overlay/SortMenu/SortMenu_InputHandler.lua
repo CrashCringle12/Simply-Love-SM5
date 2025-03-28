@@ -69,10 +69,12 @@ local input = function(event)
 				-- We have to turn off autosetstyle to switch styles
 				if ThemePrefs.Get("PreferredStyle")=="auto" then
 					ThemePrefs.Set("PreferredStyle", "none")
+					THEME:ReloadMetrics()
 				end
 				local new_style = focus.change:lower()
 				if focus.change:lower() == "all" then
 					ThemePrefs.Set("PreferredStyle", "auto")
+					THEME:ReloadMetrics()
 					new_style = #GAMESTATE:GetHumanPlayers() == 1 and "single" or "versus"
 				end
 				-- Get the style we want to change to

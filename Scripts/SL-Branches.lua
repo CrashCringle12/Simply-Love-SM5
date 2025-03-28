@@ -187,6 +187,7 @@ Branch.AfterHeartEntry = function()
 	if( pm == "Regular" ) then return "ScreenEvaluationStage" end
 	if (pm == "Oni") then return "ScreenEvaluationNonstop" end
 	if( pm == "Nonstop" ) then return "ScreenEvaluationNonstop" end
+	if (pm == "Rave") then return "ScreenEvaluationStage" end
 end
 
 Branch.AfterSelectMusic = function()
@@ -205,6 +206,7 @@ Branch.AfterSelectMusic = function()
 			return "ScreenGameplay"
 		end
 	else
+		
 		if SCREENMAN:GetTopScreen():GetGoToOptions() then
 			return "ScreenPlayerOptions"
 		else
@@ -350,6 +352,10 @@ Branch.AfterScreenAds = function()
 	else
 		return SL.Global.ScreenAfter.PlayerOptions
 	end
+end
+
+Branch.AfterScreenSelectCharacter = function()
+	return SL.Global.ScreenAfter.PlayerOptions
 end
 
 -- Branch.AfterCoronaLines = function()

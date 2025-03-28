@@ -1,0 +1,1 @@
+return LoadActor(THEME:GetPathG("_char","icons/(5th) Afro_diffuse"));

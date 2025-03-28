@@ -45,4 +45,5 @@ for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 	af[#af+1] = LoadActor("./PerColumnJudgmentTracking.lua", player)
 end
 
+
 return af

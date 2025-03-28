@@ -504,7 +504,7 @@ ParseChartInfo = function(steps, pn)
 				SL[pn].Streams.Sideswitches = techCounts:GetValue("TechCountsCategory_Sideswitches")
 				SL[pn].Streams.Jacks = techCounts:GetValue("TechCountsCategory_Jacks")
 				SL[pn].Streams.Brackets = techCounts:GetValue("TechCountsCategory_Brackets")
-
+				SL[pn].Streams.Doublesteps = techCounts:GetValue("TechCountsCategory_Doublesteps")
 				SL[pn].Streams.Filename = filename
 				SL[pn].Streams.StepsType = stepsType
 				SL[pn].Streams.Difficulty = difficulty
