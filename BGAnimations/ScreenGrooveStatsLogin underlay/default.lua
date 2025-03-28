@@ -10,7 +10,7 @@ local ResetGrooveStatsSettings = function(pn)
 end
 
 ws = NETWORK:WebSocket{
-  url="wss://qrlogin.groovestats.com:3000",
+  url="ws://qrlogin.groovestats.com:3000",
   pingInterval=15,
   automaticReconnect=true,
   onMessage=function(msg)
