@@ -179,12 +179,13 @@ local t = Def.ActorFrame {
 
 		-- build the array of rows
 		for i, folder in ipairs(self.wheel_options) do
+			local is_module = folder.module or false
 			-- some folders' `children` table are dynamically constructed at SSM screen init,
 			-- which could result in a folder having 0 children.  e.g. AddPlaylists() could
 			-- return an empty table.  only add a row for this folder if it has children
 			local folder_children = type(folder.children)=="function" and folder.children() or folder.children
 			if #folder_children > 0 then
-				table.insert(filtered_wheel_options, {"ToggleFolder", folder.name, ToggleFolder})
+				table.insert(filtered_wheel_options, {"ToggleFolder", folder.name, ToggleFolder, is_module})
 			end
 
 			-- a folder's `open` flag is toggled in `ToggleFolder`
@@ -192,11 +193,13 @@ local t = Def.ActorFrame {
 			if (folder.open) then
 				for _, row in ipairs(folder_children) do
 					local condition = row[2]
-
 					if condition==nil                                       -- no condition specified, always add this row
 					or (type(condition)=="function" and condition()==true)  -- condition is a function, evaluate it now
 					or (type(condition)=="boolean"  and condition==true)    -- condition is a boolean, evaluated at screen init
 					then
+						if is_module then
+							table.insert(row[1], true)
+						end
 						table.insert(filtered_wheel_options,  row[1])
 					end
 				end

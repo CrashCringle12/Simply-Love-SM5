@@ -157,21 +157,33 @@ return {
 		set = function(self, info)
 			if not info then self.bottom_text:settext("") return end
 			self.info = info
+			local toptext 
+			local bottomtext		
 
-			local toptext = THEME:GetString("ScreenSelectMusic", info[1])
-			local bottomtext
-
-			-- this row's bottom_text is the name of the playlist file retrieved from disk
-			if (info[1]=="Playlist" or info[1]=="MachinePlaylist" or info[1]=="PersonalPlaylist") then
-				bottomtext = info[2]
-
-			-- localize this row's bottom_text from ScreenSelectPlayMode (e.g. "Casual")
-			elseif (info[1] == "ChangeMode") then
-				bottomtext = THEME:GetString("ScreenSelectPlayMode", info[2])
-
-			-- localize this row's bottom_text from ScreenSelectMusic
+			-- If we're handling a folder added via Module
+			if info[4] then
+				-- Check if string starts with "Folder"
+				if string.sub(info[2], 1, 6) == "Folder" then
+					toptext = ""
+					bottomtext = string.sub(info[2], 7)
+				else
+					toptext = info[1]
+					bottomtext = info[2]
+				end
 			else
-				bottomtext = THEME:GetString("ScreenSelectMusic", info[2])
+				toptext = THEME:GetString("ScreenSelectMusic", info[1])
+				-- this row's bottom_text is the name of the playlist file retrieved from disk
+				if (info[1]=="Playlist" or info[1]=="MachinePlaylist" or info[1]=="PersonalPlaylist") then
+					bottomtext = info[2]
+
+				-- localize this row's bottom_text from ScreenSelectPlayMode (e.g. "Casual")
+				elseif (info[1] == "ChangeMode") then
+					bottomtext = THEME:GetString("ScreenSelectPlayMode", info[2])
+
+				-- localize this row's bottom_text from ScreenSelectMusic
+				else
+					bottomtext = THEME:GetString("ScreenSelectMusic", info[2])
+				end
 			end
 
 			self.top_text:settext(toptext)
