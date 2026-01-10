@@ -46,7 +46,7 @@ local HandleStateChange = function(self, Player)
 			-- using local profile
 			joinframe:visible(false)
 			scrollerframe:visible(true)
-			seltext:visible(selected)
+			seltext:visible(true)
 			usbsprite:visible(false)
 		else
 			-- using memorycard profile
