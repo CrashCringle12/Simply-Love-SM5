@@ -530,6 +530,9 @@ function InitializeSimplyLove()
 		PREFSMAN:SetPreference("DefaultLocalProfileIDP1", "")
 		PREFSMAN:SetPreference("DefaultLocalProfileIDP2", "")
 	end
+	-- Make sure we reset to no preferred style on init
+	ThemePrefs.Set("PreferredStyle", "none")
+	THEME:ReloadMetrics()
 end
 
 InitializeSimplyLove()
