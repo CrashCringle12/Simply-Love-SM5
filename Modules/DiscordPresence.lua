@@ -1,4 +1,5 @@
 local t = {}
+return t -- Disable for now
 local discordPresence = {
     startTime = 0,
     endTime = 0,

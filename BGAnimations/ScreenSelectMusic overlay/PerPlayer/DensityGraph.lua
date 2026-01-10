@@ -8,7 +8,7 @@ local pn = ToEnumShortString(player)
 
 -- Height and width of the density graph.
 local height = 64
-local width = IsUsingWideScreen() and 286 or 268
+local width = IsUsingWideScreen() and 300 or 268
 
 -- In 2-players mode, whether the DensityGraph or PatternInfo is shown
 -- Can be toggled by the code "ToggleChartInfo" in metrics.ini
@@ -29,7 +29,7 @@ local af = Def.ActorFrame{
 		else
 			self:visible(GAMESTATE:IsHumanPlayer(player))
 		end
-		self:xy(IsUsingWideScreen() and  _screen.cx-198 or  _screen.cx-176, _screen.cy+20):zoom(0.92)
+		self:xy(IsUsingWideScreen() and  _screen.cx-192 or  _screen.cx-176, _screen.cy+20):zoom(0.92)
 
 		if player == PLAYER_2 then
 			self:addy(height+12)
@@ -355,233 +355,233 @@ local function ComputeVerticesFromRawValues(rawValues)
     return verts
 end
 
-local lineColor = color("#cccccc")
-af3[#af3+1] = Def.ActorFrame{
-	InitCommand=function(self)
-		if #GAMESTATE:GetHumanPlayers() == 2 then
-			self:xy(width/2 +40, height/2 - (pn == "P1" and 30 or -45)):rotationz(77):zoom(0.55)
+-- local lineColor = color("#cccccc")
+-- af3[#af3+1] = Def.ActorFrame{
+-- 	InitCommand=function(self)
+-- 		if #GAMESTATE:GetHumanPlayers() == 2 then
+-- 			self:xy(width/2 +40, height/2 - (pn == "P1" and 30 or -45)):rotationz(77):zoom(0.55)
 
-		else
-			self:xy(width/2 +40, height/2 - 35):rotationz(77):zoom(0.55)
+-- 		else
+-- 			self:xy(width/2 +40, height/2 - 35):rotationz(77):zoom(0.55)
 
-		end
-	end,
-	RedrawCommand=function(self)
-		self:visible(true)
-	end,
-	HideCommand=function(self)
-		self:visible(false)
-	end,
-	Def.ActorMultiVertex{
-		InitCommand=function(self)
-			-- these coordinates aren't neat and tidy, but they do create three triangles
-			-- that fit together to approximate hurtpiggypig's original png asset
-			local verts = {}
-			-- Set verts to an empty table then lets use it to draw a circle with for loops
-			for i=1,360 do
-				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
-			end
-			self:SetDrawState({Mode=6}):SetVertices(verts)
-			self:diffuse(Color.Black):diffusealpha(0.01)
-			self:zoom(7.75)
-		end
-	},
-	Def.ActorMultiVertex{
-		InitCommand=function(self)
-			-- these coordinates aren't neat and tidy, but they do create three triangles
-			-- that fit together to approximate hurtpiggypig's original png asset
-			local verts = {}
-			-- Set verts to an empty table then lets use it to draw a circle with for loops
-			for i=1,360 do
-				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
-			end
-			self:SetDrawState({Mode=6}):SetVertices(verts)
-			self:diffuse(color("f5f5f5")):diffusealpha(0.05)
-			self:zoom(7)
-		end
-	},
-	Def.ActorMultiVertex{
-		Name="LifeLine_AMV",
-		InitCommand=function(self)
-		amv_reference = self
-			self:SetDrawState({Mode="DrawMode_Fan"})
-				:SetLineWidth( 1 ):zoom(65):diffuse(color("f6e8c9")):diffusealpha(0.25)
-				:queuecommand("SetVertices")
+-- 		end
+-- 	end,
+-- 	RedrawCommand=function(self)
+-- 		self:visible(true)
+-- 	end,
+-- 	HideCommand=function(self)
+-- 		self:visible(false)
+-- 	end,
+-- 	Def.ActorMultiVertex{
+-- 		InitCommand=function(self)
+-- 			-- these coordinates aren't neat and tidy, but they do create three triangles
+-- 			-- that fit together to approximate hurtpiggypig's original png asset
+-- 			local verts = {}
+-- 			-- Set verts to an empty table then lets use it to draw a circle with for loops
+-- 			for i=1,360 do
+-- 				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+-- 			end
+-- 			self:SetDrawState({Mode=6}):SetVertices(verts)
+-- 			self:diffuse(Color.Black):diffusealpha(0.01)
+-- 			self:zoom(7.75)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		InitCommand=function(self)
+-- 			-- these coordinates aren't neat and tidy, but they do create three triangles
+-- 			-- that fit together to approximate hurtpiggypig's original png asset
+-- 			local verts = {}
+-- 			-- Set verts to an empty table then lets use it to draw a circle with for loops
+-- 			for i=1,360 do
+-- 				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+-- 			end
+-- 			self:SetDrawState({Mode=6}):SetVertices(verts)
+-- 			self:diffuse(color("f5f5f5")):diffusealpha(0.05)
+-- 			self:zoom(7)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name="LifeLine_AMV",
+-- 		InitCommand=function(self)
+-- 		amv_reference = self
+-- 			self:SetDrawState({Mode="DrawMode_Fan"})
+-- 				:SetLineWidth( 1 ):zoom(65):diffuse(color("f6e8c9")):diffusealpha(0.25)
+-- 				:queuecommand("SetVertices")
 			
-		end,
-		SetVerticesCommand=function(self)
-			local verts = ComputeVertices()
-			self:SetNumVertices(#verts):SetVertices(verts)
-		end
-	},
-	Def.ActorMultiVertex{
-		Name="LifeLine_AMV",
-		InitCommand=function(self)
-		amv_reference = self
-			self:SetDrawState({Mode="DrawMode_LineStrip"})
-				:SetLineWidth( 1 ):zoom(65):diffuse(lineColor)
-				:queuecommand("SetVertices")
+-- 		end,
+-- 		SetVerticesCommand=function(self)
+-- 			local verts = ComputeVertices()
+-- 			self:SetNumVertices(#verts):SetVertices(verts)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name="LifeLine_AMV",
+-- 		InitCommand=function(self)
+-- 		amv_reference = self
+-- 			self:SetDrawState({Mode="DrawMode_LineStrip"})
+-- 				:SetLineWidth( 1 ):zoom(65):diffuse(lineColor)
+-- 				:queuecommand("SetVertices")
 			
-		end,
-		SetVerticesCommand=function(self)
-			local verts = ComputeVertices()
-			self:SetNumVertices(#verts):SetVertices(verts)
-		end
-	},
-	Def.ActorMultiVertex{
-		Name="LifeLine_AMV",
-		InitCommand=function(self)
-		amv_reference = self
-			self:SetDrawState({Mode="DrawMode_LineStrip"})
-				:SetLineWidth( 1 ):zoom(50):diffuse(lineColor)
-				:queuecommand("SetVertices")
+-- 		end,
+-- 		SetVerticesCommand=function(self)
+-- 			local verts = ComputeVertices()
+-- 			self:SetNumVertices(#verts):SetVertices(verts)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name="LifeLine_AMV",
+-- 		InitCommand=function(self)
+-- 		amv_reference = self
+-- 			self:SetDrawState({Mode="DrawMode_LineStrip"})
+-- 				:SetLineWidth( 1 ):zoom(50):diffuse(lineColor)
+-- 				:queuecommand("SetVertices")
 			
-		end,
-		SetVerticesCommand=function(self)
-			local verts = ComputeVertices()
-			self:SetNumVertices(#verts):SetVertices(verts)
-		end
-	},
-	Def.ActorMultiVertex{
-		Name="LifeLine_AMV",
-		InitCommand=function(self)
-		amv_reference = self
-			self:SetDrawState({Mode="DrawMode_LineStrip"})
-				:SetLineWidth( 1 ):zoom(35):diffuse(lineColor)
-				:queuecommand("SetVertices")
-		end,
-	  SetVerticesCommand=function(self)
-		local verts = ComputeVertices()
-		self:SetNumVertices(#verts):SetVertices(verts)
-	  end
-	},
-	Def.ActorMultiVertex{
-		Name="LifeLine_AMV",
-		InitCommand=function(self)
-		amv_reference = self
-			self:SetDrawState({Mode="DrawMode_LineStrip"})
-				:SetLineWidth( 1 ):zoom(20):diffuse(lineColor)
-				:queuecommand("SetVertices")
-		end,
-	  SetVerticesCommand=function(self)
-		local verts = ComputeVertices()
-		self:SetNumVertices(#verts):SetVertices(verts)
-	  end
-	},
-	Def.ActorMultiVertex{
-		Name = "GrooveRadar_AMV",
-		InitCommand = function(self)
-			self:zoom(0.85)
-				:SetDrawState({ Mode = 2})
-				:SetLineWidth(1):diffuse(color("#ff6384")):diffusealpha(0.5)
-				:queuecommand("Redraw")
-		end,
-		RedrawCommand = function(self)
-			-- Gather raw tech counts.
-			local rawValues = { 0, 0, 0, 0, 0, 0, 0 }
-			if GAMESTATE:GetCurrentSong() and GAMESTATE:GetCurrentSteps(player) then
-				local techCounts = GAMESTATE:GetCurrentSteps(player):CalculateTechCounts(player)
-				local crossovers    = techCounts:GetValue("TechCountsCategory_Crossovers")    or 0
-				local footswitches  = techCounts:GetValue("TechCountsCategory_Footswitches")    or 0
-				local sideswitches  = techCounts:GetValue("TechCountsCategory_Sideswitches")    or 0
-				local jacks         = techCounts:GetValue("TechCountsCategory_Jacks")           or 0
-				local brackets      = techCounts:GetValue("TechCountsCategory_Brackets")        or 0
-				local doublesteps   = techCounts:GetValue("TechCountsCategory_Doublesteps")     or 0
-				local streamMeasures, breakMeasures = GetTotalStreamAndBreakMeasures(pn)
-				local stream = streamMeasures or 0
+-- 		end,
+-- 		SetVerticesCommand=function(self)
+-- 			local verts = ComputeVertices()
+-- 			self:SetNumVertices(#verts):SetVertices(verts)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name="LifeLine_AMV",
+-- 		InitCommand=function(self)
+-- 		amv_reference = self
+-- 			self:SetDrawState({Mode="DrawMode_LineStrip"})
+-- 				:SetLineWidth( 1 ):zoom(35):diffuse(lineColor)
+-- 				:queuecommand("SetVertices")
+-- 		end,
+-- 	  SetVerticesCommand=function(self)
+-- 		local verts = ComputeVertices()
+-- 		self:SetNumVertices(#verts):SetVertices(verts)
+-- 	  end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name="LifeLine_AMV",
+-- 		InitCommand=function(self)
+-- 		amv_reference = self
+-- 			self:SetDrawState({Mode="DrawMode_LineStrip"})
+-- 				:SetLineWidth( 1 ):zoom(20):diffuse(lineColor)
+-- 				:queuecommand("SetVertices")
+-- 		end,
+-- 	  SetVerticesCommand=function(self)
+-- 		local verts = ComputeVertices()
+-- 		self:SetNumVertices(#verts):SetVertices(verts)
+-- 	  end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name = "GrooveRadar_AMV",
+-- 		InitCommand = function(self)
+-- 			self:zoom(0.85)
+-- 				:SetDrawState({ Mode = 2})
+-- 				:SetLineWidth(1):diffuse(color("#ff6384")):diffusealpha(0.5)
+-- 				:queuecommand("Redraw")
+-- 		end,
+-- 		RedrawCommand = function(self)
+-- 			-- Gather raw tech counts.
+-- 			local rawValues = { 0, 0, 0, 0, 0, 0, 0 }
+-- 			if GAMESTATE:GetCurrentSong() and GAMESTATE:GetCurrentSteps(player) then
+-- 				local techCounts = GAMESTATE:GetCurrentSteps(player):CalculateTechCounts(player)
+-- 				local crossovers    = techCounts:GetValue("TechCountsCategory_Crossovers")    or 0
+-- 				local footswitches  = techCounts:GetValue("TechCountsCategory_Footswitches")    or 0
+-- 				local sideswitches  = techCounts:GetValue("TechCountsCategory_Sideswitches")    or 0
+-- 				local jacks         = techCounts:GetValue("TechCountsCategory_Jacks")           or 0
+-- 				local brackets      = techCounts:GetValue("TechCountsCategory_Brackets")        or 0
+-- 				local doublesteps   = techCounts:GetValue("TechCountsCategory_Doublesteps")     or 0
+-- 				local streamMeasures, breakMeasures = GetTotalStreamAndBreakMeasures(pn)
+-- 				local stream = streamMeasures or 0
 				
-				rawValues = {
-					crossovers,
-					sideswitches,
-					footswitches,
-					jacks,
-					doublesteps,
-					brackets,
-					stream
-				}
-			end
-			local verts = ComputeVerticesFromRawValues(rawValues)
-			self:SetNumVertices(#verts):SetVertices(verts)
-		end
-	},
-}
+-- 				rawValues = {
+-- 					crossovers,
+-- 					sideswitches,
+-- 					footswitches,
+-- 					jacks,
+-- 					doublesteps,
+-- 					brackets,
+-- 					stream
+-- 				}
+-- 			end
+-- 			local verts = ComputeVerticesFromRawValues(rawValues)
+-- 			self:SetNumVertices(#verts):SetVertices(verts)
+-- 		end
+-- 	},
+-- }
 
 
 
-af3[#af3+1] = Def.ActorFrame{
-	InitCommand=function(self)
-		if #GAMESTATE:GetHumanPlayers() == 2 then
-			self:xy(width/2 -100, height/2 - (pn == "P1" and 30 or -45)):rotationz(77):zoom(0.55)
+-- af3[#af3+1] = Def.ActorFrame{
+-- 	InitCommand=function(self)
+-- 		if #GAMESTATE:GetHumanPlayers() == 2 then
+-- 			self:xy(width/2 -100, height/2 - (pn == "P1" and 30 or -45)):rotationz(77):zoom(0.55)
 
-		else
-			self:xy(width/2 -100, height/2 - 35):rotationz(77):zoom(0.55)
+-- 		else
+-- 			self:xy(width/2 -100, height/2 - 35):rotationz(77):zoom(0.55)
 
-		end
-	end,
-	RedrawCommand=function(self)
-		self:visible(true)
-	end,
-	HideCommand=function(self)
-		self:visible(false)
-	end,
-	Def.ActorMultiVertex{
-		InitCommand=function(self)
-			-- these coordinates aren't neat and tidy, but they do create three triangles
-			-- that fit together to approximate hurtpiggypig's original png asset
-			local verts = {}
-			-- Set verts to an empty table then lets use it to draw a circle with for loops
-			for i=1,360 do
-				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
-			end
-			self:SetDrawState({Mode=6}):SetVertices(verts)
-			self:diffuse(Color.Black):diffusealpha(0.01)
-			self:zoom(7.75)
-		end
-	},
-	Def.ActorMultiVertex{
-		InitCommand=function(self)
-			-- these coordinates aren't neat and tidy, but they do create three triangles
-			-- that fit together to approximate hurtpiggypig's original png asset
-			local verts = {}
-			-- Set verts to an empty table then lets use it to draw a circle with for loops
-			for i=1,360 do
-				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
-			end
-			self:SetDrawState({Mode=6}):SetVertices(verts)
-			self:diffuse(color("f5f5f5")):diffusealpha(0.05)
-			self:zoom(7)
-		end
-	},
-	Def.ActorMultiVertex{
-		Name="LifeLine_AMV",
-		InitCommand=function(self)
-		amv_reference = self
-			self:SetDrawState({Mode="DrawMode_Fan"})
-				:SetLineWidth( 1 ):zoom(65):diffuse(color("f6e8c9")):diffusealpha(0.25)
-				:queuecommand("SetVertices")
+-- 		end
+-- 	end,
+-- 	RedrawCommand=function(self)
+-- 		self:visible(true)
+-- 	end,
+-- 	HideCommand=function(self)
+-- 		self:visible(false)
+-- 	end,
+-- 	Def.ActorMultiVertex{
+-- 		InitCommand=function(self)
+-- 			-- these coordinates aren't neat and tidy, but they do create three triangles
+-- 			-- that fit together to approximate hurtpiggypig's original png asset
+-- 			local verts = {}
+-- 			-- Set verts to an empty table then lets use it to draw a circle with for loops
+-- 			for i=1,360 do
+-- 				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+-- 			end
+-- 			self:SetDrawState({Mode=6}):SetVertices(verts)
+-- 			self:diffuse(Color.Black):diffusealpha(0.01)
+-- 			self:zoom(7.75)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		InitCommand=function(self)
+-- 			-- these coordinates aren't neat and tidy, but they do create three triangles
+-- 			-- that fit together to approximate hurtpiggypig's original png asset
+-- 			local verts = {}
+-- 			-- Set verts to an empty table then lets use it to draw a circle with for loops
+-- 			for i=1,360 do
+-- 				verts[i] = {{math.cos(i)*10,math.sin(i)*10,0},{1,1,1,0.25}}
+-- 			end
+-- 			self:SetDrawState({Mode=6}):SetVertices(verts)
+-- 			self:diffuse(color("f5f5f5")):diffusealpha(0.05)
+-- 			self:zoom(7)
+-- 		end
+-- 	},
+-- 	Def.ActorMultiVertex{
+-- 		Name="LifeLine_AMV",
+-- 		InitCommand=function(self)
+-- 		amv_reference = self
+-- 			self:SetDrawState({Mode="DrawMode_Fan"})
+-- 				:SetLineWidth( 1 ):zoom(65):diffuse(color("f6e8c9")):diffusealpha(0.25)
+-- 				:queuecommand("SetVertices")
 			
-		end,
-		SetVerticesCommand=function(self)
-			local verts = ComputeVertices()
-			self:SetNumVertices(#verts):SetVertices(verts)
-		end
-	},
-	Def.GrooveRadar{
-		Name="GrooveRadar",
-		InitCommand=function(self)
-			self:visible(true):zoom(3)
-			self:queuecommand("Redraw")
-		end,
+-- 		end,
+-- 		SetVerticesCommand=function(self)
+-- 			local verts = ComputeVertices()
+-- 			self:SetNumVertices(#verts):SetVertices(verts)
+-- 		end
+-- 	},
+-- 	Def.GrooveRadar{
+-- 		Name="GrooveRadar",
+-- 		InitCommand=function(self)
+-- 			self:visible(true):zoom(3)
+-- 			self:queuecommand("Redraw")
+-- 		end,
 
-		RedrawCommand=function(self)
-			if GAMESTATE:GetCurrentSong() and
-				GAMESTATE:GetCurrentSteps(player) then
-					local radarValues = GAMESTATE:GetCurrentSteps(player):GetRadarValues(player)
-					self:SetFromRadarValues(player, radarValues)
-				end
-		end
-	}
-}
+-- 		RedrawCommand=function(self)
+-- 			if GAMESTATE:GetCurrentSong() and
+-- 				GAMESTATE:GetCurrentSteps(player) then
+-- 					local radarValues = GAMESTATE:GetCurrentSteps(player):GetRadarValues(player)
+-- 					self:SetFromRadarValues(player, radarValues)
+-- 				end
+-- 		end
+-- 	}
+-- }
 
 
 -- XO Skill:  XS count + 20.6 · (BPM – 100)

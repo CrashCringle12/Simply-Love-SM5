@@ -72,7 +72,11 @@ return Def.Sprite{
 			if song and FindInTable(song, SL[pn].Favorites) then 
 				self:diffuse(color("#ffc0cb"))
 			else
-				self:diffuse(1,1,1,1) 
+				if ThemePrefs.Get("VisualStyle") == "Rights" then
+					self:diffuse(Color.Black)
+				else
+					self:diffuse(1,1,1,1) 
+				end
 			end
 			for i,chart in pairs( GetStepsToDisplay(playable_steps) ) do
 				if chart == current_steps then

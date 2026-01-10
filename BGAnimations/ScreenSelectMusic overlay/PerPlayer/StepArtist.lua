@@ -50,7 +50,7 @@ return Def.ActorFrame{
 				self:x( _screen.cx - (IsUsingWideScreen() and 210 or 242))
 				self:y(_screen.cy + 85)
 			else
-				self:x( _screen.cx - (IsUsingWideScreen() and 266 or 242))
+				self:x( _screen.cx - (IsUsingWideScreen() and 254 or 242))
 				self:y(_screen.cy + 28)
 			end
 		end
