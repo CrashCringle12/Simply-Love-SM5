@@ -10,7 +10,7 @@ end
 getFavoritesPath = function(player)
     local path = PROFILEMAN:GetProfileDir(
                      ProfileSlot[PlayerNumber:Reverse()[player] + 1]) ..
-                     "FavoriteSongs.txt";
+                     "favorites.txt";
     return path;
 end
 
@@ -106,7 +106,7 @@ generateFavoritesForMusicWheel = function()
                     for line in favs:gmatch("[^\r\n]+") do
                         --- If the line starts with "---" it's a header, so don't add it to the list of songs
                         if line:find("^---") then
-                            -- You could modify the FavoriteSongs.txt file to create custom sections when using the Preferred Sort (Favorites)
+                            -- You could modify the favorites.txt file to create custom sections when using the Preferred Sort (Favorites)
                             -- Any line that begins with --- will be treated as the start of a new section
                             -- i.e. ---Cringle's Super Cool Stamina Playlist
 
