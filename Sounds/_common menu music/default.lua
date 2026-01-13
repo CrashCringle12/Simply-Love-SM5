@@ -18,7 +18,7 @@ local songs = {
 	Boba = "Bubble Tea.ogg",
 	ITL = "EasyStreet.ogg",
 	Rights = "RUSH E 8 Bit.ogg",
-	Lefts = "RUSH E 8 Bit.ogg"
+	Lefts = "MrSandman 8bituniverse.ogg"
 }
 
 -- retrieve the current VisualStyle from the ThemePrefs system
