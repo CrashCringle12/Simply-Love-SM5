@@ -617,10 +617,10 @@ t[#t+1] = Def.ActorFrame {
 	end,
     AchievementUnlockedP1MessageCommand=function(self, params)
 		local NumPlayers = #GAMESTATE:GetHumanPlayers()
-		if NumPlayers == 2 then
-			self:y(0)
-		else
+		if (#SL.Accolades.Notifications["P1"].achievements > 0 and #SL.Accolades.Notifications["P2"].achievements > 0) then
 			self:y(-75)
+		else
+			self:y(0)
 		end
 		
         -- Process SL.Accolades.Notifications.achievements
@@ -728,7 +728,7 @@ t[#t+1] = Def.ActorFrame {
 			{ Frame=1,	Delay=0.09},
 			{ Frame=0,	Delay=0.51},
 		};
-		Texture=THEME:GetPathO("", "Achievements/achievement 2x5.png"),
+		Texture=THEME:GetPathO("", "Achievements/achievement_p2 2x5.png"),
 		OnCommand=function(self)
 			self:CenterX():y(_screen.h*.85):zoom(.4):diffusealpha(0)
 			gui_actors["P2"].achieve = self

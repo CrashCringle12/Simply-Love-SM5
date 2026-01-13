@@ -356,7 +356,6 @@ local wheel_options = {
 		{"", "CategoryViews"},
 		{
 			{{"View", "Gallery"}},
-			{{"View", "Trials"}},
 			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
 			{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
 		}

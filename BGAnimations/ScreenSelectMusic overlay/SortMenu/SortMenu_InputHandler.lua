@@ -16,7 +16,6 @@ local input = function(event)
 			sort_wheel:scroll_by_amount(-1)
 			sortmenu:GetChild("change_sound"):play()
 		elseif event.GameButton == "Start" then
-			SL.Global.ViewingTrials = false
 			sortmenu:GetChild("start_sound"):play()
 			local focus = sort_wheel:get_actor_item_at_focus_pos()
 			if focus.kind == "SortBy" then
@@ -32,7 +31,6 @@ local input = function(event)
 					SCREENMAN:GetTopScreen():GetMusicWheel():ChangeSort("SortOrder_Preferred")
 				end
 			elseif focus.kind == "MachinePlaylist" then
-				SL.Global.ViewingTrials = true
 				local path = THEME:GetPathO("", "Playlists/" .. focus.new_overlay .. ".txt")
 				SONGMAN:SetPreferredSongs(path, --[[isAbsolute=]]true);
 				if SONGMAN:GetPreferredSortSongs() then
@@ -161,14 +159,6 @@ local input = function(event)
 				elseif focus.new_overlay == "SetSummary" then
 					SCREENMAN:GetTopScreen():SetNextScreenName("ScreenEvaluationSummarySet")
 					SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen")
-				elseif focus.new_overlay == "Trials" then
-					SL.Global.ViewingTrials = true
-					generateTrialsForMusicWheel()
-					SONGMAN:SetPreferredSongs(getTrialsPath(), --[[isAbsolute=]]true);
-					if SONGMAN:GetPreferredSortSongs() then
-						overlay:queuecommand("DirectInputToEngine")
-						SCREENMAN:GetTopScreen():GetMusicWheel():ChangeSort("SortOrder_Preferred")
-					end
 				elseif focus.new_overlay == "Achievements" then
 					SL.Global.AchievementMenuActive = true
 					overlay:queuecommand("DirectInputToEngineForAchievements")

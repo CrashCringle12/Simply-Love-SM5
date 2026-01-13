@@ -23,7 +23,6 @@ local t = Def.ActorFrame{
 	RedrawStepsDisplayCommand=function(self)
 
 		local song = GAMESTATE:GetCurrentSong()
-		-- isTrial = song and FindInTable(song, SL.Global.Trials)
 		if song then
 			local steps = SongUtil.GetPlayableSteps( song )
 

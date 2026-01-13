@@ -1,7 +1,5 @@
 return function(AllSteps)
 	local song = GAMESTATE:GetCurrentSong()
-	--local isTrial = song and FindInTable(song, SL.Global.Trials)
-	--isTrial = isTrial and SL.Global.ViewingTrials
 	AllSteps = AllSteps or (song and SongUtil.GetPlayableSteps(song)) or {}
 
 	local StepsToShow, edits = {}, {}
