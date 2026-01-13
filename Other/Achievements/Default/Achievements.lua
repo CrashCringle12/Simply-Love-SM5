@@ -128,7 +128,8 @@ return {
         Name = "Make it stop....MAKE IT STOP",
         Icon = "crab.png",
         Condition = function(pn)
-            if string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(), "[14] [125] Crab Rave Marathon") then
+            if string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(), "[14] [125] Crab Rave Marathon")
+            or (string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(), "[14] [125] Crab Rave Marathon") and string.match(GAMESTATE:GetCurrentSong():GetDisplayMainTitle(), "125")) then
                 return HasPassed(pn, song)
             else
                 return false

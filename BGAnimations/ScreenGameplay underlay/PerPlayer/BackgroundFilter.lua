@@ -8,7 +8,8 @@ if mods.BackgroundFilter == "Off" then return end
 local FilterAlpha = {
 	Dark = 0.5,
 	Darker = 0.75,
-	Darkest = 0.95
+	-- Because of the darkness of the "background" set via preference, this was actually fully opaque
+	Darkest = 0.90
 }
 
 local FilterColors = {

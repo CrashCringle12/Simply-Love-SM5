@@ -14,6 +14,23 @@ local af = Def.ActorFrame{
 		local songOptions = GAMESTATE:GetSongOptionsObject("ModsLevel_Preferred")
 		songOptions:MusicRate(SL.Global.ActiveModifiers.MusicRate)
 	end,
+	OnCommand=function(self)
+		-- For testing achievements:
+		-- SL.Accolades.Notifications = {
+		-- 	P1 = { achievements = {} },
+		-- 	P2 = { achievements = {} }
+		-- }
+		-- table.insert(SL.Accolades.Notifications["P1"].achievements, 1, {
+		-- 	Name = "Test1",
+		-- 	Desc = "This is only a test."
+		-- })
+		-- table.insert(SL.Accolades.Notifications["P2"].achievements, 1, {
+		-- 	Name = "Test 2",
+		-- 	Desc = "This is only another test."
+		-- })
+		-- MESSAGEMAN:Broadcast("AchievementUnlockedP1")
+		-- MESSAGEMAN:Broadcast("AchievementUnlockedP2")
+	end,
 
 	PlayerProfileSetMessageCommand=function(self, params)
 		if not PROFILEMAN:IsPersistentProfile(params.Player) then

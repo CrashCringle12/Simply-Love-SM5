@@ -274,6 +274,7 @@ ValidateAchievements = function(player)
 		end
 	end
 	if #SL.Accolades.Notifications[pn].achievements > 0 then
+		MESSAGEMAN:Broadcast("AchievementUnlocked")
 		MESSAGEMAN:Broadcast("AchievementUnlocked"..pn)
 	end
 end

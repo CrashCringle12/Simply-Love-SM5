@@ -614,9 +614,15 @@ local function AchievementUnlocked(achievementName, achievementDesc, pn)
 t[#t+1] = Def.ActorFrame {
 	InitCommand=function(self)
 		self:queuecommand("On")
-		self:addy(-75)
 	end,
     AchievementUnlockedP1MessageCommand=function(self, params)
+		local NumPlayers = #GAMESTATE:GetHumanPlayers()
+		if NumPlayers == 2 then
+			self:y(0)
+		else
+			self:y(-75)
+		end
+		
         -- Process SL.Accolades.Notifications.achievements
         -- For each one, queue a command to display it
         if #SL.Accolades.Notifications["P1"].achievements > 0 then
@@ -652,7 +658,7 @@ t[#t+1] = Def.ActorFrame {
         OnCommand=function(self)
             self:CenterX():y(_screen.h*.85):zoom(.4):diffusealpha(0)
             gui_actors["P1"].achieve = self
-        end
+        end,
 	},
     Def.BitmapText{
         File=THEME:GetPathO("", "Achievements/_x360 by redge 20px.ini"),
