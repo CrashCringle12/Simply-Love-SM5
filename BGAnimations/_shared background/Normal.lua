@@ -13,7 +13,7 @@ local anim_data = {
 local t = Def.ActorFrame {
 	InitCommand=function(self)
 		local style = ThemePrefs.Get("VisualStyle")
-		self:visible(not ThemePrefs.Get("RainbowMode") and style ~= "SRPG8" and style ~= "PSU" and style ~= "ITL" and style ~= "Rights")
+		self:visible(not ThemePrefs.Get("RainbowMode") and style ~= "SRPG8" and style ~= "PSU" and style ~= "ITL" and style ~= "Rights"and style ~= "Lefts")
 	end,
 	OnCommand=function(self) 
 		self:accelerate(0.8):diffusealpha(1) end,
@@ -22,7 +22,7 @@ local t = Def.ActorFrame {
 	VisualStyleSelectedMessageCommand=function(self)
 		local style = ThemePrefs.Get("VisualStyle")
 
-		if ThemePrefs.Get("RainbowMode") or style == "SRPG8" or style == "Technique" or style == "PSU" or style == "ITL" or style == "Rights" then
+		if ThemePrefs.Get("RainbowMode") or style == "SRPG8" or style == "Technique" or style == "PSU" or style == "ITL" or style == "Rights" or style == "Lefts" then
 			self:linear(0.6):diffusealpha(0):queuecommand("Hide")
 		else
 			self:visible(true):linear(0.6):diffusealpha(1)

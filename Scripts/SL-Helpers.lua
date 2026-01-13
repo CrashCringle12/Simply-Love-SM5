@@ -455,7 +455,7 @@ end
 
 RandomizeVisualStyle = function()
 	-- Array of possible visual theme options
-	local visualthemes = {"Hearts", "Arrows", "Bears", "Ducks", "Stars", "Thonk", "PSU", "Cats", "GotEm", "Ice_Cream", "Spades", "Gay", "Rights"}
+	local visualthemes = {"Hearts", "Arrows", "Bears", "Ducks", "Stars", "Thonk", "PSU", "Cats", "GotEm", "Ice_Cream", "Spades", "Gay", "Rights", "Lefts"}
 	local index = math.floor(math.random(0, 11)) 
 		
 	ThemePrefs.Set("VisualStyle", visualthemes[index])

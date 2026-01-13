@@ -36,5 +36,5 @@ end
 -- the best way school spirit! We are..?
 af[#af+1] = LoadActor( "./spirit.lua")
 af[#af+1] = LoadActor( "./rights.lua")
-
+af[#af+1] = LoadActor( "./lefts.lua")
 return af
