@@ -17,6 +17,9 @@ end
 if ThemePrefs.Get("VisualStyle") == "Rights" then
 	resolved_path = ("/%s/Graphics/_logos/rights.png"):format( THEME:GetCurrentThemeDirectory() )
 end
+if ThemePrefs.Get("VisualStyle") == "Lefts" then
+	resolved_path = ("/%s/Graphics/_logos/lefts.png"):format( THEME:GetCurrentThemeDirectory() )
+end
 -- -----------------------------------------------------------------------
 local af = Def.ActorFrame{}
 
@@ -52,6 +55,9 @@ af[#af+1] = Def.Sprite{
 			if style == "Rights" then
 				self:y(-140):zoom(.90)
 			end
+			if style == "Lefts" then
+				self:y(-120):zoom(.2)
+			end
 		end
 	end,
 }
@@ -82,6 +88,9 @@ if ThemePrefs.Get("VisualStyle") ~= "SRPG8" then
 			end
 			if ThemePrefs.Get("VisualStyle") == "Rights" then
 				self:zoom(0.15):y(-12)
+			end
+			if ThemePrefs.Get("VisualStyle") == "Lefts" then
+				self:zoom(0.15):y(48)
 			end
 		end,
 		VisualStyleSelectedMessageCommand=function(self)

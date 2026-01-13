@@ -18,8 +18,8 @@ SL_CustomPrefs.Get = function()
         -- emojis are our lingua franca for the 21st century
 
 	 -- emojis are our lingua franca for the 21st century
-	 local visualStyleChoices = {  "❤", "↖", "🐻", "🦆", "🎃", "🌈", "⭐", "🤔", "🏈", "😺", "🍀", "👌", "🍦", "♠", "🧋" , "🌀", "🌮", "Rights" }
-	 local visualStyleValues  = {"Hearts", "Arrows", "Bears", "Ducks", "Spooky", "Gay", "Stars", "Thonk", "PSU", "Cats", "Lucky", "GotEm", "Ice_Cream", "Spades", "Boba", "Technique", "ITL","Rights" }
+	 local visualStyleChoices = {  "❤", "↖", "🐻", "🦆", "🎃", "🌈", "⭐", "🤔", "🏈", "😺", "🍀", "👌", "🍦", "♠", "🧋" , "🌀", "🌮", "Rights", "Lefts" }
+	 local visualStyleValues  = {"Hearts", "Arrows", "Bears", "Ducks", "Spooky", "Gay", "Stars", "Thonk", "PSU", "Cats", "Lucky", "GotEm", "Ice_Cream", "Spades", "Boba", "Technique", "ITL","Rights", "Lefts" }
  
 	local year = Year()
 	local month = MonthOfYear()+1
