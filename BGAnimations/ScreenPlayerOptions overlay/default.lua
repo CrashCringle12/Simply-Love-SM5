@@ -52,7 +52,11 @@ local CalculateScrollSpeed = function(player)
 	local mini = 0
 	if SpeedModRowIndex then
 		-- The BitmapText actors for P1 and P2 speedmod are both named "Item", so we need to provide a 1 or 2 to index
-		miniText = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")[ PlayerNumber:Reverse()[player]+1 ]:GetText()
+		if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+			miniText = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item"):GetText()
+		else
+			miniText = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")[ PlayerNumber:Reverse()[player]+1 ]:GetText()
+		end
 		mini = tonumber(miniText:sub(1, -2)) / 100
 	end
 	local StepsOrTrail = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player)) or GAMESTATE:GetCurrentSteps(player)
@@ -110,6 +114,11 @@ local ChangeSpeedMod = function(pn, direction)
 	speedmod = increment * math.floor(speedmod/increment + 0.5)
 
 	mods.SpeedMod = speedmod
+	if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+		local otherPn = pn == "P1" and "P2" or "P1"
+		SL[otherPn].ActiveModifiers.SpeedMod     = SL[pn].ActiveModifiers.SpeedMod
+		SL[otherPn].ActiveModifiers.SpeedModType = SL[pn].ActiveModifiers.SpeedModType
+	end
 end
 
 
@@ -129,16 +138,21 @@ local t = Def.ActorFrame{
 	OffCommand=function(self) self:linear(0.2):diffusealpha(0) end,
 	CaptureCommand=function(self)
 		local ScreenOptions = SCREENMAN:GetTopScreen()
-
 		for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 			local pn = ToEnumShortString(player)
 			local SpeedModRowIndex = FindOptionRowIndex(ScreenOptions,"SpeedMod")
-
-			if SpeedModRowIndex then
-				-- The BitmapText actors for P1 and P2 speedmod are both named "Item", so we need to provide a 1 or 2 to index
-				SpeedModBMTs[pn] = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")[ PlayerNumber:Reverse()[player]+1 ]
-				self:playcommand("Set"..pn)
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				if player == GAMESTATE:GetMasterPlayerNumber() then
+					SpeedModBMTs[pn] = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")
+				end
+			else
+				if SpeedModRowIndex then
+					-- The BitmapText actors for P1 and P2 speedmod are both named "Item", so we need to provide a 1 or 2 to index
+					SpeedModBMTs[pn] = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")[ PlayerNumber:Reverse()[player]+1 ]
+					self:playcommand("Set"..pn)
+				end
 			end
+
 		end
 	end,
 	MusicRateChangedMessageCommand=function(self)
@@ -193,14 +207,20 @@ t[#t+1] = LoadActor(THEME:GetPathB("ScreenPlayerOptions", "common"))
 
 for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 	local pn = ToEnumShortString(player)
+	local original_pn = pn
 	local song = GAMESTATE:GetCurrentSong()
-
 	t[#t+1] = Def.Actor{
 
 		-- this is called from ./Scripts/SL-PlayerOptions.lua when the player changes their SpeedModType (X, M, C)
 		["SpeedModType" .. pn .. "SetMessageCommand"]=function(self,params)
-			if params.Player ~= player then return end
-
+			local pn = pn
+			local player = player
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				pn = ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())
+				player = GAMESTATE:GetMasterPlayerNumber()
+			else
+				if params.Player ~= player  then return end
+			end
 			local oldtype = SL[pn].ActiveModifiers.SpeedModType
 			local newtype = params.SpeedModType
 
@@ -231,13 +251,17 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			end
 			SL[pn].ActiveModifiers.SpeedMod     = speedmod
 			SL[pn].ActiveModifiers.SpeedModType = newtype
-
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				local otherPn = pn == "P1" and "P2" or "P1"
+				SL[otherPn].ActiveModifiers.SpeedMod     = SL[pn].ActiveModifiers.SpeedMod
+				SL[otherPn].ActiveModifiers.SpeedModType = SL[pn].ActiveModifiers.SpeedModType
+			end
 			self:queuecommand("Set" .. pn)
 		end,
 
 		["Set" .. pn .. "Command"]=function(self)
 			local text = ""
-
+			local pn = pn
 			if  SL[pn].ActiveModifiers.SpeedModType == "X" then
 				text = string.format("%.2f" , SL[pn].ActiveModifiers.SpeedMod ) .. "x"
 
@@ -249,8 +273,13 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			elseif  SL[pn].ActiveModifiers.SpeedModType == "R" then
 				text = tostring(SL[pn].ActiveModifiers.SpeedMod) .. "R"
 			end
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				local otherPn = pn == "P1" and "P2" or "P1"
+				SpeedModBMTs[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())]:settext( text )
+			else
+				SpeedModBMTs[pn]:settext( text )
+			end
 
-			SpeedModBMTs[pn]:settext( text )
 			self:GetParent():queuecommand("Refresh")
 		end,
 
@@ -258,6 +287,10 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 		["CurrentTrail" .. pn .. "ChangedMessageCommand"]=function(self) self:queuecommand("Set"..pn) end,
 
 		["MenuLeft" .. pn .. "MessageCommand"]=function(self)
+			local pn = pn
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				pn = ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())
+			end
 			local topscreen = SCREENMAN:GetTopScreen()
 			local row_index = topscreen:GetCurrentRowIndex(player)
 			if row_index == FindOptionRowIndex(topscreen, "Mini") then
@@ -265,10 +298,14 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 				self:queuecommand("Set"..pn)
 			elseif row_index == FindOptionRowIndex(topscreen, "SpeedMod") then
 				ChangeSpeedMod( pn, -1 )
-				self:queuecommand("Set"..pn)
+				self:queuecommand("Set"..original_pn)
 			end
 		end,
 		["MenuRight" .. pn .. "MessageCommand"]=function(self)
+			local pn = pn
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				pn = ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())
+			end
 			local topscreen = SCREENMAN:GetTopScreen()
 			local row_index = topscreen:GetCurrentRowIndex(player)
 			if row_index == FindOptionRowIndex(topscreen, "Mini") then
@@ -276,7 +313,7 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 				self:queuecommand("Set"..pn)
 			elseif row_index == FindOptionRowIndex(topscreen, "SpeedMod") then
 				ChangeSpeedMod( pn, 1 )
-				self:queuecommand("Set"..pn)
+				self:queuecommand("Set"..original_pn)
 			end
 		end
 	}
@@ -289,6 +326,10 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			self:diffuse(PlayerColor(player)):diffusealpha(0)
 			self:zoom(0.5):y(48)
 			self:x(player==PLAYER_1 and WideScale(-77, -100) or WideScale(140,154))
+			-- If we're in TwoPlayersSharedSides, center the text
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				self:x(WideScale(-77, -100) + WideScale(140,154)) :halign(0.65)
+			end
 			self:shadowlength(0.55)
 		end,
 		OnCommand=function(self) self:linear(0.4):diffusealpha(1) end,

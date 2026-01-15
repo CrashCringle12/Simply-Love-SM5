@@ -387,6 +387,12 @@ SL_CustomPrefs.Get = function()
 			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
 		},
+		RandomButtonBehavior = {
+			Default = "Portal",
+			Choices =  { THEME:GetString("MusicWheel","Off"), THEME:GetString("MusicWheel","Portal"), THEME:GetString("MusicWheel", "Roulette"), THEME:GetString("MusicWheel", "Both") },
+			Values  = { "Off", "Portal", "Roulette", "Both", "Random"  }
+		},
+
 	}
 end
 

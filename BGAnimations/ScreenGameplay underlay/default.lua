@@ -78,13 +78,13 @@ for player in ivalues(Players) do
 end
 -- If the style is TwoPlayersSharedSides, we need to set the speed mod for the routine as well
 if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
-	local xmod = po[PLAYER_1]:XMod()
-	local mmod = po[PLAYER_1]:MMod()
-	local cmod = po[PLAYER_1]:CMod()
+	local xmod = po[GAMESTATE:GetMasterPlayerNumber()]:XMod()
+	local mmod = po[GAMESTATE:GetMasterPlayerNumber()]:MMod()
+	local cmod = po[GAMESTATE:GetMasterPlayerNumber()]:CMod()
 
-	local mini = tonumber(SL["P1"].ActiveModifiers.Mini:sub(1, -2)) / 100
+	local mini = tonumber(SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.Mini:sub(1, -2)) / 100
 
-	local speedmod = SL["P1"].ActiveModifiers.SpeedMod
+	local speedmod = SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.SpeedMod
 	local speedmod_str = (cmod ~= nil and "CMod") or (mmod ~= nil and "MMod") or (xmod ~= nil and "XMod")
 
 	local fmt = {
@@ -95,9 +95,8 @@ if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSide
 	local gcString = fmt[speedmod_str]:format(speedmod)
 
 	gcString = gcString ..""
-	-- apply the new speed mod to the player immediately
-	GAMESTATE:ApplyGameCommand(gcString, PLAYER_2)
-	GAMESTATE:ApplyGameCommand("mod,"..SL["P1"].ActiveModifiers.Mini.." mini", PLAYER_2)
+	GAMESTATE:ApplyGameCommand(gcString.."mod,"..SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.Mini.." mini", PLAYER_2)
+	GAMESTATE:ApplyGameCommand(gcString.."mod,"..SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.Mini.." mini", PLAYER_1)
 
 end
 local RestartHandler = function(event)

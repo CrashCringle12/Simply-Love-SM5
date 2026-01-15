@@ -903,6 +903,17 @@ local OptionRowDefault = {
 			self.LayoutType = Overrides[name].LayoutType or "ShowAllInRow"
 			self.SelectType = Overrides[name].SelectType or "SelectOne"
 			self.OneChoiceForAllPlayers = Overrides[name].OneChoiceForAllPlayers or false
+			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
+				local list = {
+					"NoteSkin",
+					"JudgmentGraphic",
+					"ComboFont",
+					"HoldJudgment",
+				}
+				if not FindInTable(name, list) then
+					self.OneChoiceForAllPlayers = true
+				end
+			end
 			self.ExportOnChange = Overrides[name].ExportOnChange or false
 
 
