@@ -233,7 +233,9 @@ local function AddPlaylists()
 	return player_sort_options
 end
 
-local function GetChangeableStyles(style)
+
+local function GetChangeableStyles()
+	local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
 	local available_styles = {}
 	-- Allow players to switch from single to double and from double to single
 	-- but only present these options if Joint Double or Joint Premium is enabled
@@ -287,7 +289,7 @@ local function GetChangeableStyles(style)
 
 	return available_styles
 end
-local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
+
 local wheel_options = {
 	-- This is the master table that controls the SortMenu's choices
 	-- The structure is as follows:
@@ -346,11 +348,11 @@ local wheel_options = {
 	},
 	{
 		{"", "CategoryStyles"},
-		GetChangeableStyles(style),
+		GetChangeableStyles,
 	},
 	{
 		{"", "CategoryPlaylists"},
-		AddPlaylists(),
+		AddPlaylists,
 	},
 	{ 
 		{"", "CategoryViews"},
@@ -392,26 +394,26 @@ local t = Def.ActorFrame {
 	EnterCategoryMessageCommand=function(self, params)
 		local category = params.Category
 		lastCategory = params.Category
-		local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
 		local filtered_wheel_options = {}
 		for i=1, #wheel_options do
 			local option = wheel_options[i]
-			if option ~= nil then
-				-- Only worry about options with a second element that is a table
-				if type(option[2]) == "table" then
-					-- If the first element of the option is the same as the category we're entering
-					if option[1][2] == category then
-						-- Copy the second element of the option to the wheel_options table
-						local sub_options = {}
-						for j=1, #option[2] do
-							local sub_option = option[2][j]
-							if type(sub_option[2]) == "function" then
-								if sub_option[2]() then
-									table.insert(filtered_wheel_options, sub_option[1])
-								end
-							elseif sub_option[2] == nil or sub_option[2] == true then
+			if option ~= nil and option[1] ~= nil and option[1][2] == category then
+				local source_sub_options = nil
+				-- Allow categories to specify their submenu via a function
+				if type(option[2]) == "function" and option[1][1] == "" then
+					source_sub_options = option[2]() or {}
+				elseif type(option[2]) == "table" then
+					source_sub_options = option[2]
+				end
+				if source_sub_options ~= nil then
+					for j=1, #source_sub_options do
+						local sub_option = source_sub_options[j]
+						if type(sub_option[2]) == "function" then
+							if sub_option[2]() then
 								table.insert(filtered_wheel_options, sub_option[1])
 							end
+						elseif sub_option[2] == nil or sub_option[2] == true then
+							table.insert(filtered_wheel_options, sub_option[1])
 						end
 					end
 				end
@@ -507,15 +509,24 @@ local t = Def.ActorFrame {
 		for i=1, #wheel_options do
 			local option = wheel_options[i]
 			if option ~= nil then
-				if type(option[2]) == "table" then
+				-- If this is a category (empty top text) and uses either
+				-- a table or a function as its submenu source, resolve it
+				local is_category = type(option[1]) == "table" and option[1][1] == "" and option[1][2] ~= nil
+				if is_category and (type(option[2]) == "table" or type(option[2]) == "function") then
+					local source_sub_options
+					if type(option[2]) == "function" then
+						source_sub_options = option[2]() or {}
+					else
+						source_sub_options = option[2]
+					end
 					local sub_options = {}
-					for j=1, #option[2] do
-						local sub_option = option[2][j]
-					if type(sub_option[2]) == "function" then
-						if sub_option[2]() then
-							table.insert(sub_options, sub_option)
-						end
-					elseif sub_option[2] == nil or sub_option[2] == true then
+					for j=1, #source_sub_options do
+						local sub_option = source_sub_options[j]
+						if type(sub_option[2]) == "function" then
+							if sub_option[2]() then
+								table.insert(sub_options, sub_option)
+							end
+						elseif sub_option[2] == nil or sub_option[2] == true then
 							table.insert(sub_options, sub_option)
 						end
 					end
@@ -523,10 +534,12 @@ local t = Def.ActorFrame {
 						table.insert(filtered_wheel_options, {option[1][1], option[1][2]})
 					end
 				elseif type(option[2]) == "function" then
+					-- Non-category entry using a function as a visibility condition
 					if option[2]() then
 						table.insert(filtered_wheel_options, {option[1][1], option[1][2]})
 					end
 				elseif option[2] == nil or option[2] == true then
+					-- Simple always-visible entry
 					table.insert(filtered_wheel_options, {option[1][1], option[1][2]})
 				end
 			end
