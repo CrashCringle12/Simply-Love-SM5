@@ -152,6 +152,11 @@ local GlobalDefaults = {
 			self.GameplayReloadCheck = false
 			-- How long to wait before displaying a "cue"
 			self.ColumnCueMinTime = 1.5
+		    -- all of the trials currently on the machine
+            		self.ViewingTrials = false
+			self.Trials = {}
+			self.TrialDiffs = {}
+			self.TrialMap = {}
 		end,
 
 		-- These values outside initialize() won't be reset each game cycle,
