@@ -3,13 +3,19 @@ local transitioning_out = false
 local Update = function(self, dt)
 	if not transitioning_out then
 		SL.Global.MenuTimer.ScreenSelectMusic = SCREENMAN:GetTopScreen():GetChild("Timer"):GetSeconds()
-		SL.Global.WheelLocked = SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked()
+		local topscreen = SCREENMAN:GetTopScreen():GetName()
+		if topscreen == "ScreenSelectMusic" then
+			SL.Global.WheelLocked = SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked()
+		end
 	end
 end
 
 local UpdateLockStatus = function(self, dt)
 	if not transitioning_out then
-		SL.Global.WheelLocked = SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked()
+		local topscreen = SCREENMAN:GetTopScreen():GetName()
+		if topscreen == "ScreenSelectMusic" then
+			SL.Global.WheelLocked = SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked()
+		end
 	end
 end
 
