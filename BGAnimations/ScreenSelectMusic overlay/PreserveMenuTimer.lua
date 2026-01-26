@@ -3,6 +3,13 @@ local transitioning_out = false
 local Update = function(self, dt)
 	if not transitioning_out then
 		SL.Global.MenuTimer.ScreenSelectMusic = SCREENMAN:GetTopScreen():GetChild("Timer"):GetSeconds()
+		SL.Global.WheelLocked = SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked()
+	end
+end
+
+local UpdateLockStatus = function(self, dt)
+	if not transitioning_out then
+		SL.Global.WheelLocked = SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked()
 	end
 end
 
@@ -13,6 +20,8 @@ return Def.ActorFrame{
 		-- value if the player opts to return to ScreenSelectMusic from ScreenPlayerOptions.
 		if PREFSMAN:GetPreference("MenuTimer") then
 			self:SetUpdateFunction(Update)
+		else
+			self:SetUpdateFunction(UpdateLockStatus)
 		end
 	end,
 	ViewGalleryCommand=function(self)

@@ -38,7 +38,6 @@ local af = Def.ActorFrame{
 		generateFavoritesForMusicWheel()
 		ApplyMods(params.Player)
 	end,
-
 	PlayerJoinedMessageCommand=function(self, params)
 		if not PROFILEMAN:IsPersistentProfile(params.Player) then
 			LoadGuest(params.Player)
