@@ -139,6 +139,10 @@ Branch.AllowScreenSelectPlayMode = function()
 	if ThemePrefs.Get("AllowScreenSelectPlayMode") then
 		return "ScreenSelectPlayMode"
 	else
+		-- Set a default game mode if we're skipping the select play mode screen.
+		SL.Global.GameMode = "ITG"
+		SetGameModePreferences()
+		THEME:ReloadMetrics()
 		return Branch.AllowScreenSelectPlayMode2()
 	end
 end

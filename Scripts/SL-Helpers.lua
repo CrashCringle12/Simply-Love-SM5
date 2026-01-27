@@ -36,6 +36,16 @@ SL_WideScale = function(AR4_3, AR16_9)
 	return clamp(scale( SCREEN_WIDTH, 640, 854, AR4_3, AR16_9 ), math.min(AR4_3, AR16_9), math.max(AR4_3, AR16_9))
 end
 
+-- -----------------------------------------------------------------------
+BackgroundFilterValues = function()
+	return {
+		Off = 0,
+		Dark = 50,
+		Darker = 75,
+		Darkest = 90,
+	}
+end
+
 
 -- -----------------------------------------------------------------------
 -- get timing window in milliseconds
@@ -79,7 +89,7 @@ GetWorstJudgment = function(offsets)
 			end
 		end
 	end
-	
+
 	return worst_judgment
 end
 
@@ -149,7 +159,6 @@ local NoteFieldWidth = {
 		versus  = 250,
 		double  = 500,
 		routine = 500,
-		halfdouble = 300,
 	},
 	-- These values for techno, para, and kb7 are the result of empirical observation
 	-- of the SM5 engine and should not be regarded as any kind of Truth.
@@ -208,15 +217,6 @@ GetComboThreshold = function( MaintainOrContinue )
 	-- lights is not a playable game mode, but it is, oddly, a selectable one within the operator menu
 	-- include dummy values here to prevent Lua errors in case players accidentally switch to lights
 	Combo.lights  = { Maintain = "TapNoteScore_W3", Continue = "TapNoteScore_W3" }
-
-
-	-- handle FA+ for Dance
-	-- should these values change for Pump?  I guess that's up to me.
-	if SL.Global.GameMode=="FA+" then
-		Combo.dance.Maintain = "TapNoteScore_W4"
-		Combo.dance.Continue = "TapNoteScore_W4"
-	end
-
 
 	local game = GAMESTATE:GetCurrentGame():GetName() or "dance"
 	return Combo[game][MaintainOrContinue]
@@ -326,7 +326,7 @@ end
 -- -----------------------------------------------------------------------
 
 SetGameModePreferences = function()
-	-- apply the preferences associated with this SL GameMode (Casual, ITG, FA+)
+	-- apply the preferences associated with this SL GameMode (Casual, ITG)
 	for key,val in pairs(SL.Preferences[SL.Global.GameMode]) do
 		PREFSMAN:SetPreference(key, val)
 	end
@@ -380,10 +380,6 @@ SetGameModePreferences = function()
 	-- this was probably a Bad Decision™ on my part in hindsight  -quietly
 	prefix["ITG"] = ""
 
-	-- "FA+" mode is prefixed with "ECFA-" because the mode was previously known as "ECFA Mode"
-	-- and I don't want to deal with renaming relatively critical files from the theme.
-	-- Thus, scores from FA+ mode will continue to go into ECFA-Stats.xml.
-	prefix["FA+"] = "ECFA-"
 	prefix["Casual"] = "Casual-"
 
 	if PROFILEMAN:GetStatsPrefix() ~= prefix[SL.Global.GameMode] then
@@ -396,7 +392,7 @@ end
 -- manages for you back to their stock SM5 values.
 --
 -- These "managed" Preferences are listed in ./Scripts/SL_Init.lua
--- per-gamemode (Casual, ITG, FA+), and actively applied (and reapplied)
+-- per-gamemode (Casual, ITG), and actively applied (and reapplied)
 -- for each new game using SetGameModePreferences()
 --
 -- SL normally calls ResetPreferencesToStockSM5() from
@@ -484,7 +480,7 @@ DarkUI = function()
 	-- but we can prevent Lua errors from being thrown in the meantime.
 	if THEME:GetCurThemeName() ~= PREFSMAN:GetPreference("Theme") then return false end
 
-	if (ThemePrefs.Get("RainbowMode") or ThemePrefs.Get("VisualStyle") == "Boba")then return true end
+	if (ThemePrefs.Get("RainbowMode") or ThemePrefs.Get("VisualStyle") == "Boba") then return true end
 	if HolidayCheer() then return true end
 	return false
 end
@@ -626,7 +622,7 @@ IsW0Judgment = function(params, player)
 	if params.HoldNoteScore then return false end
 
 	-- Only check/update FA+ count if we received a TNS in the top window.
-	if params.TapNoteScore == "TapNoteScore_W1" and SL.Global.GameMode == "ITG"  then
+	if params.TapNoteScore == "TapNoteScore_W1" and SL.Global.GameMode == "ITG" then
 		local prefs = SL.Preferences["FA+"]
 		local scale = PREFSMAN:GetPreference("TimingWindowScale")
 		local W0 = prefs["TimingWindowSecondsW1"] * scale + prefs["TimingWindowAdd"]
@@ -674,27 +670,8 @@ GetExJudgmentCounts = function(player)
 	local counts = {}
 
 	local TNS = { "W1", "W2", "W3", "W4", "W5", "Miss" }
-	if SL.Global.GameMode == "FA+" then
-		for window in ivalues(TNS) do
-			adjusted_window = window
-			-- In FA+ mode, we need to shift the windows up 1 so that the key we're using is accurate.
-			-- E.g. W1 window becomes W0, W2 becomes W1, etc.
-			if window ~= "Miss" then
-				adjusted_window = "W"..(tonumber(window:sub(-1))-1)
-			end
-			-- Get the count.
-			local number = stats:GetTapNoteScores( "TapNoteScore_"..window )
-			-- For the last window (Decent) in FA+ mode...
-			if window == "W5" then
-				-- Only populate if the window is still active.
-				if SL[pn].ActiveModifiers.TimingWindows[5] then
-					counts[adjusted_window] = number
-				end
-			else
-				counts[adjusted_window] = number
-			end
-		end
-	elseif SL.Global.GameMode == "ITG" then
+
+    if SL.Global.GameMode == "ITG" then
 		for window in ivalues(TNS) do
 			-- Get the count.
 			local number = stats:GetTapNoteScores( "TapNoteScore_"..window )
@@ -1066,3 +1043,45 @@ GetPlayerAF = function(pn)
 
 	return playerAF
 end
+
+-- -----------------------------------------------------------------------
+-- If the banner is missing, use the VisualStyle fallback banner according to selected color.
+GetFallbackBanner = function()
+    local path = "/" .. THEME:GetCurrentThemeDirectory() .. "Graphics/_FallbackBanners/" .. ThemePrefs.Get("VisualStyle")
+    local banner_directory = FILEMAN:DoesFileExist(path) and path or THEME:GetPathG("", "_FallbackBanners/Arrows")
+
+    return banner_directory .. "/banner" .. SL.Global.ActiveColorIndex .. " (doubleres).png"
+end
+
+-- -----------------------------------------------------------------------
+-- cool functions for scatterplotting course mode
+
+-- calculate each chart's actual length by GetLastSecond instead of song length
+TotalCourseLength = function(player)
+    local trail = GAMESTATE:GetCurrentTrail(player)
+    local t = 0
+    for te in ivalues(trail:GetTrailEntries()) do
+        t = t + te:GetSong():GetLastSecond()
+    end
+
+    return t / SL.Global.ActiveModifiers.MusicRate
+end
+
+-- calculate amount of course played for properly scaling the scatterplot of judgments
+TotalCourseLengthPlayed = function(player)
+	local pn = ToEnumShortString(player)
+	local trail = GAMESTATE:GetCurrentTrail(player)
+	local storage = SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1]
+	if storage.DeathSecond ~= nil then
+		local deathSecond = storage.DeathSecond
+		local t = 0
+		for te in ivalues(trail:GetTrailEntries()) do
+			t = t + ( te:GetSong():GetLastSecond() / SL.Global.ActiveModifiers.MusicRate )
+			if t > deathSecond then break end
+		end
+		return t
+	else
+		return -1
+	end
+end
+

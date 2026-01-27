@@ -11,7 +11,7 @@ local PlayerDefaults = {
 				HoldJudgment = "Love 1x2 (doubleres).png",
 				NoteSkin = nil,
 				Mini = "0%",
-				BackgroundFilter = "Off",
+				BackgroundFilter = "Dark",
 				BackgroundColor = "Dark",
 				VisualDelay = "0ms",
 
@@ -26,8 +26,9 @@ local PlayerDefaults = {
 				ColumnFlashOnMiss = false,
 				SubtractiveScoring = false,
 				MeasureCounter = "None",
-				MeasureCounterLeft = true,
-				MeasureCounterUp = false,
+				MeasureCounterLeft = false,
+				MeasureCounterUp = true,
+				HideLookahead = false,
 				MeasureLines = "Off",
 				DataVisualizations = "None",
 				TargetScore = 11,
@@ -37,7 +38,7 @@ local PlayerDefaults = {
 				NPSGraphAtTop = false,
 				JudgmentTilt = false,
 				TiltMultiplier = 1,
-				ColumnCues = false,
+				ColumnCues = true,
 				DisplayScorebox = true,
 
 				ErrorBar = "None",
@@ -48,6 +49,8 @@ local PlayerDefaults = {
 				HideEarlyDecentWayOffJudgments = false,
 				HideEarlyDecentWayOffFlash = false,
 
+				-- While SL no longer supports disabling individual timing windows
+				-- in ITG mode, Casual mode still does so we still track it here.
 				TimingWindows = {true, true, true, true, true},
 				ShowFaPlusWindow = false,
 				ShowExScore = false,
@@ -107,8 +110,8 @@ local PlayerDefaults = {
 			-- Whether or not the player is playing on pad.
 			self.IsPadPlayer = false
 			self.Favorites = {}
-			    -- Contains the player's achievements
-			    self.achievementData = {}
+			-- Contains the player's achievements
+			self.achievementData = {}
 		end
 	}
 }
@@ -138,25 +141,34 @@ local GlobalDefaults = {
 			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "ITG"
 			self.ScreenshotTexture = nil
 			self.MenuTimer = {
-				ScreenSelectMusic = ThemePrefs.Get("ScreenSelectMusicMenuTimer"),
+				ScreenGrooveStatsLogin  = ThemePrefs.Get("ScreenGrooveStatsLoginMenuTimer"),
+				ScreenSelectMusic       = ThemePrefs.Get("ScreenSelectMusicMenuTimer"),
 				ScreenSelectMusicCasual = ThemePrefs.Get("ScreenSelectMusicCasualMenuTimer"),
-				ScreenPlayerOptions = ThemePrefs.Get("ScreenPlayerOptionsMenuTimer"),
-				ScreenEvaluation = ThemePrefs.Get("ScreenEvaluationMenuTimer"),
+				ScreenPlayerOptions     = ThemePrefs.Get("ScreenPlayerOptionsMenuTimer"),
+				ScreenEvaluation        = ThemePrefs.Get("ScreenEvaluationMenuTimer"),
+				ScreenEvaluationNonstop = ThemePrefs.Get("ScreenEvaluationNonstopMenuTimer"),
 				ScreenEvaluationSummary = ThemePrefs.Get("ScreenEvaluationSummaryMenuTimer"),
 				ScreenNameEntry = ThemePrefs.Get("ScreenNameEntryMenuTimer"),
 				ScreenViewGallery = ThemePrefs.Get("ScreenViewGalleryMenuTimer"),
 			}
 			self.TimeAtSessionStart = nil
 			self.SampleMusicLoops = ThemePrefs.Get("SampleMusicLoops")
-			self.Random = false
 			self.GameplayReloadCheck = false
 			-- How long to wait before displaying a "cue"
 			self.ColumnCueMinTime = 1.5
-		    -- all of the trials currently on the machine
+
+			-- TODO(teejusb): We should only initialize this once to save on compute.
+			self.GrooveStatsPlayerOptionKeys = CreateGrooveStatsPlayerOptionKeys()
+
+			-- used to track active OptionRow index when navigating the Operator Menu's many screens and sub-screens
+			-- shaped like: { ScreenOptionsService=3, ScreenVisualOptions=1 }
+			self.PrevScreenOptionsServiceRow = {}
+		        -- all of the trials currently on the machine
             		self.ViewingTrials = false
 			self.Trials = {}
 			self.TrialDiffs = {}
 			self.TrialMap = {}
+
 		end,
 
 		-- These values outside initialize() won't be reset each game cycle,
@@ -509,7 +521,11 @@ SL = {
 	--              (either success or failure).
 	-- If a request fails, there will be another key:
 	--    ErrorMessage: string, the reasoning for the failure.
-	Downloads = {}
+	Downloads = {},
+
+	-- Latest versions available for ITGmania and Simply Love.
+	ITGmaniaLatestVersion = nil,
+	SimplyLoveLatestVersion = nil,
 }
 
 

@@ -4,8 +4,12 @@
 
 local GetModsAndPlayerOptions = function(player)
 	local mods = SL[ToEnumShortString(player)].ActiveModifiers
-	local topscreen = SCREENMAN:GetTopScreen():GetName()
-	local modslevel = topscreen  == "ScreenEditOptions" and "ModsLevel_Stage" or "ModsLevel_Preferred"
+	-- This can get called already when loading ScreenTitleMenu if all screens
+	-- before and including ScreenSelectPlayMode are disabled. Top screen will
+	-- be nil in that case.
+	local topscreen = SCREENMAN:GetTopScreen()
+	local topscreenname = topscreen and topscreen:GetName()
+	local modslevel = topscreenname == "ScreenEditOptions" and "ModsLevel_Stage" or "ModsLevel_Preferred"
 	local playeroptions = GAMESTATE:GetPlayerState(player):GetPlayerOptions(modslevel)
 	return mods, playeroptions
 end
@@ -410,10 +414,6 @@ local Overrides = {
 				return { "ShowFaPlusWindow" }
 			end
 
-			if SL.Global.GameMode == "FA+" then
-				return { "ShowExScore" }
-			end
-
 			return { "ShowFaPlusWindow", "ShowExScore", "ShowFaPlusPane" }
 		end,
 		LoadSelections = function(self, list, pn)
@@ -422,11 +422,6 @@ local Overrides = {
 				list[1] = mods.ShowFaPlusWindow or false
 				return list
 			end
-
-			if SL.Global.GameMode == "FA+" then
-				list[1] = mods.ShowExScore or false
-				return list
-			end		
 
 			list[1] = mods.ShowFaPlusWindow or false
 			list[2] = mods.ShowExScore or false
@@ -443,15 +438,6 @@ local Overrides = {
 				mods.ShowFaPlusPane = true
 				-- Default to FA+ pane in Tournament Mode
 				sl_pn.EvalPanePrimary = 2
-				return
-			end
-
-			if SL.Global.GameMode == "FA+" then
-				-- always disable in FA+ mode since it's handled engine side.
-				mods.ShowFaPlusWindow = false
-				mods.ShowExScore = list[1]
-				-- the main score pane is already the FA+ pane
-				mods.ShowFaPlusPane = false
 				return
 			end
 
@@ -673,9 +659,7 @@ local Overrides = {
 		Values = function()
 			return {
 				{true,true,true,true,true},
-				{true,true,true,true,false},
 				{true,true,true,false,false},
-				{false,false,true,true,true},
 			}
 		end,
 		Choices = function()

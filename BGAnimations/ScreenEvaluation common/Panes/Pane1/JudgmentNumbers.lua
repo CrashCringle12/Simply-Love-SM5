@@ -32,7 +32,7 @@ local t = Def.ActorFrame{
 for i=1,#TapNoteScores.Types do
 	local window = TapNoteScores.Types[i]
 	local number = pss:GetTapNoteScores( "TapNoteScore_"..window )
-	
+
 	-- actual numbers
 	t[#t+1] = Def.RollingNumbers{
 		Font="Wendy/_ScreenEvaluation numbers",

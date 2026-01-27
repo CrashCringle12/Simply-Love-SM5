@@ -35,6 +35,12 @@ ws = NETWORK:WebSocket{
           local username = data.username
           local side = data.side
           local pn = (side == 1) and "P1" or "P2"
+          local player = (side == 1) and PLAYER_1 or PLAYER_2
+
+          if data.playerOptions then
+            SetPlayerOptionsJsonFromGroovestats(player, data.playerOptions)
+          end
+
           SL[pn].ApiKey = apiKey
           SL[pn].GrooveStatsUsername = username
           -- If they're QR code logging in, let's assume they're a pad player.
@@ -76,17 +82,27 @@ local af = Def.ActorFrame{
 
   LoadFont("Common Normal")..{
     Text=THEME:GetString("ScreenSelectProfile", "LoginInstructions"),
-    InitCommand=function(self) self:y(-150) end,
+    InitCommand=function(self)
+      self:y(-150)
+      if ThemePrefs.Get("RainbowMode") then
+        self:diffuse(Color.Black)
+      end
+    end,
   },
   LoadFont("Common Normal")..{
     Text=THEME:GetString("ScreenSelectProfile", "VisitWebsite"),
-    InitCommand=function(self) self:y(-120) end,
+    InitCommand=function(self)
+      self:y(-120)
+      if ThemePrefs.Get("RainbowMode") then
+        self:diffuse(Color.Black)
+      end
+    end,
   },
 
-  LoadFont("Common Normal")..{
+  LoadFont("Common Bold")..{
     Text=THEME:GetString("ScreenEvaluation", "PressStartToContinue"),
     InitCommand=function(self)
-      self:y(150)
+      self:zoom(0.55):y(150):shadowlength(1)
     end,
   },
 }
@@ -113,6 +129,11 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 
     LoadFont("Common Normal")..{
       Text=SL[pn].ApiKey and THEME:GetString("ScreenSelectProfile", "ProfileConnected") or "",
+      InitCommand=function(self)
+        if ThemePrefs.RainbowMode then
+          self:diffuse(Color.Black)
+        end
+      end,
       HideQrMessageCommand=function(self, params)
         if params.pn == pn then
           WriteGrooveStatsIni(player)

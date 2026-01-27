@@ -384,7 +384,10 @@ local wheel_options = {
 local t = Def.ActorFrame {
 	Name="SortMenu",
 	-- Always ensure player input is directed back to the engine when initializing SelectMusic.
-	InitCommand=function(self) self:visible(false):queuecommand("DirectInputToEngine") end,
+	-- Must to use playcommand here instead of queuecommand. If the player
+	-- enters the code early, queuecommand could run after the menu is opened
+	-- and direct input back to engine while the menu is still open.
+	InitCommand=function(self) self:visible(false):playcommand("DirectInputToEngine") end,
 	-- Always ensure player input is directed back to the engine when leaving SelectMusic.
 	OffCommand=function(self) self:playcommand("DirectInputToEngine") end,
 	-- Figure out which choices to put in the SortWheel based on various current conditions.
@@ -452,6 +455,8 @@ local t = Def.ActorFrame {
 		for player in ivalues(PlayerNumber) do
 			SCREENMAN:set_input_redirected(player, true)
 		end
+		-- Stop the music wheel in case it's still spinning.
+		screen:GetMusicWheel():Move(0)
 		self:queuecommand("AssessAvailableChoices"):queuecommand("ShowSortMenu")
 		overlay:playcommand("HideTestInput")
 		overlay:playcommand("HideLeaderboard")

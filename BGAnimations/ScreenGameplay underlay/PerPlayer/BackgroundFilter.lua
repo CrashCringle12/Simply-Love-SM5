@@ -5,12 +5,7 @@ local mods = SL[pn].ActiveModifiers
 -- if no BackgroundFilter is necessary, it's safe to bail now
 if mods.BackgroundFilter == "Off" then return end
 
-local FilterAlpha = {
-	Dark = 0.5,
-	Darker = 0.75,
-	-- Because of the darkness of the "background" set via preference, this was actually fully opaque
-	Darkest = 0.90
-}
+local FilterAlpha = BackgroundFilterValues()
 
 local FilterColors = {
 	Rainbow     = color("#000000"),
@@ -34,7 +29,7 @@ return Def.Quad{
 		else
 			self:xy(GetNotefieldX(player), _screen.cy )
 				:diffuse(FilterColors[mods.BackgroundColor])
-				:diffusealpha( FilterAlpha[mods.BackgroundFilter] or 0 )
+				:diffusealpha( FilterAlpha[mods.BackgroundFilter]/100 or 0 )
 				:zoomto( GetNotefieldWidth(), _screen.h )
 		end
 	end,

@@ -201,7 +201,7 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 							-- TODO(teejusb): Determine how we want to easily display EX scores.
 							-- For now just highlight blue because it's simple.
 							if showExScore then
-								entry:GetChild("Score"):diffuse(SL.JudgmentColors["FA+"][1])
+								entry:GetChild("Score"):diffuse(SL.JudgmentColors["ITG"][1])
 							else
 								entry:GetChild("Score"):diffuse(Color.White)
 							end
@@ -305,7 +305,7 @@ local af = Def.ActorFrame {
 		-- local eventAf = overlay:GetChild("AutoSubmitMaster"):GetChild("EventOverlay"):GetChild("P1EventAf")
 		-- eventAf:playcommand("Show", {data={
 		-- 	["rpg"] = {
-		-- 		["name"] = "SRPG8",
+		-- 		["name"] = "SRPG9",
 		-- 		["result"] = "score-added",
 		-- 		["rpgLeaderboard"] = {
 		-- 			{
@@ -351,7 +351,7 @@ local af = Def.ActorFrame {
 				local pn = ToEnumShortString(player)
 
 				if GAMESTATE:IsHumanPlayer(player) and GAMESTATE:IsSideJoined(player) then
-					local _, valid = ValidForGrooveStats(player)
+					local _, valid, _ = ValidForGrooveStats(player)
 					local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 					local submitForPlayer = false
 
@@ -375,6 +375,7 @@ local af = Def.ActorFrame {
 								rescoreCounts=GetRescoredJudgmentCounts(player),
 								usedCmod=(GAMESTATE:GetPlayerState(pn):GetPlayerOptions("ModsLevel_Preferred"):CMod() ~= nil),
 								comment=CreateCommentString(player),
+								playerOptions=GetPlayerOptionsJsonForGrooveStats(player),
 							}
 							sendRequest = true
 							submitForPlayer = true
@@ -393,8 +394,8 @@ local af = Def.ActorFrame {
 			-- Only send the request if it's applicable.
 			if sendRequest then
 				-- Unjoined players won't have the text displayed.
-             
-                self:GetParent():GetChild("P1SubmitText"):settext(THEME:GetString("GrooveStats", "Submitting"))
+
+				self:GetParent():GetChild("P1SubmitText"):settext(THEME:GetString("GrooveStats", "Submitting"))
 				self:GetParent():GetChild("P2SubmitText"):settext(THEME:GetString("GrooveStats", "Submitting"))
 					
 				self:playcommand("MakeGrooveStatsRequest", {
@@ -404,7 +405,7 @@ local af = Def.ActorFrame {
 					body=JsonEncode(body),
 					timeout=30,
 					callback=AutoSubmitRequestProcessor,
-				args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("ScreenEval Common"),
+					args=SCREENMAN:GetTopScreen():GetChild("Overlay"):GetChild("ScreenEval Common"),
 				})
 			end
 		end
