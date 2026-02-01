@@ -341,6 +341,11 @@ SetGameModePreferences = function()
 		-- so turn Decents and WayOffs off now.
 		if SL.Global.GameMode == "Casual" then
 			SL[pn].ActiveModifiers.TimingWindows = {true,true,true,false,false}
+			-- Be gentle on the young ones
+			PREFSMAN:SetPreference("TimingWindowScale", 2.5);
+		else
+			-- Returns Timing Windows to "normal" scaling
+			PREFSMAN:SetPreference("TimingWindowScale", 1);
 		end
 
 		-- Now that we've set the SL table for TimingWindows appropriately,
