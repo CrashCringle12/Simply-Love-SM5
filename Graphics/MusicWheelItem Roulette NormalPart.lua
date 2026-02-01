@@ -10,5 +10,5 @@ return Def.ActorFrame{
 	InitCommand=function(self) self:x(WideScale(28,33)) end,
 
 	Def.Quad{ InitCommand=function(self) self:horizalign(left):diffuse(color("#000000")):diffusealpha(0.3):zoomto(item_width, _screen.h/num_visible_items) end },
-	Def.Quad{ InitCommand=function(self) self:horizalign(left):diffuse(color("#2e3a42")):diffusealpha(0.9):zoomto(item_width, _screen.h/num_visible_items - 1) end }
+	Def.Quad{ InitCommand=function(self) self:horizalign(left):diffuse(color("#2e3a42")):diffusealpha(0.5):zoomto(item_width, _screen.h/num_visible_items - 1) end }
 }
