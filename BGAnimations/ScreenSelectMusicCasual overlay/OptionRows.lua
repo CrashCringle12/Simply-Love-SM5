@@ -1,25 +1,25 @@
 -- helper functions
 local GetDifficulty = function(steps)
 	if steps:GetMeter() == 1 then
-		return "Novice"
+		return "1 Novice"
 	elseif steps:GetMeter() == 2 then
-		return "Novice+"
+		return "2 Novice+"
 	elseif steps:GetMeter() == 3 then
-		return "Easy"
+		return "3 Easy"
 	elseif steps:GetMeter() == 4 then
-		return "Easy+"
+		return "4 Easy+"
 	elseif steps:GetMeter() == 5 then
-		return "Medium"
+		return "5 Medium"
 	elseif steps:GetMeter() == 6 then
-		return "Medium+"
+		return "6 Medium+"
 	elseif steps:GetMeter() == 7 then
-		return "Hard"
+		return "7 Hard"
 	elseif steps:GetMeter() == 8 then
-		return "Hard+"
+		return "8 Hard+"
 	elseif steps:GetMeter() == 9 then
-		return "Expert"
-	elseif steps:GetMeter() == 10 then
-		return "Insane"
+		return "9 Expert"
+	elseif steps:GetMeter() >= 10 then
+		return steps:GetMeter().." Insane"
 	end
 end
 

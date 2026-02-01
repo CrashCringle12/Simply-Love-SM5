@@ -121,14 +121,14 @@ SL_CustomPrefs.Get = function()
 			},
 			Values 	= { true , false }
 		},
-		UseEnhancedUI =
+		UseHiddenUI =
 		{
-			Default = "FA+",
+			Default = false,
 			Choices = { 
 				THEME:GetString("ThemePrefs", "On"),
-				"FA+",
 				THEME:GetString("ThemePrefs", "Off")
-			}
+			},
+			Values 	= { true , false }
 		},
 		VisualStyle =
 		{

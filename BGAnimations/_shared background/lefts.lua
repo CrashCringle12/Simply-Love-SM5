@@ -15,8 +15,8 @@ end
 
 local af = Def.ActorFrame{
 	InitCommand=function(self) 
-		self:SetUpdateFunction( Update )
 		if ThemePrefs.Get("VisualStyle") == "Lefts" then
+			self:SetUpdateFunction( Update )
 			self:visible(true) 
 		else
 			self:visible(false)

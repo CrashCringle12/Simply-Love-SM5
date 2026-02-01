@@ -589,7 +589,7 @@ t[#t+1] = Def.ActorFrame {
 
 			self:maxwidth(_screen.w-20)
 			self:horizalign(left):vertalign(top):xy(10, 10)
-			self:diffusealpha(0):zoom(SL_WideScale(0.8, 1))
+			self:diffusealpha(0):zoom(SL_WideScale(0.8, 1)):zoom(0.75)
 		end,
 		OnCommand=function(self)
 			self:finishtweening():diffusealpha(1)

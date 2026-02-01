@@ -14,17 +14,9 @@ local width = IsUsingWideScreen() and 300 or 268
 -- Can be toggled by the code "ToggleChartInfo" in metrics.ini
 local showPatternInfo = false
 
--- In 2-players mode, whether the DensityGraph or PatternInfo is shown
--- Can be toggled by the code "ToggleChartInfo" in metrics.ini
-local showPatternInfo = false
-
--- In 2-players mode, whether the DensityGraph or PatternInfo is shown
--- Can be toggled by the code "ToggleChartInfo" in metrics.ini
-local showPatternInfo = false
-
 local af = Def.ActorFrame{
 	InitCommand=function(self)
-		if not enhancedUI() then
+		if hiddenUI() then
 			self:visible(false)
 		else
 			self:visible(GAMESTATE:IsHumanPlayer(player))
@@ -43,7 +35,7 @@ local af = Def.ActorFrame{
 	end,
 	PlayerJoinedMessageCommand=function(self, params)
 		if params.Player == player then
-			self:visible(enhancedUI())
+			self:visible(hiddenUI())
 		end
 	end,
 	PlayerUnjoinedMessageCommand=function(self, params)
@@ -321,6 +313,7 @@ for i, row in ipairs(layout) do
 
 	end
 end
+
 local num_segments = 7
 local amv_reference
 

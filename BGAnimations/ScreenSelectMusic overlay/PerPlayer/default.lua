@@ -25,20 +25,20 @@ else
 		--   AuthorCredit, Description, and ChartName associated with the current stepchart
 
 		t[#t+1] = LoadActor("./DensityGraph.lua", player)
-		if enhancedUI() then
-			t[#t+1] = LoadActor("./StepArtist.lua", player)
-		else
+		if hiddenUI() then
 			t[#t+1] = LoadActor("./StepArtist-Classic.lua", player)
+		else
+			t[#t+1] = LoadActor("./StepArtist.lua", player)
 		end
 
 	end
 	-- Cursor.lua contains the actor for a rounded arrow that bounces in time with the beat
 	--   and moves up and down the difficulty block grid
 	for player in ivalues( PlayerNumber ) do
-	if enhancedUI() then
-			t[#t+1] = LoadActor("./Cursor.lua", player)
-		else
+		if hiddenUI() then
 			t[#t+1] = LoadActor("./Cursor-Classic.lua", player)
+		else
+			t[#t+1] = LoadActor("./Cursor.lua", player)
 		end
 	end
 end

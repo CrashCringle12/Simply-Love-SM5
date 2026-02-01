@@ -108,21 +108,14 @@ SSM_Header_StageText = function()
 	end
 end
 
-enhancedUI = function(self)
+hiddenUI = function(self)
 	if THEME:GetMetric("Common", "AutoSetStyle") == true then
-		return true
-	end
-		-- The enhanced UI does not support any other games besides dance (4-Panel)
-	if GAMESTATE:GetCurrentGame():GetName() ~= "dance" or ThemePrefs.Get("UseEnhancedUI") == "Off" then
 		return false
 	end
-	-- If Enhanced UI is set to All, show it everywhere
-	if ThemePrefs.Get("UseEnhancedUI") == "On" then
-		return true
+	-- The enhanced UI does not support any other games besides dance (4-Panel)
+	if GAMESTATE:GetCurrentGame():GetName() == "dance" and not ThemePrefs.Get("UseHiddenUI")  then
+		return false
 	end
-	-- If the player is using FA+ 
-	if ThemePrefs.Get("UseEnhancedUI") == "FA+" and SL.Global.GameMode == "FA+" then
-		return true
-	end
-	return false;
+
+	-- return true;
 end
