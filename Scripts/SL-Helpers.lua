@@ -159,6 +159,7 @@ local NoteFieldWidth = {
 		versus  = 250,
 		double  = 500,
 		routine = 500,
+		halfdouble = 300
 	},
 	-- These values for techno, para, and kb7 are the result of empirical observation
 	-- of the SM5 engine and should not be regarded as any kind of Truth.
@@ -338,15 +339,8 @@ SetGameModePreferences = function()
 		-- If we're switching to Casual mode,
 		-- we want to reduce the number of judgments,
 		-- so turn Decents and WayOffs off now.
-		-- Be gentle on the young ones
 		if SL.Global.GameMode == "Casual" then
-			-- We also want to widen the Timing Windows
-			-- to decrease the difficulty for new players.
 			SL[pn].ActiveModifiers.TimingWindows = {true,true,true,false,false}
-		else
-	 		SL.Global.ActiveModifiers.TimingWindows = {true,true,true,true,true}
-			--Returns Timing Windows to "normal" scaling
-			PREFSMAN:SetPreference("TimingWindowScale", 1);
 		end
 
 		-- Now that we've set the SL table for TimingWindows appropriately,
@@ -449,30 +443,15 @@ GetStepsCredit = function(player)
 	return t
 end
 
-RandomizeVisualStyle = function()
-	-- Array of possible visual theme options
-	local visualthemes = {"Hearts", "Arrows", "Bears", "Ducks", "Stars", "Thonk", "PSU", "Cats", "GotEm", "Ice_Cream", "Spades", "Gay", "Rights", "Lefts"}
-	local index = math.floor(math.random(0, 11)) 
-		
-	ThemePrefs.Set("VisualStyle", visualthemes[index])
-
-	ThemePrefs.Save()
-
-	-- This compensates for ThemePrefsRows' current lack of support for ExportOnChange() and SaveSelections().
-	MESSAGEMAN:Broadcast("BackgroundImageChanged")
-end
-
 -- -----------------------------------------------------------------------
 -- the best way to spread holiday cheer is singing loud for all to hear
 
 HolidayCheer = function()
 	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11)
 end
-
 AprilFools = function()
 	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==3 and DayOfMonth()==1)
 end
-
 DarkUI = function()
 	-- During the process of switching games, THEME:GetCurThemeName() will temporarily return "_fallback"
 	-- which will cause the ThemePrefs system to throw errors when a "RainbowMode" key isn't found
@@ -480,7 +459,7 @@ DarkUI = function()
 	-- but we can prevent Lua errors from being thrown in the meantime.
 	if THEME:GetCurThemeName() ~= PREFSMAN:GetPreference("Theme") then return false end
 
-	if (ThemePrefs.Get("RainbowMode") or ThemePrefs.Get("VisualStyle") == "Boba") then return true end
+	if ThemePrefs.Get("RainbowMode") then return true end
 	if HolidayCheer() then return true end
 	return false
 end

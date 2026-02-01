@@ -144,10 +144,6 @@ Branch.AllowScreenSelectPlayMode = function()
 end
 
 Branch.AllowScreenSelectPlayMode2 = function()
-	-- now that a GameMode has been selected (or defaulted), set related preferences
-	SetGameModePreferences()
-	-- and reload the theme's Metrics
-	THEME:ReloadMetrics()
 	if SL.Global.GameMode == "ITG" and ThemePrefs.Get("AllowScreenSelectPlayMode2") then
 		return "ScreenSelectPlayMode2"
 	else

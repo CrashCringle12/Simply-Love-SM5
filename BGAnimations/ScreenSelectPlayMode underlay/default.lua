@@ -49,24 +49,18 @@ local t = Def.ActorFrame{
 			choices[#choices+1] = choice
 			choice_actors[#choice_actors+1] = TopScreen:GetChild("IconChoice"..choice)
 		end
-
 		self:queuecommand("Update")
 	end,
-	MenuStartP1MessageCommand=function(self)
+	OffCommand=function(self)
 		if ScreenName=="ScreenSelectPlayMode" or ScreenName=="ScreenSelectPlayModeThonk" then
 			-- set the GameMode now; we'll use it throughout the theme
 			-- to set certain Gameplay settings and determine which screen comes next
 			SL.Global.GameMode = choices[cursor.index+1]
+			-- now that a GameMode has been selected, set related preferences
+			SetGameModePreferences()
+			-- and reload the theme's Metrics
+			THEME:ReloadMetrics()
 		end
-		SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen")
-	end,
-	MenuStartP2MessageCommand=function(self)
-		if ScreenName=="ScreenSelectPlayMode" or ScreenName=="ScreenSelectPlayModeThonk" then
-			-- set the GameMode now; we'll use it throughout the theme
-			-- to set certain Gameplay settings and determine which screen comes next
-			SL.Global.GameMode = choices[cursor.index+1]
-		end
-		SCREENMAN:GetTopScreen():StartTransitioningScreen("SM_GoToNextScreen")
 	end,
 	-- side mask
 	Def.Quad{

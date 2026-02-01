@@ -7,7 +7,7 @@ local mods = SL[pn].ActiveModifiers
 if SL.Global.GameMode ~= "Casual" then
 	if not mods.ColumnCues then return end
 end
-local column_mapping = GetColumnMapping(player)
+local columnMapping = GetColumnMapping(player)
 
 -- Disable column cues if we couldn't compute valid columnMapping
 if columnMapping == nil then return end
