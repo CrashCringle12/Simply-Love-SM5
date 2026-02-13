@@ -232,7 +232,6 @@ function updatePassData(pn, pack, i)
             }
         }
     end
-    SM(SL[pn].AchievementData[pack][i].Data)
 end
 
 function checkSingleProgress(pn, pack, i)

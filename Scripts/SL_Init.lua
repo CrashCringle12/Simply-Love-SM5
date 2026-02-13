@@ -536,9 +536,7 @@ SL = {
 function InitializeSimplyLove()
 	SL.P1:initialize()
 	SL.P2:initialize()
-	SM("Prev GameMode: " .. tostring(SL.Global.GameMode), 10, true)
 	SL.Global:initialize()
-	SM("GameMode: " .. SL.Global.GameMode, 10, true)
 	-- Temporary fix so late joining players aren't getting the last person's profile.
 	-- This obsoletes the handling for defaulting to the DefaultLocalProfile in SelectProfile
 	-- However, the addition of the ProfileSortOrder_Recent will ensure the last used profile is

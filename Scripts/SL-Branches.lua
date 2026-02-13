@@ -136,7 +136,6 @@ Branch.AfterScreenSelectColor = function()
 end
 
 Branch.AllowScreenSelectPlayMode = function()
-	SM("GameMode in AllowScreenSelectPlayMode: " .. tostring(SL.Global.GameMode), 10, true)
 	if ThemePrefs.Get("AllowScreenSelectPlayMode") then
 		return "ScreenSelectPlayMode"
 	else
@@ -145,7 +144,6 @@ Branch.AllowScreenSelectPlayMode = function()
 end
 
 Branch.AllowScreenSelectPlayMode2 = function()
-	SM("GameMode in AllowScreenSelectPlayMode2: " .. tostring(SL.Global.GameMode), 10, true)
 	-- now that a GameMode has been selected (or defaulted), set related preferences
 	SetGameModePreferences()
 	-- and reload the theme's Metrics

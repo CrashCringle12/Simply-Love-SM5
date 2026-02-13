@@ -59,7 +59,6 @@ local pos = nil
 -- so that we can scroll to it.
 for profile in ivalues(profile_data) do
     if profile.guid == PROFILEMAN:GetProfile(player):GetGUID() then
-        SM(PROFILEMAN:GetProfile(player):GetDisplayName())
         pos = profile.index
         break
     end
