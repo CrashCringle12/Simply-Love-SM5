@@ -180,6 +180,18 @@ Branch.AfterHeartEntry = function()
 end
 
 Branch.AfterSelectMusic = function()
+	-- This happens in the "good path" i.e. when proceeding forward in the game
+	-- loop vs. reloading the screen programmatically, or ending the session, etc.
+	-- Broadcasting song selection (for online lobbies) here makes sense since
+	-- this is the point at which the player has actually "selected" a song and
+	-- we're proceeding to the next screen which is either Gameplay or PlayerOptions.
+	--
+	-- NOTE: It is possible for a player to back out of PlayerOptions, but they
+	-- would be expected to pick the same song since it's broadcast to the library.
+	--
+	-- TODO: Consider locking the music wheel in this case.
+	MESSAGEMAN:Broadcast("SongSelected")
+
 	if SCREENMAN:GetTopScreen():GetGoToOptions() then
 		return "ScreenPlayerOptions"
 	else
