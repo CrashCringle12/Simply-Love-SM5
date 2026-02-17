@@ -107,6 +107,9 @@ local input = function(event)
 					overlay:GetChild("PaneDisplayMaster"):GetChild("GetScoresRequester"):playcommand("Cancel")
 					overlay:playcommand("DirectInputToEngine")
 					SCREENMAN:SetNewScreen("ScreenViewDownloads")
+				elseif focus.new_overlay == "OnlineLobbies" then
+					overlay:queuecommand("DirectInputToEngine")
+					SCREENMAN:SetNewScreen("ScreenOnlineLobbies")
 				elseif focus.new_overlay == "SwitchProfile" then
 					SL.Global.FastProfileSwitchInProgress = true
 					-- If a memory card is inserted we can't be on that profile's songs when switching profiles

@@ -341,6 +341,7 @@ local wheel_options = {
 			{ {"HardTime", "PracticeMode"}, function() return GAMESTATE:IsEventMode() and GAMESTATE:GetCurrentSong() ~= nil and ThemePrefs.Get("KeyboardFeatures") end },
 			{ {"TakeABreather", "LoadNewSongs"} },
 			{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
+			{ {"BottomText", "OnlineLobbies"} },
 			{ {"WhereforeArtThou", "SongSearch"}, not GAMESTATE:IsCourseMode() and ThemePrefs.Get("KeyboardFeatures") },
 			{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") },
 			{ {"SetSummaryText", "SetSummary"}, SL.Global.Stages.PlayedThisGame > 0 },

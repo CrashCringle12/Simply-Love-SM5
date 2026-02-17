@@ -42,29 +42,34 @@
 --       can of any type as long as the callback knows what to do with it.
 RequestResponseActor = function(x, y)
 	local url_prefix = "https://apiservice.groovestats.com/api/"
+	local request_time = -1
+	local timeout_secs = -1
+	local request_handler = nil
+	local leaving_screen = false
+	local request_actor_id = tostring({})
 
 	return Def.ActorFrame{
 		InitCommand=function(self)
-			self.request_time = -1
-			self.timeout = -1
-			self.request_handler = nil
-			self.leaving_screen = false
+			request_time = -1
+			timeout_secs = -1
+			request_handler = nil
+			leaving_screen = false
 			self:xy(x, y)
 		end,
 		CancelCommand=function(self)
-			self.leaving_screen = true
+			leaving_screen = true
 			-- Cancel the request if we pressed back on the screen.
-			if self.request_handler then
-				self.request_handler:Cancel()
-				self.request_handler = nil
+			if request_handler then
+				request_handler:Cancel()
+				request_handler = nil
 			end
 		end,
 		OffCommand=function(self)
-			self.leaving_screen = true
+			leaving_screen = true
 			-- Cancel the request if this actor will be destructed soon.
-			if self.request_handler then
-				self.request_handler:Cancel()
-				self.request_handler = nil
+			if request_handler then
+				request_handler:Cancel()
+				request_handler = nil
 			end
 		end,
 		MakeGrooveStatsRequestCommand=function(self, params)
@@ -75,9 +80,9 @@ RequestResponseActor = function(x, y)
 			end
 
 			-- Cancel any existing requests if we're waiting on one at the moment.
-			if self.request_handler then
-				self.request_handler:Cancel()
-				self.request_handler = nil
+			if request_handler then
+				request_handler:Cancel()
+				request_handler = nil
 			end
 			self:GetChild("Spinner"):visible(true)
 
@@ -87,10 +92,10 @@ RequestResponseActor = function(x, y)
 			local body = params.body
 			local headers = params.headers
 
-			self.timeout = timeout
+			timeout_secs = timeout
 
 			-- Attempt to make the request
-			self.request_handler = NETWORK:HttpRequest{
+			request_handler = NETWORK:HttpRequest{
 				url=url_prefix..endpoint,
 				method=method,
 				body=body,
@@ -98,7 +103,7 @@ RequestResponseActor = function(x, y)
 				connectTimeout=timeout,
 				transferTimeout=timeout,
 				onResponse=function(response)
-					self.request_handler = nil
+					request_handler = nil
 					-- If we get a permanent error, make sure we "disconnect" from
 					-- GrooveStats until we recheck on ScreenTitleMenu.
 					if response.statusCode then
@@ -112,7 +117,7 @@ RequestResponseActor = function(x, y)
 						end
 					end
 
-					if self.leaving_screen then
+					if leaving_screen then
 						return
 					end
 					
@@ -122,25 +127,30 @@ RequestResponseActor = function(x, y)
 						end
 					end
 
-					self:GetChild("Spinner"):visible(false)
+					MESSAGEMAN:Broadcast("GrooveStatsRequestFinished", {id=request_actor_id})
 				end,
 			}
 			-- Keep track of when we started making the request
-			self.request_time = GetTimeSinceStart()
+			request_time = GetTimeSinceStart()
 			-- Start looping for the spinner.
 			self:queuecommand("GrooveStatsRequestLoop")
 		end,
 		GrooveStatsRequestLoopCommand=function(self)
 			local now = GetTimeSinceStart()
-			local remaining_time = self.timeout - (now - self.request_time)
+			local remaining_time = timeout_secs - (now - request_time)
 			self:playcommand("UpdateSpinner", {
-				timeout=self.timeout,
+				timeout=timeout_secs,
 				remaining_time=remaining_time
 			})
 			-- Only loop if the request is still ongoing.
 			-- The callback always resets the request_handler once its finished.
-			if self.request_handler then
+			if request_handler then
 				self:sleep(0.5):queuecommand("GrooveStatsRequestLoop")
+			end
+		end,
+		GrooveStatsRequestFinishedMessageCommand=function(self, params)
+			if params and params.id == request_actor_id then
+				self:GetChild("Spinner"):visible(false)
 			end
 		end,
 
