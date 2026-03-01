@@ -289,6 +289,7 @@ local HandleResponse = function(response, actor)
 
 	if event == "lobbyState" then
 		actor.inLobby = true
+		SM(data)
 		DisplayLobbyState(data, actor)
 		MESSAGEMAN:Broadcast("OnlineLobbyState", data or {})
 	elseif event == "lobbySearched" then
