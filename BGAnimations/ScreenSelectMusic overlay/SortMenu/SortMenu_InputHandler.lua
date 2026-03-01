@@ -11,6 +11,7 @@ local input = function(event)
 	if SCREENMAN:GetTopScreen():GetMusicWheel():IsLocked() then
 		overlay:queuecommand("DirectInputToEngine")
 	end
+	
 	if event.type ~= "InputEventType_Release" then
 		if event.GameButton == "MenuRight" or event.GameButton == "MenuDown" then
 			sort_wheel:scroll_by_amount(1)
@@ -26,7 +27,6 @@ local input = function(event)
 				MESSAGEMAN:Broadcast('ResetHeaderText')
 				overlay:queuecommand("DirectInputToEngine")
 			elseif focus.kind == "PersonalPlaylist" then
-
 				local profileDir = PROFILEMAN:GetProfileDir(ProfileSlot[PlayerNumber:Reverse()[event.PlayerNumber] + 1])
 				SONGMAN:SetPreferredSongs(profileDir .."Playlists/" .. focus.new_overlay .. ".txt", --[[isAbsolute=]]true);
 				if SONGMAN:GetPreferredSortSongs() then
@@ -79,10 +79,9 @@ local input = function(event)
 					new_style = #GAMESTATE:GetHumanPlayers() == 1 and "single" or "versus"
 				end
 				-- Get the style we want to change to
+				local new_style = focus.change:lower()
 				-- accommodate techno game
 				if GAMESTATE:GetCurrentGame():GetName() == "techno" then new_style = new_style .. "8" end
-
-
 				-- set it in the engine
 				GAMESTATE:SetCurrentStyle(new_style)
 				-- Make sure we cancel the request if it's active before trying to switch screens.
@@ -120,6 +119,12 @@ local input = function(event)
 					overlay:playcommand("DirectInputToEngine")
 					SCREENMAN:SetNewScreen("ScreenViewDownloads")
 				elseif focus.new_overlay == "SwitchProfile" then
+					-- There's a race condition that occurs when a player mashes the Start button
+					-- fast enough, when the Switch Profiles button is highlighted, that causes
+					-- two SelectProfile screens to be present. This softlocks the game
+					-- due to the first screen not able to receive inputs.
+					if SL.Global.FastProfileSwitchInProgress then return false end
+
 					SL.Global.FastProfileSwitchInProgress = true
 					-- If a memory card is inserted we can't be on that profile's songs when switching profiles
 					-- as the profile is temporarily unloaded when finishing the screen.

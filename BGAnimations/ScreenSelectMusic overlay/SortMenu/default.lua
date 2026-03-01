@@ -289,7 +289,7 @@ local function GetChangeableStyles()
 
 	return available_styles
 end
-
+local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
 local wheel_options = {
 	-- This is the master table that controls the SortMenu's choices
 	-- The structure is as follows:
@@ -384,7 +384,10 @@ local wheel_options = {
 local t = Def.ActorFrame {
 	Name="SortMenu",
 	-- Always ensure player input is directed back to the engine when initializing SelectMusic.
-	InitCommand=function(self) self:visible(false):queuecommand("DirectInputToEngine") end,
+	-- Must to use playcommand here instead of queuecommand. If the player
+	-- enters the code early, queuecommand could run after the menu is opened
+	-- and direct input back to engine while the menu is still open.
+	InitCommand=function(self) self:visible(false):playcommand("DirectInputToEngine") end,
 	-- Always ensure player input is directed back to the engine when leaving SelectMusic.
 	OffCommand=function(self) self:playcommand("DirectInputToEngine") end,
 	-- Figure out which choices to put in the SortWheel based on various current conditions.
@@ -394,6 +397,7 @@ local t = Def.ActorFrame {
 	EnterCategoryMessageCommand=function(self, params)
 		local category = params.Category
 		lastCategory = params.Category
+		local style = GAMESTATE:GetCurrentStyle():GetName():gsub("8", "")
 		local filtered_wheel_options = {}
 		for i=1, #wheel_options do
 			local option = wheel_options[i]
@@ -536,12 +540,10 @@ local t = Def.ActorFrame {
 						table.insert(filtered_wheel_options, {option[1][1], option[1][2]})
 					end
 				elseif type(option[2]) == "function" then
-					-- Non-category entry using a function as a visibility condition
 					if option[2]() then
 						table.insert(filtered_wheel_options, {option[1][1], option[1][2]})
 					end
 				elseif option[2] == nil or option[2] == true then
-					-- Simple always-visible entry
 					table.insert(filtered_wheel_options, {option[1][1], option[1][2]})
 				end
 			end

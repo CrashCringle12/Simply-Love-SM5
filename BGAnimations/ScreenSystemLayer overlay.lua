@@ -482,7 +482,7 @@ t[#t+1] = Def.ActorFrame{
 				SL.GrooveStats.Leaderboard = false
 				SL.GrooveStats.AutoSubmit = false
 				self:playcommand("MakeGrooveStatsRequest", {
-					endpoint="new-session.php?chartHashVersion="..SL.GrooveStats.ChartHashVersion,
+					endpoint="?action=newSession&chartHashVersion="..SL.GrooveStats.ChartHashVersion,
 					method="GET",
 					timeout=10,
 					callback=NewSessionRequestProcessor,

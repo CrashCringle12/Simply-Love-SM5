@@ -15,7 +15,7 @@
 --
 -- af.OnCommand=function(self)
 --     self:playcommand("MakeGrooveStatsRequest", {
---         endpoint="new-session.php?chartHashVersion="..SL.GrooveStats.ChartHashVersion,
+--         endpoint="?action=newSession&chartHashVersion="..SL.GrooveStats.ChartHashVersion,
 --         method="GET",
 --         timeout=10,
 --         callback=NewSessionRequestProcessor,
@@ -41,7 +41,7 @@
 -- args: any, arguments that will be made accesible to the callback function. This
 --       can of any type as long as the callback knows what to do with it.
 RequestResponseActor = function(x, y)
-	local url_prefix = "https://api.groovestats.com/"
+	local url_prefix = "https://apiservice.groovestats.com/api/"
 
 	return Def.ActorFrame{
 		InitCommand=function(self)
