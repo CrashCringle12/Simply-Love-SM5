@@ -39,26 +39,6 @@ local song = GAMESTATE:GetCurrentSong()
 -- this prepares and returns a string to be used by the helper BitmapText
 -- that shows players their effective scrollspeed
 
-
--- Use this function to find an OptionRow by name so that you can manipulate its text as needed.
---     first argument is a screen object provided by SCREENMAN:GetTopScreen()
---     second argument is a string that might match the name of an OptionRow somewhere on this screen
---
---     returns the 0-based index of that OptionRow within this screen
-
-local FindOptionRowIndex = function(ScreenOptions, Name)
-	if not ScreenOptions or not ScreenOptions.GetNumRows then return end
-
-	local num_rows = ScreenOptions:GetNumRows()
-
-	-- OptionRows on ScreenOptions are 0-indexed, so start counting from 0
-	for i=0,num_rows-1 do
-		if ScreenOptions:GetOptionRow(i):GetName() == Name then
-			return i
-		end
-	end
-end
-
 local CalculateScrollSpeed = function(player)
 	player   = player or GAMESTATE:GetMasterPlayerNumber()
 	local pn = ToEnumShortString(player)
@@ -136,6 +116,26 @@ local ChangeSpeedMod = function(pn, direction)
 	end
 end
 
+
+-- Use this function to find an OptionRow by name so that you can manipulate its text as needed.
+--     first argument is a screen object provided by SCREENMAN:GetTopScreen()
+--     second argument is a string that might match the name of an OptionRow somewhere on this screen
+--
+--     returns the 0-based index of that OptionRow within this screen
+
+local FindOptionRowIndex = function(ScreenOptions, Name)
+	if not ScreenOptions or not ScreenOptions.GetNumRows then return end
+
+	local num_rows = ScreenOptions:GetNumRows()
+
+	-- OptionRows on ScreenOptions are 0-indexed, so start counting from 0
+	for i=0,num_rows-1 do
+		if ScreenOptions:GetOptionRow(i):GetName() == Name then
+			return i
+		end
+	end
+end
+
 local ChangeVariant = function(pn, direction)
 	local ScreenOptions = SCREENMAN:GetTopScreen()
 	if direction == 0 then
@@ -175,8 +175,10 @@ local t = Def.ActorFrame{
 	OffCommand=function(self) self:linear(0.2):diffusealpha(0) end,
 	CaptureCommand=function(self)
 		local ScreenOptions = SCREENMAN:GetTopScreen()
+
 		for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 			local pn = ToEnumShortString(player)
+
 			local SpeedModRowIndex = FindOptionRowIndex(ScreenOptions,"SpeedMod")
 			local VariantRowIndex = FindOptionRowIndex(ScreenOptions,"NoteSkinVariant")			
 			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
@@ -269,6 +271,7 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 	local pn = ToEnumShortString(player)
 	local original_pn = pn
 	local song = GAMESTATE:GetCurrentSong()
+
 	t[#t+1] = Def.Actor{
 
 		-- this is called from ./Scripts/SL-PlayerOptions.lua when the player changes their SpeedModType (X, M, C)
