@@ -33,13 +33,15 @@ af[#af+1] = LoadActor("./Technique.lua", file)
 
 if ThemePrefs.Get("VisualStyle") == "DBZ" then
 	af[#af+1] = LoadActor("./timechamber.lua", file)
-else
-	if ThemePrefs.Get("VisualStyle") == "ITL" then
-		af[#af+1] = LoadActor("./ITL", file)
-	end
+elseif ThemePrefs.Get("VisualStyle") == "ITL" then
+	af[#af+1] = LoadActor("./ITL", file)
+elseif ThemePrefs.Get("VisualStyle") == "PSU" then
 	-- the best way school spirit! We are..?
 	af[#af+1] = LoadActor( "./spirit.lua")
+elseif ThemePrefs.Get("VisualStyle") == "Rights" then
 	af[#af+1] = LoadActor( "./rights.lua")
+elseif ThemePrefs.Get("VisualStyle") == "Lefts" then
 	af[#af+1] = LoadActor( "./lefts.lua")
 end
+
 return af
