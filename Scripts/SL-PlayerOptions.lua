@@ -917,6 +917,7 @@ local OptionRowDefault = {
 			if GAMESTATE:GetCurrentStyle() ~= nil and GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
 				local list = {
 					"NoteSkin",
+					"NoteSkinVariant",
 					"JudgmentGraphic",
 					"ComboFont",
 					"HoldJudgment",

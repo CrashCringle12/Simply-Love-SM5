@@ -82,19 +82,6 @@ local function MakePercentScore(actual, possible)
     return percent
 end
 
--- Function to calculate combined percent for two players
-local function GetCombinedPercent(playerStats1, playerStats2)
-    local actual1 = playerStats1:GetActualDancePoints()
-    local possible1 = playerStats1:GetPossibleDancePoints()
-    local actual2 = playerStats2:GetActualDancePoints()
-    local possible2 = playerStats2:GetPossibleDancePoints()
-
-    local combinedActual = actual1 + actual2
-    local combinedPossible = possible1 + possible2
-
-    return MakePercentScore(combinedActual, combinedPossible)
-end
-
 return LoadFont("Wendy/_wendy monospace numbers")..{
 	Text="0.00",
 	Name=pn.."Score",
@@ -177,28 +164,15 @@ return LoadFont("Wendy/_wendy monospace numbers")..{
 	RedrawScoreCommand=function(self)
 		if not IsEX then
 			local dance_points = pss:GetPercentDancePoints()
-			if styletype == "TwoPlayersSharedSides" then
-				local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
-				local otherStats = STATSMAN:GetCurStageStats():GetPlayerStageStats(OtherPlayer[player])
-				dance_points = GetCombinedPercent(pss, otherStats)
-			end
 			local percent = FormatPercentScore( dance_points ):sub(1,-2)
 			self:settext(percent)
 		end
 	end,
 	ExCountsChangedMessageCommand=function(self, params)
-		if styletype == "TwoPlayersSharedSides" then
-			local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
-			local otherStats = STATSMAN:GetCurStageStats():GetPlayerStageStats(OtherPlayer[player])
-			local dance_points = GetCombinedPercent(pss, otherStats)
-			local percent = FormatPercentScore( dance_points ):sub(1,-2)
-			self:settext(percent)
-		else	
-			if params.Player ~= player then return end
+		if params.Player ~= player then return end
 
-			if IsEX then
-				self:settext(("%.02f"):format(params.ExScore))
-			end
+		if IsEX then
+			self:settext(("%.02f"):format(params.ExScore))
 		end
 	end,
 }

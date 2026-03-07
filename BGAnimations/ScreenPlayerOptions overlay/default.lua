@@ -33,6 +33,27 @@ end
 
 local song = GAMESTATE:GetCurrentSong()
 
+
+
+-- Use this function to find an OptionRow by name so that you can manipulate its text as needed.
+--     first argument is a screen object provided by SCREENMAN:GetTopScreen()
+--     second argument is a string that might match the name of an OptionRow somewhere on this screen
+--
+--     returns the 0-based index of that OptionRow within this screen
+
+local FindOptionRowIndex = function(ScreenOptions, Name)
+	if not ScreenOptions or not ScreenOptions.GetNumRows then return end
+
+	local num_rows = ScreenOptions:GetNumRows()
+
+	-- OptionRows on ScreenOptions are 0-indexed, so start counting from 0
+	for i=0,num_rows-1 do
+		if ScreenOptions:GetOptionRow(i):GetName() == Name then
+			return i
+		end
+	end
+end
+
 ------------------------------------------------------------
 -- functions local to this file
 
@@ -117,25 +138,6 @@ local ChangeSpeedMod = function(pn, direction)
 end
 
 
--- Use this function to find an OptionRow by name so that you can manipulate its text as needed.
---     first argument is a screen object provided by SCREENMAN:GetTopScreen()
---     second argument is a string that might match the name of an OptionRow somewhere on this screen
---
---     returns the 0-based index of that OptionRow within this screen
-
-local FindOptionRowIndex = function(ScreenOptions, Name)
-	if not ScreenOptions or not ScreenOptions.GetNumRows then return end
-
-	local num_rows = ScreenOptions:GetNumRows()
-
-	-- OptionRows on ScreenOptions are 0-indexed, so start counting from 0
-	for i=0,num_rows-1 do
-		if ScreenOptions:GetOptionRow(i):GetName() == Name then
-			return i
-		end
-	end
-end
-
 local ChangeVariant = function(pn, direction)
 	local ScreenOptions = SCREENMAN:GetTopScreen()
 	if direction == 0 then
@@ -180,7 +182,7 @@ local t = Def.ActorFrame{
 			local pn = ToEnumShortString(player)
 
 			local SpeedModRowIndex = FindOptionRowIndex(ScreenOptions,"SpeedMod")
-			local VariantRowIndex = FindOptionRowIndex(ScreenOptions,"NoteSkinVariant")			
+			local VariantRowIndex = FindOptionRowIndex(ScreenOptions,"NoteSkinVariant")	
 			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
 				if player == GAMESTATE:GetMasterPlayerNumber() then
 					SpeedModBMTs[pn] = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")
@@ -346,10 +348,11 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			self:GetParent():queuecommand("Refresh")
 		end,
 		["Set" .. pn .. "VariantCommand"]=function(self)
-			local current_variant = SL[pn].ActiveModifiers.NoteSkinVariant or SL[pn].ActiveModifiers.NoteSkin
+			local current_variant = SL[original_pn].ActiveModifiers.NoteSkinVariant or SL[original_pn].ActiveModifiers.NoteSkin
 			-- Get all text after first _ to get the variant name
 			current_variant = current_variant:match("_(.*)") or current_variant
-			VariantBMTs[pn]:settext( current_variant )
+			
+			VariantBMTs[original_pn]:settext( current_variant )
 			self:GetParent():queuecommand("RefreshVariants")
 		end,
 
@@ -371,12 +374,12 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 				self:queuecommand("Set"..original_pn)
 			end
 			if row_index == FindOptionRowIndex(topscreen, "NoteSkinVariant") then
-				ChangeVariant( pn, -1 )
-				self:queuecommand("Set"..pn.."Variant")
+				ChangeVariant( original_pn, -1 )
+				self:queuecommand("Set"..original_pn.."Variant")
 			end
 			if row_index == FindOptionRowIndex(topscreen, "NoteSkin") then
-				ChangeVariant( pn, 0 )
-				self:queuecommand("Set"..pn.."Variant")
+				ChangeVariant( original_pn, 0 )
+				self:queuecommand("Set"..original_pn.."Variant")
 			end
 		end,
 		["MenuRight" .. pn .. "MessageCommand"]=function(self)
@@ -394,11 +397,11 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 				self:queuecommand("Set"..original_pn)
 			end
 			if row_index == FindOptionRowIndex(topscreen, "NoteSkinVariant") then
-				ChangeVariant( pn, 1 )
-				self:queuecommand("Set"..pn.."Variant")
+				ChangeVariant( original_pn, 1 )
+				self:queuecommand("Set"..original_pn.."Variant")
 			elseif row_index == FindOptionRowIndex(topscreen, "NoteSkin") then
-				ChangeVariant( pn, 0 )
-				self:queuecommand("Set"..pn.."Variant")
+				ChangeVariant( original_pn, 0 )
+				self:queuecommand("Set"..original_pn.."Variant")
 			end
 		end
 	}
