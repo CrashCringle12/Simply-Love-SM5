@@ -368,7 +368,6 @@ local t = Def.ActorFrame {
 					{ {"SortBy", "PopularityP2"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
 					{ {"SortBy", "RecentP2"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
 					{ {"SortBy", "TopP2Grades"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
-					{AddFavorites()},
 					{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") }
 				}
 			},
@@ -391,14 +390,15 @@ local t = Def.ActorFrame {
 				{"", "CategoryPlaylists"},
 				AddPlaylists,
 			},
-{ 
-		{"", "CategoryViews"},
-		{
-			{{"View", "Gallery"}},
-			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
-			{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
-		}
-	},
+			{ 
+				{"", "CategoryViews"},
+				{
+					{{"View", "Gallery"}},
+					{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
+					{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
+					{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
+				}
+			},
 			{ {"SortBy", "Group"} },
 			{ {"SortBy", "Title"} },
 			{ {"SortBy", "Recent"} },

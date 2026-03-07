@@ -93,7 +93,7 @@ for p=1,pages do
 							self:stopeffect()
 						end,
 						PageMessageCommand=function(self, params)
-							if (activePack == "Trial") then
+							if (activePack == "Trials") then
 								self:Load("medal 4x3.png")
 							else
 							end

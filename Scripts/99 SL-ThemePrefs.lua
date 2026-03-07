@@ -121,15 +121,6 @@ SL_CustomPrefs.Get = function()
 			},
 			Values 	= { true , false }
 		},
-		UseHiddenUI =
-		{
-			Default = false,
-			Choices = { 
-				THEME:GetString("ThemePrefs", "On"),
-				THEME:GetString("ThemePrefs", "Off")
-			},
-			Values 	= { true , false }
-		},
 		VisualStyle =
 		{
 			Default = "PSU",
