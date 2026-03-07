@@ -94,7 +94,7 @@ return LoadFont("Common Normal")..{
 	UpdateColorCommand=function(self)
 		local textColor = Color.White
 		local shadowLength = 0
-		if ThemePrefs.Get("RainbowMode") and not HolidayCheer() then
+		if ThemePrefs.Get("RainbowMode") and not HolidayCheer() or ThemePrefs.Get("VisualStyle") == "DBZ" then
 			textColor = Color.Black
 		end
 		if ThemePrefs.Get("VisualStyle") == "SRPG9" then
@@ -103,6 +103,9 @@ return LoadFont("Common Normal")..{
 		end
 
 		self:diffuse(textColor):shadowlength(shadowLength)
+		if ThemePrefs.Get("VisualStyle") == "DBZ" then
+			self:addy(-20)
+		end
 	end,
 	VersionCheckMessageCommand=function(self)
 		self:settext(GetText())

@@ -20,6 +20,10 @@ end
 if ThemePrefs.Get("VisualStyle") == "Lefts" then
 	resolved_path = ("/%s/Graphics/_logos/lefts.png"):format( THEME:GetCurrentThemeDirectory() )
 end
+
+if ThemePrefs.Get("VisualStyle") == "DBZ" then
+	resolved_path = ("/%s/Graphics/_logos/dbz.png"):format( THEME:GetCurrentThemeDirectory() )
+end
 -- -----------------------------------------------------------------------
 local af = Def.ActorFrame{}
 
@@ -58,9 +62,15 @@ af[#af+1] = Def.Sprite{
 			if style == "Lefts" then
 				self:y(-120):zoom(.2)
 			end
+
+			if style == "DBZ" then
+				self:y(-200):zoom(0.75):rotationz(-1)
+			end
 		end
 	end,
 }
+
+
 
 
 if ThemePrefs.Get("VisualStyle") ~= "SRPG9" then
@@ -92,6 +102,9 @@ if ThemePrefs.Get("VisualStyle") ~= "SRPG9" then
 			if ThemePrefs.Get("VisualStyle") == "Lefts" then
 				self:zoom(0.15):y(48)
 			end
+			if ThemePrefs.Get("VisualStyle") == "DBZ" then
+				self:zoom(0.23):y(-20):rotationz(0.25)
+			end
 		end,
 		VisualStyleSelectedMessageCommand=function(self)
 			-- In case we auto-switch to SRPG9, then it's possible this actor may have been added to the screen.
@@ -103,5 +116,16 @@ if ThemePrefs.Get("VisualStyle") ~= "SRPG9" then
 		end
 	}
 end
+
+-- af[#af+1] = LoadActor("Dragon_Ball_Super.png")..{
+-- 	InitCommand=function(self)
+-- 		if ThemePrefs.Get("VisualStyle") == "DBZ" then
+-- 			self:visible(true):zoom(0.2):y(30)
+-- 		else
+-- 			self:visible(false)
+-- 		end
+-- 	end,
+-- }
+
 
 return af

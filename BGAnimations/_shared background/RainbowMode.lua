@@ -15,7 +15,7 @@ local delay = 0
 local af1 = Def.ActorFrame{
 	InitCommand=function(self)
 		local style = ThemePrefs.Get("VisualStyle")
-		self:visible(ThemePrefs.Get("RainbowMode") and (style ~= "SRPG9" and style ~= "ITL" and style ~= "PSU" and style ~= "Rights" and style ~= "Lefts"))
+		self:visible(ThemePrefs.Get("RainbowMode") and (style ~= "SRPG9" and style ~= "ITL" and style ~= "PSU" and style ~= "Rights" and style ~= "Lefts" and style ~= "DBZ"))
 	end,
 	OnCommand=function(self) self:Center():bob():effectmagnitude(0,50,0):effectperiod(8) end,
 	VisualStyleSelectedMessageCommand=function(self)
