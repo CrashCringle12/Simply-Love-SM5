@@ -56,12 +56,7 @@ end
 
 Branch.AllowScreenSelectProfile = function()
 	if ThemePrefs.Get("AllowScreenSelectProfile") then
-		local randomNum = math.random(0, 16)
-		if (AprilFools() and randomNum % 3 == 0) then
-			return "ScreenSponsors"
-		else
 			return "ScreenSelectProfile"
-		end
 	else
 		return Branch.AfterSelectProfile()
 	end
@@ -194,39 +189,16 @@ Branch.AfterHeartEntry = function()
 end
 
 Branch.AfterSelectMusic = function()
-	if SCREENMAN:GetTopScreen():GetName() == "ScreenAds3" then
-		local randomNum = math.random(0, 16)
-		if (AprilFools() and randomNum % 6 == 0) then
-			return "ScreenSponsors3"
-		else
-			-- routine mode specifically uses ScreenGameplayShared
-			local style = GAMESTATE:GetCurrentStyle():GetName()
-			if style == "routine" then
-				return "ScreenGameplayShared"
-			end
-
-			-- while everything else (single, versus, double, etc.) uses ScreenGameplay
-			return "ScreenGameplay"
-		end
+	if SCREENMAN:GetTopScreen():GetGoToOptions() then
+		return "ScreenPlayerOptions"
 	else
-		if SCREENMAN:GetTopScreen():GetGoToOptions() then
-			return "ScreenPlayerOptions"
-		else
-
-			local randomNum = math.random(0, 16)
-			if (AprilFools() and randomNum % 4 == 0) then
-				return "ScreenSponsors3"
-			else
-				-- routine mode specifically uses ScreenGameplayShared
-				local style = GAMESTATE:GetCurrentStyle():GetName()
-				if style == "routine" then
-					return "ScreenGameplayShared"
-				end
-
-				-- while everything else (single, versus, double, etc.) uses ScreenGameplay
-				return "ScreenGameplay"
-			end
+		-- routine mode specifically uses ScreenGameplayShared
+		local style = GAMESTATE:GetCurrentStyle():GetName()
+		if style == "routine" then
+			return "ScreenGameplayShared"
 		end
+		-- while everything else (single, versus, double, etc.) uses ScreenGameplay
+		return "ScreenGameplay"
 	end
 end
 

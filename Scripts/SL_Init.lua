@@ -133,10 +133,9 @@ local GlobalDefaults = {
 			}
 			self.ScreenAfter = {
 				PlayAgain = "ScreenEvaluationSummary",
-				PlayerOptions = "ScreenAds",
-				PlayerOptions2 = "ScreenAds",
-				PlayerOptions3 = "ScreenAds",
-				SelectCharacter = "ScreenAds",
+				PlayerOptions  = "ScreenGameplay",
+				PlayerOptions2 = "ScreenGameplay",
+				PlayerOptions3 = "ScreenGameplay",
 			}
 			self.ContinuesRemaining = ThemePrefs.Get("NumberOfContinuesAllowed") or 0
 			self.GameMode = ThemePrefs.Get("DefaultGameMode") or "ITG"
@@ -168,12 +167,6 @@ local GlobalDefaults = {
 			-- used to track active OptionRow index when navigating the Operator Menu's many screens and sub-screens
 			-- shaped like: { ScreenOptionsService=3, ScreenVisualOptions=1 }
 			self.PrevScreenOptionsServiceRow = {}
-		        -- all of the trials currently on the machine
-            		self.ViewingTrials = false
-			self.Trials = {}
-			self.TrialDiffs = {}
-			self.TrialMap = {}
-
 		end,
 
 		-- These values outside initialize() won't be reset each game cycle,

@@ -395,6 +395,7 @@ local t = Def.ActorFrame {
 				{"", "CategoryViews"},
 				{
 					{{"View", "Gallery"}},
+					{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
 					{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
 					{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
 				}

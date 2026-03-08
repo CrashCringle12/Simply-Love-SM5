@@ -1,18 +1,19 @@
 function TrialCheck(pn,trial)
 	local profile = PROFILEMAN:GetProfile(pn)
-	local trialMap = SL.Global.TrialMap[trial]
-	if trialMap then
-		for song, i in ivalues(trialMap) do
-			if song then
-				if not profile:HasPassedAnyStepsInSong(song) then
-					return false;
-				end
-			end
-		end
-		return true
-	else
-		return false
-	end
+	return false;
+	-- -- local trialMap = SL.Global.TrialMap[trial]
+	-- if trialMap then
+	-- 	for song, i in ivalues(trialMap) do
+	-- 		if song then
+	-- 			if not profile:HasPassedAnyStepsInSong(song) then
+	-- 				return false;
+	-- 			end
+	-- 		end
+	-- 	end
+	-- 	return true
+	-- else
+	-- 	return false
+	-- end
 end
 
 function HasPassed(pn,song)
