@@ -40,18 +40,21 @@ return Def.ActorFrame{
 				self:x( _screen.cx - (IsUsingWideScreen() and 356 or 346))
 				self:y(_screen.cy + 32)
 			else
-				self:x( _screen.cx - (IsUsingWideScreen() and 356 or 337))
-				self:y(_screen.cy + 10)
+				self:x( _screen.cx - (IsUsingWideScreen() and 356 or 346))
+				self:y(_screen.cy + 12)	
 			end
 
 		elseif player == PLAYER_2 then
 
 			if GAMESTATE:IsCourseMode() then
-				self:x( _screen.cx - (IsUsingWideScreen() and 210 or 242))
+				self:x( _screen.cx - 210)
 				self:y(_screen.cy + 85)
-			else
-				self:x( _screen.cx - (IsUsingWideScreen() and 254 or 242))
+			elseif ThemePrefs.Get("PreferredStyle")=="auto" then
+				self:x( _screen.cx - 210)
 				self:y(_screen.cy + 28)
+			else
+				self:x( _screen.cx - 244)
+				self:y(_screen.cy + 40)
 			end
 		end
 

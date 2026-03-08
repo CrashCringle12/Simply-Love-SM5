@@ -4,29 +4,36 @@ if GAMESTATE:IsCourseMode() then return end
 
 local player = ...
 local pn = ToEnumShortString(player)
-
+local autoStyle = ThemePrefs.Get("PreferredStyle")=="auto" 
 
 -- Height and width of the density graph.
 local height = 64
-local width = IsUsingWideScreen() and 300 or 268
-
+local width = IsUsingWideScreen() and 286 or 276
+if autoStyle then
+	width = 352
+end
 -- In 2-players mode, whether the DensityGraph or PatternInfo is shown
 -- Can be toggled by the code "ToggleChartInfo" in metrics.ini
 local showPatternInfo = false
 
 local af = Def.ActorFrame{
 	InitCommand=function(self)
-		self:visible(GAMESTATE:IsHumanPlayer(player))
-		self:xy(IsUsingWideScreen() and  _screen.cx-192 or  _screen.cx-176, _screen.cy+20):zoom(0.92)
-
+		self:visible( GAMESTATE:IsHumanPlayer(player) )
+		self:xy(_screen.cx-182, _screen.cy+23)
+		if autoStyle then
+			self:xy(IsUsingWideScreen() and  _screen.cx-170 or  _screen.cx-176, _screen.cy+20):zoom(0.91)
+		end
 		if player == PLAYER_2 then
-			self:addy(height+12)
-		else
-			self:addy(-2)
+			self:addy(autoStyle and height+11 or height+24)
 		end
 
-		if IsUsingWideScreen() then
-			self:addx(0)
+		if IsUsingWideScreen() and not autoStyle then
+			self:addx(-5)
+		end
+	end,
+	PlayerJoinedMessageCommand=function(self, params)
+		if params.Player == player then
+			self:visible(true)
 		end
 	end,
 	PlayerUnjoinedMessageCommand=function(self, params)
@@ -177,7 +184,6 @@ af2[#af2+1] = Def.ActorFrame{
 		Text="",
 		Name="BreakdownText",
 		InitCommand=function(self)
-
 			local textZoom = 0.8
 			self:maxwidth(width/textZoom):zoom(textZoom)
 		end,
@@ -202,7 +208,7 @@ af2[#af2+1] = Def.ActorFrame{
 		if GAMESTATE:GetNumSidesJoined() == 2 then
 			self:y(0)
 		else
-			self:y(74 * (player == PLAYER_1 and 1 or -1.25))
+			self:y((autoStyle and 74 or 88) * (player == PLAYER_1 and 1 or -1))
 		end
 		self:visible(GAMESTATE:GetNumSidesJoined() == 1)
 	end,
@@ -211,7 +217,7 @@ af2[#af2+1] = Def.ActorFrame{
 		if GAMESTATE:GetNumSidesJoined() == 2 then
 			self:y(0)
 		else
-			self:y(74 * (player == PLAYER_1 and 1 or -1.25))
+			self:y((autoStyle and 74 or 88) * (player == PLAYER_1 and 1 or -1))
 		end
 	end,
 	PlayerUnjoinedMessageCommand=function(self, params)
@@ -219,7 +225,7 @@ af2[#af2+1] = Def.ActorFrame{
 		if GAMESTATE:GetNumSidesJoined() == 2 then
 			self:y(0)
 		else
-			self:y(74 * (player == PLAYER_1 and 1 or -1))
+			self:y((autoStyle and 74 or 88) * (player == PLAYER_1 and 1 or -1))
 		end
 	end,
 	TogglePatternInfoCommand=function(self)
@@ -246,7 +252,7 @@ local layout = {
 	{"Brackets", "Total Stream"},
 }
 
-local colSpacing = 150
+local colSpacing = autoStyle and 200 or 150
 local rowSpacing = 20
 local noneText = THEME:GetString("SLPlayerOptions", "None")
 local totalStreamText = THEME:GetString("SLPlayerOptions", "TotalStream")
@@ -264,7 +270,7 @@ for i, row in ipairs(layout) do
 					self:maxwidth(100)
 				end
 				self:xy(-width/2 + 40, -height/2 + 13)
-				self:addx((j-1)*colSpacing)
+				self:addx((j-1)*colSpacing )
 				self:addy((i-1)*rowSpacing)
 			end,
 			HideCommand=function(self)
@@ -304,4 +310,5 @@ for i, row in ipairs(layout) do
 
 	end
 end
+
 return af

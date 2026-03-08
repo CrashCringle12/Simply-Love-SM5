@@ -233,7 +233,7 @@ local t = Def.ActorFrame {
 			return
 		end
 
-		if PreferredStyle=="none" or PreferredStyle=="versus" or #GAMESTATE:GetHumanPlayers() > 1 then
+		if not (PreferredStyle=="single" or PreferredStyle=="double")  or #GAMESTATE:GetHumanPlayers() > 1 then
 			HandleStateChange(self, PLAYER_1)
 			HandleStateChange(self, PLAYER_2)
 		else

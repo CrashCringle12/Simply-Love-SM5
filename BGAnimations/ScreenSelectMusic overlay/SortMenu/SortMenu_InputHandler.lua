@@ -78,8 +78,6 @@ local input = function(event)
 					THEME:ReloadMetrics()
 					new_style = #GAMESTATE:GetHumanPlayers() == 1 and "single" or "versus"
 				end
-				-- Get the style we want to change to
-				local new_style = focus.change:lower()
 				-- accommodate techno game
 				if GAMESTATE:GetCurrentGame():GetName() == "techno" then new_style = new_style .. "8" end
 				-- set it in the engine
