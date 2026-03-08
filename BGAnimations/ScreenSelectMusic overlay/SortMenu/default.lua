@@ -253,7 +253,7 @@ local function GetChangeableStyles()
 	-- but only present these options if Joint Double or Joint Premium is enabled
 	-- and we're not in "AutoSetStyle" mode (all styles presented simultaneously like PIU does)
 	
-	if THEME:GetMetric("Common", "AutoSetStyle") == true then
+	if ThemePrefs.Get("PreferredStyle")=="auto" then
 		-- Check number of players
 		if ThemePrefs.Get("AllowDanceSolo") then
 			table.insert(available_styles, {{"ChangeStyle", "Solo"}, GAMESTATE:GetNumPlayersEnabled() == 1  })
@@ -294,7 +294,7 @@ local function GetChangeableStyles()
 				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
 			end
-			-- table.insert(available_styles, {{"ChangeStyle", "All"}})
+			table.insert(available_styles, {{"ChangeStyle", "All"}})
 
 		end
 	end

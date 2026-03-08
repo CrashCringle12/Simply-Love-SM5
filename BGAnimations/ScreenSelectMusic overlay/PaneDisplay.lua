@@ -83,7 +83,6 @@ local GetScoresRequestProcessor = function(res, params)
 
 	for i=1,2 do
 		local paneDisplay = master:GetChild("PaneDisplayP"..i)
-
 		local machineScore = paneDisplay:GetChild("MachineHighScore")
 		local machineName = paneDisplay:GetChild("MachineHighScoreName")
 
@@ -408,6 +407,13 @@ for player in ivalues(PlayerNumber) do
 			end
 		end
 	}
+
+		-- -----------------------------------------------------------------------
+	-- tabs along the top of the PaneDisplay, one per available stepchart
+
+	if ThemePrefs.Get("PreferredStyle")=="auto" then
+		af2[#af2+1] = LoadActor("./StepsDisplayList/TabbedStepchartList/default.lua", {player, _screen.w/2 - 10})
+	end
 
 	-- -----------------------------------------------------------------------
 	-- loop through the six sub-tables in the PaneItems table
