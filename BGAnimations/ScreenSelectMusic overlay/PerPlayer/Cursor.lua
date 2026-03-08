@@ -75,7 +75,7 @@ return Def.Sprite{
 			if song and FindInTable(song, SL[pn].Favorites) then 
 				self:diffuse(color("#ffc0cb"))
 			else
-				if ThemePrefs.Get("VisualStyle") == "Rights" then
+				if ThemePrefs.Get("VisualStyle") == "Rights" or ThemePrefs.Get("VisualStyle") == "DBZ" then
 					self:diffuse(Color.Black)
 				else
 					self:diffuse(1,1,1,1) 
