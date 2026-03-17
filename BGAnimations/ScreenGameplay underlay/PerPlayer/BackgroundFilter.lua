@@ -1,9 +1,9 @@
 local player = ...
 local pn = ToEnumShortString(player)
 local mods = SL[pn].ActiveModifiers
-
 -- if no BackgroundFilter is necessary, it's safe to bail now
 if mods.BackgroundFilter == "Off" then return end
+if IsRoutine() and player ~= GAMESTATE:GetMasterPlayerNumber() then return end
 
 local FilterAlpha = BackgroundFilterValues()
 return Def.Quad{
