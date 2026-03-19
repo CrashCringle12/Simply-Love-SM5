@@ -12,7 +12,7 @@ local pane = Def.ActorFrame{
 
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 if (styletype == "TwoPlayersSharedSides") then
-	pss = STATSMAN:GetCurStageStats():GetRoutineStageStats()
+	pss = STATSMAN:GetCurStageStats():GetSharedPlayerStageStats()
 end
 local NumHighScores = math.min(10, PREFSMAN:GetPreference("MaxHighScoresPerListForMachine"))
 

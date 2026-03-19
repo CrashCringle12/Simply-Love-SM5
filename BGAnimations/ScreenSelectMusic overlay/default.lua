@@ -52,7 +52,7 @@ local af = Def.ActorFrame{
 	-- Apply player modifiers from profile
 	LoadActor("./PlayerModifiers.lua"),
 
-	-- allow stepcharts from multiple styles (single, double, routine) to coexist
+	-- allow stepcharts from multiple styles (single, double, couples) to coexist
 	-- in the same music wheel
 	LoadActor("./AutoSetStyle.lua"),
 	-- ---------------------------------------------------

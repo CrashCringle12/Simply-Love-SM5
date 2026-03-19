@@ -110,6 +110,7 @@ local af = Def.Actor{
 			local currentMeasure = math.floor(playerState:GetSongPosition():GetSongBeatVisible()/4)
 
 			local streams = SL[pn].Streams
+            if streams == nil then return end
 			local storage = SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1]
 
 			storage.TotalSeconds = totalSeconds
