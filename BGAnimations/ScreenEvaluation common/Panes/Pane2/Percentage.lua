@@ -4,7 +4,7 @@ local percent = nil
 local diffuse = nil
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 if (styletype == "TwoPlayersSharedSides") then
-	stats = STATSMAN:GetCurStageStats():GetRoutineStageStats()
+	stats = STATSMAN:GetCurStageStats():GetSharedPlayerStageStats()
 	-- Format the Percentage string, removing the % symbol
 	percent = CalculateExScore(player)
 	diffuse = SL.JudgmentColors[SL.Global.GameMode][1]

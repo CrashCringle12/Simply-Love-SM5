@@ -28,7 +28,7 @@ local po = {}
 for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 	po[player] = GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Song')
 end
--- If the style is TwoPlayersSharedSides, we need to set the speed mod for the routine as well
+-- If the style is TwoPlayersSharedSides, we need to set the speed mod for the couple as well
 if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
 	local xmod = po[GAMESTATE:GetMasterPlayerNumber()]:XMod()
 	local mmod = po[GAMESTATE:GetMasterPlayerNumber()]:MMod()

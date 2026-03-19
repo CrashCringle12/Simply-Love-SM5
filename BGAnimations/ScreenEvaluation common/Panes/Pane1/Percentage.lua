@@ -3,7 +3,7 @@ local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
 local stats
 if  styletype == "TwoPlayersSharedSides" then
-	stats = STATSMAN:GetCurStageStats():GetRoutineStageStats()
+	stats = STATSMAN:GetCurStageStats():GetSharedPlayerStageStats()
 else
 	stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 end

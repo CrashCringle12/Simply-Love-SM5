@@ -288,11 +288,11 @@ local function GetChangeableStyles()
 			elseif style == "routine" then
 				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
-			-- Routine is not ready for use yet, but it might be soon.
-			-- This can be uncommented at that time to allow switching from versus into routine.
-			-- elseif style == "versus" then
-			-- 	table.insert(available_styles, {{"ChangeStyle", "Routine"}})
-			-- 	table.insert(available_styles, {{"ChangeStyle", "Couple"}})
+			-- Routine/Couples is not ready for use yet, but it might be soon.
+			-- This can be uncommented at that time to allow switching from versus into routine/couples.
+			elseif style == "versus" then
+				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
+				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
 			end
 			-- table.insert(available_styles, {{"ChangeStyle", "All"}})
 

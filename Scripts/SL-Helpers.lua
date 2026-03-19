@@ -148,8 +148,8 @@ local NoteFieldWidth = {
 		versus  = 256,
 		double  = 512,
 		solo    = 384,
-		routine = 512,
-		couple = 256,
+		couple = 512,
+		routine = 256,
 		threepanel = 192
 	},
 	-- pump's values are very similar to those used in dance, but curiously smaller
@@ -157,7 +157,7 @@ local NoteFieldWidth = {
 		single  = 250,
 		versus  = 250,
 		double  = 500,
-		routine = 500,
+		couple = 500,
 		halfdouble = 300
 	},
 	-- These values for techno, para, and kb7 are the result of empirical observation
