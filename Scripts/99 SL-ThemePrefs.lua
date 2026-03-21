@@ -14,8 +14,8 @@ if type(ThemePrefs) ~= "table" or type(ThemePrefs.Get) ~= "function" then
 	}
 end
 
-SL_CustomPrefs.Get = function(
-	 -- emojis are our lingua franca for the 21st century
+SL_CustomPrefs.Get = function()
+	-- emojis are our lingua franca for the 21st century
 	 local visualStyleChoices = {  "❤", "↖", "🐻", "🦆", "🎃", "🌈", "⭐", "🤔", "🏈", "😺", "🍀", "👌", "🍦", "♠", "🧋" , "🌀", "🌮", "Rights", "Lefts", "🐉"}
 	 local visualStyleValues  = {"Hearts", "Arrows", "Bears", "Ducks", "Spooky", "Gay", "Stars", "Thonk", "PSU", "Cats", "Lucky", "GotEm", "Ice_Cream", "Spades", "Boba", "Technique", "ITL","Rights", "Lefts", "DBZ"}
 	local year = Year()
