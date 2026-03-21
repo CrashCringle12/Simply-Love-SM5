@@ -2,6 +2,7 @@
 -- set up the SortMenu's choices first, prior to Actor initialization
 -- sick_wheel_mt is a metatable with global scope defined in ./Scripts/Consensual-sick_wheel.lua
 local sort_wheel = setmetatable({}, sick_wheel_mt)
+sort_wheel.custom_functions = {}
 -- the logic that handles navigating the SortMenu
 -- (scrolling through choices, choosing one, canceling)
 -- is large enough that I moved it to its own file
@@ -173,16 +174,26 @@ local function AddFavorites()
     for player in ivalues(GAMESTATE:GetHumanPlayers()) do
         local path = getFavoritesPath(player)
         if FILEMAN:DoesFileExist(path) then
-            return {{"View", "Preferred"}}
+	return true
         end
     end
-    return nil
+	return false
 end
 
 -- Only display the View Downloads option if we're connected to
 -- GrooveStats and Auto-Downloads are enabled.
 local function DownloadsExist()
     return SL.GrooveStats.IsConnected and ThemePrefs.Get("AutoDownloadUnlocks")
+end
+
+local function PracticeModeAvailable()
+	-- Don't allow practice mode if we're using online lobbies
+	local onlineHandler = GetOnlineHandlerInstance()
+	if onlineHandler and onlineHandler.connected then
+		return false
+	end
+
+	return GAMESTATE:IsEventMode() and GAMESTATE:GetCurrentSong() ~= nil and ThemePrefs.Get("KeyboardFeatures")
 end
 
 local function AddPlayerSortOptions()
@@ -321,7 +332,9 @@ end
 local t = Def.ActorFrame {
 	Name="SortMenu",
 	wheel_options = {},
+	custom_functions = {},
 	InitCommand=function(self)
+		self.custom_functions = sort_wheel.custom_functions
 		self.wheel_options = {
 			-- This is the master table that controls the SortMenu's choices
 			-- The structure is as follows:
@@ -343,8 +356,20 @@ local t = Def.ActorFrame {
 			-- The first element becomes the top and bottomtext for the category.
 			-- The second element's table contains that options will show under this category.
 			-- It follows the same structure as the top level table.
-
+			
+			-- Casual players often choose the wrong mode and an experienced player in the area may notice this
+			-- and offer to switch them back to casual mode. This allows them to do so again.
+			-- It's technically not possible to reach the sort menu in Casual Mode, but juuust in case let's still
+			-- include the check.
+			{ { "", "GoBack" } },
+			{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") },
+			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },
+			{ {"WhereforeArtThou", "SongSearch"}, not GAMESTATE:IsCourseMode() and ThemePrefs.Get("KeyboardFeatures") },
+			{ {"ImLovinIt", "AddFavorite"}, function() return GAMESTATE:GetCurrentSong() ~= nil end},
+			{ {"MixTape", "Preferred"}, AddFavorites },
+			{ {"ChangeMode", "Casual"}, SL.Global.Stages.PlayedThisGame == 0 and SL.Global.GameMode ~= "Casual" },	
 			{ 
+
 				{"", "CategorySorts"}, 
 				{
 					{{"SortBy", "Group"} },
@@ -368,18 +393,18 @@ local t = Def.ActorFrame {
 					{ {"SortBy", "PopularityP2"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
 					{ {"SortBy", "RecentP2"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
 					{ {"SortBy", "TopP2Grades"}, function() return PROFILEMAN:IsPersistentProfile(PLAYER_2) end },
-					{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") }
+					{ {"MixTape", "Preferred"}, AddFavorites },
 				}
 			},
 			{
 				{"", "CategoryAdvanced"},
 				{
 					{ {"FeelingSalty", "TestInput"}, GAMESTATE:IsEventMode() },
-					{ {"HardTime", "PracticeMode"}, function() return GAMESTATE:IsEventMode() and GAMESTATE:GetCurrentSong() ~= nil and ThemePrefs.Get("KeyboardFeatures") end },
+					{ {"HardTime", "PracticeMode"}, PracticeModeAvailable },
 					{ {"TakeABreather", "LoadNewSongs"} },
 					{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
-					{ {"WhereforeArtThou", "SongSearch"}, not GAMESTATE:IsCourseMode() and ThemePrefs.Get("KeyboardFeatures") },
 					{ {"SetSummaryText", "SetSummary"}, SL.Global.Stages.PlayedThisGame > 0 },
+					{ {"BottomText", "OnlineLobbies"}, ThemePrefs.Get("EnableOnlineLobbies") and GAMESTATE:IsEventMode() },
 				}
 			},
 			{
@@ -399,21 +424,6 @@ local t = Def.ActorFrame {
 					{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
 				}
 			},
-			{ {"SortBy", "Group"} },
-			{ {"SortBy", "Title"} },
-			{ {"SortBy", "Recent"} },
-			{ {"NextPlease", "SwitchProfile"}, ThemePrefs.Get("AllowScreenSelectProfile") },
-			-- Allow players to switch out to a different SL GameMode if no stages have been played yet,
-			-- but don't add the current SL GameMode as a choice.
-			{ {"ChangeMode", "ITG"}, SL.Global.Stages.PlayedThisGame == 0 and SL.Global.GameMode ~= "ITG" },
-			-- Casual players often choose the wrong mode and an experienced player in the area may notice this
-			-- and offer to switch them back to casual mode. This allows them to do so again.
-			-- It's technically not possible to reach the sort menu in Casual Mode, but juuust in case let's still
-			-- include the check.
-			{ {"ChangeMode", "Casual"}, SL.Global.Stages.PlayedThisGame == 0 and SL.Global.GameMode ~= "Casual" },
-			{ {"ImLovinIt", "AddFavorite"}, function() return GAMESTATE:GetCurrentSong() ~= nil end},
-			AddFavorites(),
-			{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
 		}
 		self:visible(false)
 	end,

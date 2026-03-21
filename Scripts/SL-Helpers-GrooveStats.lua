@@ -122,13 +122,18 @@ RequestResponseActor = function(x, y)
 						end
 					end
 
-					self:GetChild("Spinner"):visible(false)
+					MESSAGEMAN:Broadcast("GrooveStatsRequestFinished", {id=request_actor_id})
 				end,
 			}
 			-- Keep track of when we started making the request
 			self.request_time = GetTimeSinceStart()
 			-- Start looping for the spinner.
 			self:queuecommand("GrooveStatsRequestLoop")
+		end,
+		GrooveStatsRequestFinishedMessageCommand=function(self, params)
+			if params and params.id == request_actor_id then
+				self:GetChild("Spinner"):visible(false)
+			end
 		end,
 		GrooveStatsRequestLoopCommand=function(self)
 			local now = GetTimeSinceStart()
@@ -413,6 +418,10 @@ ValidForGrooveStats = function(player)
 		return math.abs(a-b) < 0.0001
 	end
 
+	local FloatLE = function(a, b)
+		return a < b + 0.0001
+	end
+
 	valid[7] = Check(FloatEquals(THEME:GetMetric("LifeMeterBar", "InitialValue"), 0.5), "- Lifebar Initial Value", badSettings) and valid[7]
 	valid[7] = Check(PREFSMAN:GetPreference("HarshHotLifePenalty"), "- HarshHotLifePenalty", badSettings) and valid[7]
 
@@ -428,8 +437,9 @@ ValidForGrooveStats = function(player)
 		end
 
 		for i, window in ipairs(LifeWindows) do
-			valid[7] = Check(FloatEquals(THEME:GetMetric("LifeMeterBar", "LifePercentChange"..window), ExpectedLife[i]), "- LifePercentChange"..window, badSettings) and valid[7]
-
+			-- We can support *harder* lifebars (i.e. <= the expected weights).
+			valid[7] = Check(FloatLE(THEME:GetMetric("LifeMeterBar", "LifePercentChange"..window), ExpectedLife[i]), "- LifePercentChange"..window, badSettings) and valid[7]
+		
 			valid[7] = Check(THEME:GetMetric("ScoreKeeperNormal", "PercentScoreWeight"..window) == ExpectedScoreWeight[i], "- PercentScoreWeight"..window, badSettings) and valid[7]
 		end
 	end
@@ -736,7 +746,7 @@ DownloadEventUnlock = function(url, unlockName, packName)
 
 						-- If Pack.ini doesn't exist (new unlock for this player), create it.
 						local group = string.lower(packName)
-						local year = 2025
+						local year = 2026
 						if string.find(group, "itl online "..year.." unlocks") then
 							local packIniPath = destinationPack.."Pack.ini"
 							if not FILEMAN:DoesFileExist(packIniPath) then
@@ -749,7 +759,7 @@ DownloadEventUnlock = function(url, unlockName, packName)
 										["Series"]="ITL Online",
 										["Year"]=year,
 										["Banner"]="",
-										["SyncOffset"]="ITG",
+										["SyncOffset"]="NULL",
 									}
 								})
 							end

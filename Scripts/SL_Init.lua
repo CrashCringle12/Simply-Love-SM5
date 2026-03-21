@@ -97,6 +97,7 @@ local PlayerDefaults = {
 			self.ITLData = {
 				["pathMap"] = {},
 				["hashMap"] = {},
+				["unlockFolders"] = {},
 			}
 
 			-- default panes to intialize ScreenEvaluation to

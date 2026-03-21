@@ -90,7 +90,7 @@ local input = function(event)
 				screen:StartTransitioningScreen("SM_GoToNextScreen")
 			elseif focus.new_overlay then
 				if focus.new_overlay == "GoBack" then
-					sortmenu:playcommand("AssessAvailableChoices")
+					overlay:queuecommand("DirectInputToEngine")
 				-- if the overlay starts with "Category"
 				elseif focus.new_overlay:match("^Category") then
 					sortmenu:playcommand("ToggleCategory", { Category = focus.new_overlay })
@@ -115,6 +115,9 @@ local input = function(event)
 					overlay:GetChild("PaneDisplayMaster"):GetChild("GetScoresRequester"):playcommand("Cancel")
 					overlay:playcommand("DirectInputToEngine")
 					SCREENMAN:SetNewScreen("ScreenViewDownloads")
+				elseif focus.new_overlay == "OnlineLobbies" then
+					overlay:queuecommand("DirectInputToEngine")
+					SCREENMAN:SetNewScreen("ScreenOnlineLobbies")
 				elseif focus.new_overlay == "SwitchProfile" then
 					-- There's a race condition that occurs when a player mashes the Start button
 					-- fast enough, when the Switch Profiles button is highlighted, that causes
@@ -172,6 +175,8 @@ local input = function(event)
 					overlay:playcommand("ViewGallery")
 					screen:SetNextScreenName("ScreenViewGallery")
 					screen:StartTransitioningScreen("SM_GoToNextScreen")
+				elseif sortmenu.custom_functions[focus.new_overlay] ~= nil then
+					sortmenu.custom_functions[focus.new_overlay](event)
 				end
 			end
 

@@ -93,6 +93,9 @@ local AttemptDownloads = function(res)
 	for i=1,2 do
 		local playerStr = "player"..i
 		local events = {"rpg", "itl"}
+		local player = "PlayerNumber_P"..i
+		local itlDownloadsFound = false
+
 
 		for event in ivalues(events) do
 			if data and data[playerStr] and data[playerStr][event] then
@@ -111,7 +114,6 @@ local AttemptDownloads = function(res)
 
 							if ThemePrefs.Get("SeparateUnlocksByPlayer") then
 								local profileName = "NoName"
-								local player = "PlayerNumber_P"..i
 								if (PROFILEMAN:IsPersistentProfile(player) and
 										PROFILEMAN:GetProfile(player)) then
 									profileName = PROFILEMAN:GetProfile(player):GetDisplayName()
@@ -234,6 +236,26 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 						local eventAf = overlay:GetChild("AutoSubmitMaster"):GetChild("EventOverlay"):GetChild("P"..i.."EventAf")
 						eventAf:playcommand("Show", {data=data[playerStr]})
 						shouldDisplayOverlay = true
+
+						if data[playerStr]["itl"] then
+							-- Check for downloadFolders
+							local itlData = data[playerStr]["itl"]
+							if itlData["progress"] and itlData["progress"]["questsCompleted"] then
+								local quests = itlData["progress"]["questsCompleted"]
+								local hasDownloadFolders = false
+								for quest in ivalues(quests) do
+									if quest["songDownloadFolders"] then
+										local downloadFolders = quest["songDownloadFolders"]
+										UpdateItlUnlocks("PlayerNumber_P"..side, downloadFolders)
+										hasDownloadFolders = true
+									end
+								end
+								if hasDownloadFolders then
+									-- Write out the file if we found any download unlocks.
+									WriteItlFile("PlayerNumber_P"..side)
+								end
+							end
+						end
 					end
 
 					-- Only update PB/WR messages on the side that is joined

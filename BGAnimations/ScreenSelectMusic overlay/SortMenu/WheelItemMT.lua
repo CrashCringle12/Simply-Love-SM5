@@ -107,10 +107,18 @@ return {
 						subself:xy(32,17)
 					end,
 					GainFocusCommand=function(subself)
-						subself:diffuse(1,1,1,1)
+						if subself:GetText() == "Go Back" then
+							subself:diffuse(1,0.6,0.6,1)
+						else
+							subself:diffuse(1,1,1,1)
+						end
 					end,
 					LoseFocusCommand=function(subself)
-						subself:diffuse(0.6,0.6,0.6,1)
+						if subself:GetText() == "Go Back" then
+							subself:diffuse(color("#7E0E13"))
+						else
+							subself:diffuse(0.6,0.6,0.6,1)
+						end
 					end,
 				}
 			}
@@ -167,9 +175,8 @@ return {
 			elseif THEME:HasString("ScreenSelectPlayMode", info[2]) then
 				bottomtext = THEME:GetString("ScreenSelectPlayMode", info[2])
 			else
-				bottomtext = tostring(info[2])
+				bottomtext = tostring(info[2]):gsub("^Category", "")
 			end
-
 			self.top_text:settext(toptext)
 			self.bottom_text:settext(bottomtext)
 		end

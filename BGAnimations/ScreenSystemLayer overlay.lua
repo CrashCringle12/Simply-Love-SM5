@@ -498,6 +498,13 @@ t[#t+1] = Def.ActorFrame{
 LoadUnlocksCache()
 
 -- -----------------------------------------------------------------------
+-- Online Lobby Handler
+-- We only want one global instance of this, so we create it once but
+-- can get the same instance of the actor multiple times.
+
+t[#t+1] = CreateOnlineHandler()
+
+-- -----------------------------------------------------------------------
 -- SystemMessage stuff.
 -- Put it on top of everything
 -- this is what appears when someone uses SCREENMAN:SystemMessage(text)

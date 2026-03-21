@@ -3,7 +3,6 @@ local pn = ToEnumShortString(player)
 
 local mods = SL[pn].ActiveModifiers
 
-
 if SL.Global.GameMode ~= "Casual" then
 	if not mods.ColumnCues then return end
 end
@@ -35,6 +34,8 @@ else
 end
 
 local Update = function(self, delta)
+	if SCREENMAN:GetTopScreen():IsPaused() then return end
+
 	if curIndex <= #columnCues then
 		local curTime = playerState:GetSongPosition():GetMusicSecondsVisible()
 		local columnCue = columnCues[curIndex]

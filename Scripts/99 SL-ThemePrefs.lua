@@ -14,13 +14,10 @@ if type(ThemePrefs) ~= "table" or type(ThemePrefs.Get) ~= "function" then
 	}
 end
 
-SL_CustomPrefs.Get = function()
-        -- emojis are our lingua franca for the 21st century
-
+SL_CustomPrefs.Get = function(
 	 -- emojis are our lingua franca for the 21st century
 	 local visualStyleChoices = {  "❤", "↖", "🐻", "🦆", "🎃", "🌈", "⭐", "🤔", "🏈", "😺", "🍀", "👌", "🍦", "♠", "🧋" , "🌀", "🌮", "Rights", "Lefts", "🐉"}
 	 local visualStyleValues  = {"Hearts", "Arrows", "Bears", "Ducks", "Spooky", "Gay", "Stars", "Thonk", "PSU", "Cats", "Lucky", "GotEm", "Ice_Cream", "Spades", "Boba", "Technique", "ITL","Rights", "Lefts", "DBZ"}
- 
 	local year = Year()
 	local month = MonthOfYear()+1
 	local day = DayOfMonth()
@@ -78,30 +75,8 @@ SL_CustomPrefs.Get = function()
 			},
 			Values = { "Casual", "ITG" }
 		},
-		DefaultFailType =
-		{
-			Default = "Immediate",
-			Choices = {
-					"Immediate",
-					"ImmediateContinue",
-					"Off",
-			},
-			Values = {
-					"Immediate",
-					"ImmediateContinue",
-					"Off",
-			},
-		},
-		SortPlayer =
-		{
-			Default = PLAYER_1,
-			Choices = {
-				"P1",
-				"P2",
-			},
-			Values = {PLAYER_1, PLAYER_2}
-		},
-		PreferredStyle =
+
+		AutoStyle =
 		{
 			Default = "none",
 			Choices = {
@@ -376,6 +351,7 @@ SL_CustomPrefs.Get = function()
 			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
 		},
+
 		QRLogin = {
 			Default = "Sometimes",
 			Choices = {
@@ -386,6 +362,11 @@ SL_CustomPrefs.Get = function()
 			Values = { "Always", "Sometimes", "Never" }
 		},
 		PrioritizeLocalLeaderboard = {
+			Default = false,
+			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
+			Values  = { true, false }
+		},
+		EnableOnlineLobbies = {
 			Default = false,
 			Choices =  { THEME:GetString("ThemePrefs","Yes"), THEME:GetString("ThemePrefs", "No") },
 			Values  = { true, false }
