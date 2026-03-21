@@ -94,8 +94,11 @@ Branch.AfterScreenSelectColor = function()
 
 	if THEME:GetMetric("Common", "AutoSetStyle") == true then
 		local styles = { "single", "versus" }
-		GAMESTATE:SetCurrentStyle( styles[GAMESTATE:GetNumSidesJoined()] )
-		return "ScreenSelectPlayMode"
+		-- If for any reason all the screens prior are skipped we may
+		-- end up here without any players joined yet, so default to 
+		-- to single as PLAYER_2 can always join later
+		GAMESTATE:SetCurrentStyle( styles[math.max(GAMESTATE:GetNumSidesJoined(), 1)] )
+		return Branch.AllowScreenSelectPlayMode()
 	end
 
 	-- ------------------------------------------------------------
@@ -152,7 +155,7 @@ end
 
 Branch.AfterEvaluationStage = function()
 	-- If we're in Casual mode, don't save the profile(s).
-	if SL.Global.GameMode == "Casual"  then
+	if SL.Global.GameMode == "Casual" then
 		return Branch.AfterProfileSave()
 	else
 		return "ScreenProfileSave"
@@ -210,7 +213,7 @@ Branch.AfterSelectMusic = function()
 			return "ScreenGameplayShared"
 		end
 		-- while everything else (single, versus, double, etc.) uses ScreenGameplay
-		return "ScreenGameplay"
+		return Branch.GameplayScreen()
 	end
 end
 

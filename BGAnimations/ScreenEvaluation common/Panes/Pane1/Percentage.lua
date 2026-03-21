@@ -1,21 +1,14 @@
 local player, controller = unpack(...)
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
-local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
-if (styletype == "TwoPlayersSharedSides") then
-	stats = STATSMAN:GetCurStageStats():GetRoutineStageStats()
+local stats
+if  styletype == "TwoPlayersSharedSides" then
+	stats = STATSMAN:GetCurStageStats():GetSharedPlayerStageStats()
+else
+	stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 end
-local TNSTypes = {
-	'TapNoteScore_W1',
-	'TapNoteScore_W2',
-	'TapNoteScore_W3',
-	'TapNoteScore_W4',
-	'TapNoteScore_W5',
-	'TapNoteScore_Miss'
-}
 local PercentDP = stats:GetPercentDancePoints()
 local percent = FormatPercentScore(PercentDP)
---SM(stats:GetActualDancePoints() .. " out of " ..stats:GetPossibleDancePoints() .. " = " .. (stats:GetActualDancePoints() / stats:GetPossibleDancePoints()) * 100, 20)
 
 -- Format the Percentage string, removing the % symbol
 percent = percent:gsub("%%", "")
@@ -29,10 +22,10 @@ return Def.ActorFrame{
 	-- dark background quad behind player percent score
 	Def.Quad{
 		InitCommand=function(self)
-			self:diffuse(color("#101519")):zoomto(158.5, (styletype == "TwoPlayersSharedSides" or SL.Global.GameMode == "FA+") and 88 or 60)
+			self:diffuse(color("#101519")):zoomto(158.5, (styletype == "TwoPlayersSharedSides") and 88 or 60)
 			self:horizalign(controller==PLAYER_1 and left or right)
 			self:x(150 * (controller == PLAYER_1 and -1 or 1))
-			if styletype == "TwoPlayersSharedSides" or SL.Global.GameMode == "FA+" then
+			if styletype == "TwoPlayersSharedSides" then
 				self:y(14)
 			end
 			if ThemePrefs.Get("VisualStyle") == "Technique" then

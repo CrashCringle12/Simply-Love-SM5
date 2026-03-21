@@ -915,7 +915,7 @@ local OptionRowDefault = {
 			self.LayoutType = Overrides[name].LayoutType or "ShowAllInRow"
 			self.SelectType = Overrides[name].SelectType or "SelectOne"
 			self.OneChoiceForAllPlayers = Overrides[name].OneChoiceForAllPlayers or false
-			if IsRoutine() then
+			if IsCouples() then
 				local list = {
 					"NoteSkin",
 					"NoteSkinVariant",

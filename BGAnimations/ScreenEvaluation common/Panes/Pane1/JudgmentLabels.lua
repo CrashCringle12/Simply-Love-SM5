@@ -86,8 +86,7 @@ end
 
 -- labels: hands/ex, holds, mines, rolls
 for index, label in ipairs(RadarCategories) do
-	-- Replace hands with the EX score only in FA+ mode.
-	-- We have a separate FA+ pane for ITG mode.
+	-- Replace hands with the Couples Score if we're in couples mode
 	if index == 1 and (styletype == "TwoPlayersSharedSides") then
 		t[#t+1] = LoadFont("Wendy/_wendy small")..{
 			Text=controller == PLAYER_1 and "P1" or "P2",
@@ -98,20 +97,9 @@ for index, label in ipairs(RadarCategories) do
 				self:diffuse( controller == PLAYER_1 and Color.Blue or Color.Red )
 			end
 		}
-	elseif SL.Global.GameMode == "FA+" then
-		t[#t+1] = LoadFont("Wendy/_wendy small")..{
-			Text="EX",
-			InitCommand=function(self) self:zoom(0.5):horizalign(right) end,
-			BeginCommand=function(self)
-				self:x( (controller == PLAYER_1 and -160) or 90 )
-				self:y(38)
-				self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )
-			end
-		}
 	else
 		local performance = stats:GetRadarActual():GetValue( "RadarCategory_"..firstToUpper(EnglishRadarCategories[label]) )
 		local possible = stats:GetRadarPossible():GetValue( "RadarCategory_"..firstToUpper(EnglishRadarCategories[label]) )
-
 		t[#t+1] = LoadFont("Common Normal")..{
 			Text=label,
 			InitCommand=function(self) self:zoom(0.833):horizalign(right) end,

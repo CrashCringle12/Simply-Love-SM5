@@ -148,17 +148,16 @@ local NoteFieldWidth = {
 		versus  = 256,
 		double  = 512,
 		solo    = 384,
-		routine = 512,
-		-- couple and threepanel not supported in Simply Love at this time D:
-		-- couple = 256,
-		-- threepanel = 192
+		couple = 512,
+		routine = 256,
+		threepanel = 192
 	},
 	-- pump's values are very similar to those used in dance, but curiously smaller
 	pump = {
 		single  = 250,
 		versus  = 250,
 		double  = 500,
-		routine = 500,
+		couple = 500,
 		halfdouble = 300
 	},
 	-- These values for techno, para, and kb7 are the result of empirical observation
@@ -979,7 +978,8 @@ end
 -- helper function for returning the player AF
 -- Works as expected in ScreenGameplay + Edit + Practice Mode
 --     arguments:  pn is short string PlayerNumber like "P1" or "P2"
---     returns:    the "PlayerP1" or "PlayerP2" ActorFrame
+--     returns:    the "PlayerP1" or "PlayerP2" ActorFrame in ScreenGameplay
+--                 or, the unnamed equivalent in ScrenEdit
 GetPlayerAF = function(pn)
 	local topscreen = SCREENMAN:GetTopScreen()
 	if not topscreen then
@@ -987,11 +987,42 @@ GetPlayerAF = function(pn)
 		return nil
 	end
 
+	local playerAF = nil
+
 	-- Get the player ActorFrame on ScreenGameplay
 	-- It's a direct child of the screen and named "PlayerP1" for P1
 	-- and "PlayerP2" for P2.
 	-- This naming convention is hardcoded in the SM5 engine.
 	--
+	-- ScreenEdit does not name its player ActorFrame, but we can still find it.
+
+	-- find the player ActorFrame in edit mode
+	local notefields = {}
+	if (THEME:GetMetric(topscreen:GetName(), "Class") == "ScreenEdit") then
+		-- loop through all nameless children of topscreen
+		-- and find the one that contains the NoteField
+		-- which is thankfully still named "NoteField"1
+
+		for _,nameless_child in ipairs(topscreen:GetChild("")) do
+			if nameless_child:GetChild("NoteField") then
+				notefields[#notefields+1] = nameless_child
+			end
+		end
+		-- If there is only one side joined always return the first one.
+		if #notefields == 1 then
+			return notefields[1]
+		-- If there are two sides joined, return the one that matches the player number.
+		else
+			return notefields[pn == "P1" and 1 or 2]
+		end
+
+	-- find the player ActorFrame in gameplay
+	else
+		local player_af = topscreen:GetChild("Player"..pn)
+		if player_af then
+			playerAF = player_af
+		end
+	end
 	-- ScreenEdit does not name its player ActorFrame, but does set its alias to
 	-- "PlayerP1" or "PlayerP2". GetChild will return the child if either the
 	-- name or alias matches.

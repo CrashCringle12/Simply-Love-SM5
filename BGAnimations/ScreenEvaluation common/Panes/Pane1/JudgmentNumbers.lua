@@ -4,7 +4,6 @@ local pn = ToEnumShortString(player)
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
-
 local TapNoteScores = {
 	Types = { 'W1', 'W2', 'W3', 'W4', 'W5', 'Miss' },
 	-- x values for P1 and P2
@@ -65,8 +64,7 @@ end
 
 -- then handle hands/ex, holds, mines, rolls
 for index, RCType in ipairs(RadarCategories.Types) do
-	-- Replace hands with the EX score only in FA+ mode.
-	-- We have a separate FA+ pane for ITG mode.
+	-- Replace hands with the Couples Score if we're in couples mode
 	if index == 1 and (styletype == "TwoPlayersSharedSides") then
 		local PercentDP = pss:GetPercentDancePoints()
 		percent = FormatPercentScore(PercentDP)
@@ -80,17 +78,6 @@ for index, RCType in ipairs(RadarCategories.Types) do
 				self:x( ((controller == PLAYER_1) and -114) or 286 )
 				self:y(47)
 				self:diffuse( (controller == PLAYER_1) and Color.Blue or Color.Red)
-			end
-		}
-	elseif SL.Global.GameMode == "FA+" then
-		t[#t+1] = LoadFont("Wendy/_wendy white")..{
-			Name="Percent",
-			Text=("%.2f"):format(CalculateExScore(player)),
-			InitCommand=function(self)
-				self:horizalign(right):zoom(0.4)
-				self:x( ((controller == PLAYER_1) and -114) or 286 )
-				self:y(47)
-				self:diffuse( SL.JudgmentColors[SL.Global.GameMode][1] )
 			end
 		}
 	else

@@ -174,7 +174,7 @@ local function AddFavorites()
     for player in ivalues(GAMESTATE:GetHumanPlayers()) do
         local path = getFavoritesPath(player)
         if FILEMAN:DoesFileExist(path) then
-	return true
+			return true
         end
     end
 	return false
@@ -288,8 +288,8 @@ local function GetChangeableStyles()
 			elseif style == "routine" then
 				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
-			-- Routine is not ready for use yet, but it might be soon.
-			-- This can be uncommented at that time to allow switching from versus into routine.
+			-- Routine/Couples is not ready for use yet, but it might be soon.
+			-- This can be uncommented at that time to allow switching from versus into routine/couples.
 			elseif style == "versus" then
 				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})

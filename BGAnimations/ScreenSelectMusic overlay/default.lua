@@ -69,7 +69,7 @@ local af = Def.ActorFrame{
 	-- Apply player modifiers from profile
 	LoadActor("./PlayerModifiers.lua"),
 
-	-- allow stepcharts from multiple styles (single, double, routine) to coexist
+	-- allow stepcharts from multiple styles (single, double, couples) to coexist
 	-- in the same music wheel
 	LoadActor("./AutoSetStyle.lua"),
 
@@ -88,8 +88,8 @@ local af = Def.ActorFrame{
 	-- elements we need two of (one for each player) that draw underneath the StepsDisplayList
 	-- this includes the stepartist boxes, the density graph, and the cursors.
 	LoadActor("./PerPlayer/default.lua"),
-	-- Banner Art
-	LoadActor("./Banner.lua"),
+	-- The grid for the difficulty picker (normal) or CourseContentsList (CourseMode)
+	LoadActor("./StepsDisplayList/default.lua"),
 
 	-- Song's Musical Artist, BPM, Duration
 	LoadActor("./SongDescription/SongDescription.lua"),

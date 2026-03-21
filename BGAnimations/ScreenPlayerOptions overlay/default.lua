@@ -182,9 +182,12 @@ local t = Def.ActorFrame{
 			local pn = ToEnumShortString(player)
 
 			local SpeedModRowIndex = FindOptionRowIndex(ScreenOptions,"SpeedMod")
-			local VariantRowIndex = FindOptionRowIndex(ScreenOptions,"NoteSkinVariant")	
+			local VariantRowIndex = FindOptionRowIndex(ScreenOptions,"NoteSkinVariant")
 			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
 				if player == GAMESTATE:GetMasterPlayerNumber() then
+					local otherPn = pn == "P1" and "P2" or "P1"
+					SL[otherPn].ActiveModifiers.SpeedMod     = SL[pn].ActiveModifiers.SpeedMod
+					SL[otherPn].ActiveModifiers.SpeedModType = SL[pn].ActiveModifiers.SpeedModType
 					SpeedModBMTs[pn] = ScreenOptions:GetOptionRow(SpeedModRowIndex):GetChild(""):GetChild("Item")
 				end
 			else
@@ -286,6 +289,7 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			else
 				if params.Player ~= player  then return end
 			end
+
 			local oldtype = SL[pn].ActiveModifiers.SpeedModType
 			local newtype = params.SpeedModType
 

@@ -73,7 +73,7 @@ local input = function(event)
 					THEME:ReloadMetrics()
 				end
 				local new_style = focus.change:lower()
-				if focus.change:lower() == "all" then
+				if new_style == "all" then
 					ThemePrefs.Set("PreferredStyle", "auto")
 					THEME:ReloadMetrics()
 					new_style = #GAMESTATE:GetHumanPlayers() == 1 and "single" or "versus"
