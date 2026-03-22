@@ -75,8 +75,7 @@ SL_CustomPrefs.Get = function()
 			},
 			Values = { "Casual", "ITG" }
 		},
-
-		AutoStyle =
+		PreferredStyle =
 		{
 			Default = "none",
 			Choices = {
