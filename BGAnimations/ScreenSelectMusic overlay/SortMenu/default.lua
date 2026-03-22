@@ -404,7 +404,7 @@ local t = Def.ActorFrame {
 					{ {"TakeABreather", "LoadNewSongs"} },
 					{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
 					{ {"SetSummaryText", "SetSummary"}, SL.Global.Stages.PlayedThisGame > 0 },
-					{ {"BottomText", "OnlineLobbies"}, ThemePrefs.Get("EnableOnlineLobbies") and GAMESTATE:IsEventMode() },
+					{ {"BottomText", "OnlineLobbies"}, ThemePrefs.Get("EnableOnlineLobbies") },
 				}
 			},
 			{
