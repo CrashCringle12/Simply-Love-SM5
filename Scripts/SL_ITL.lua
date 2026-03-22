@@ -348,7 +348,7 @@ UpdateItlData = function(player)
 		else
 			if data["ex"] >= hashMap[hash]["ex"] then
 				hashMap[hash]["ex"] = data["ex"]
-				-- hashMap[hash]["points"] = data["points"]
+				hashMap[hash]["points"] = data["points"]
 				
 				if data["ex"] > hashMap[hash]["ex"] then
 					-- EX count is strictly better, copy the judgments over.
