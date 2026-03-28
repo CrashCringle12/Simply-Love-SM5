@@ -222,14 +222,14 @@ local OrderPlayers = function(data, localScreenName)
 	-- Sort the players by score.
 	-- TODO(teejusb): Determine how to do toggle between score and exScore.
 	table.sort(updatedData.players, function(a, b)
-		-- a.score or b.score can be nil, so we need to handle that.
-		if a.score == nil then
+		-- a.exScore or b.exScore can be nil, so we need to handle that.
+		if a.exScore == nil then
 			return false
 		end
-		if b.score == nil then
+		if b.exScore == nil then
 			return true
 		end
-		return a.score > b.score
+		return a.exScore > b.exScore
 	end)
 
 	-- Then add all the other players in other screens below.
