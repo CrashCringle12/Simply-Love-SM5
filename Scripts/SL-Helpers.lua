@@ -454,7 +454,7 @@ HolidayCheer = function()
 	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11)
 end
 AprilFools = function()
-	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==3 and DayOfMonth()==1)
+	return true
 end
 DarkUI = function()
 	-- During the process of switching games, THEME:GetCurThemeName() will temporarily return "_fallback"
@@ -1067,5 +1067,27 @@ TotalCourseLengthPlayed = function(player)
 		return t
 	else
 		return -1
+	end
+end
+
+
+LoadAllAds = function()
+	-- Get all .mp4 files from the BGAnimations/ScreenAds overlay/Ads directory
+	local path = THEME:GetCurrentThemeDirectory().."BGAnimations/ScreenAds overlay/Ads/"
+	local files = FILEMAN:GetDirListing(path)
+	local ads = {}
+	for i,filename in ipairs(files) do
+		if filename:match(".mp4") then
+			local fileNameWithoutDirectory = filename:match("([^/]+)$")
+			table.insert(ads, fileNameWithoutDirectory)
+		end
+	end
+	return ads
+end
+
+
+if not IsCouples then
+	IsCouples = function()
+		return GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersTwoSides"
 	end
 end

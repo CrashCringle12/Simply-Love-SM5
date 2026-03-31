@@ -243,15 +243,7 @@ SL = {
 		},
 	},
     AprilFools = {
-        Ads = {
-            "Arknights ad", "BodyWash", "DbZ", "DDR", "DDRmario",
-            "DeliveryDance", "Edd", "EducationConnection", "EmpireCarpet",
-            "Geico", "MobileGames", "Jake", "KiaSoul", "KidsBop", "Knowledge",
-            "KrustyKrab", "MeowMix", "Nescafe", "Opera", "PC", "Poptarts",
-            "Progressive", "RaidShadowLegends", "RaidShadowLegends2",
-            "RaidShadowLegends3", "RaidShadowLegends4", "Resee", "Sonic",
-            "Spongebob", "Spongebob2", "ZooPal", "ZZ"
-        }
+        Ads = LoadAllAds(),
     },
 	Preferences = {
 		Casual = {

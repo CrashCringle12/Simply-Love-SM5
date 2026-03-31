@@ -339,11 +339,21 @@ Branch.AfterProfileSaveSummary = function()
 end
 
 Branch.AfterScreenAds = function()
+	SM("ScreenSelectMusic")
 	local randomNum = math.random(0, 28)
 	if (AprilFools() and randomNum % 3 == 0) then
 		return "ScreenSponsors2"
 	else
 		return SL.Global.ScreenAfter.PlayerOptions
+	end
+end
+
+Branch.MaybeStartAnAd = function()
+	local randomNum = math.random(0, 16)
+	if (AprilFools() and randomNum % 3 == 0) then
+		return "ScreenSponsors"
+	else
+		return Branch.AllowScreenSelectProfile()
 	end
 end
 

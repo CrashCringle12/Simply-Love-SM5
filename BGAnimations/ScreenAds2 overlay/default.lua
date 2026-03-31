@@ -46,7 +46,7 @@ actor = Def.ActorFrame{
 		end
 	},
 	Def.Sprite{
-    	Texture=THEME:GetPathB("ScreenAds", "overlay/Ads/"..SL.AprilFools.Ads[adChoice]..".mp4"),
+    	Texture=THEME:GetPathB("ScreenAds", "overlay/Ads/"..SL.AprilFools.Ads[adChoice]),
     	InitCommand=function(self)
 			local src_w = self:GetTexture():GetSourceWidth()
 			self:Center():zoom(_screen.w/WideScale(src_w*0.75,src_w))
@@ -58,10 +58,11 @@ actor = Def.ActorFrame{
 		end
 	}
 }	
-	actor[#actor+1] = Def.Sound{
-		File=THEME:GetPathB("ScreenAds", "overlay/Ads/"..SL.AprilFools.Ads[adChoice]..".ogg"),
-		OnCommand=function(self) self:play() end
-	}
+actor[#actor+1] = Def.Sound{
+	--replace the .mp4 with .ogg and it should work
+	File=THEME:GetPathB("ScreenAds", "overlay/Ads/"..SL.AprilFools.Ads[adChoice]:gsub(".mp4", ".ogg")),
+	OnCommand=function(self) self:play() end
+}
 
 actor[#actor+1] = Def.Quad{
 	InitCommand=function(self)
