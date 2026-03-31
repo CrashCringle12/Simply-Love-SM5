@@ -454,7 +454,7 @@ HolidayCheer = function()
 	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==11)
 end
 AprilFools = function()
-	return true
+	return (PREFSMAN:GetPreference("EasterEggs") and MonthOfYear()==3) and (DayOfMonth()>=1 and DayOfMonth()<=5)
 end
 DarkUI = function()
 	-- During the process of switching games, THEME:GetCurThemeName() will temporarily return "_fallback"
