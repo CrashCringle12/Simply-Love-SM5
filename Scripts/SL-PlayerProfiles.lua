@@ -99,6 +99,91 @@ end
 
 
 RetrieveProfileAchievements = function(player)
+	local BuildITLAchievementsFromEventData = function(data)
+		if type(data) ~= "table" or type(data.data) ~= "table" then return {} end
+
+		local joinRequirements = function(requirements)
+			if type(requirements) ~= "table" then return "" end
+			local parts = {}
+			for _, requirement in pairs(requirements) do
+				if type(requirement) == "table" and type(requirement.requirement) == "string" and requirement.requirement ~= "" then
+					parts[#parts+1] = requirement.requirement
+				end
+			end
+			return table.concat(parts, "; ")
+		end
+
+		local output = {}
+		for _, category in pairs(data.data) do
+			if type(category) == "table" and type(category.info) == "table" then
+				local categoryTitle = (type(category.title) == "string" and category.title ~= "") and category.title or "ITL Achievement"
+				local tiers = {}
+				for tierIndex, tierData in pairs(category.info) do
+					if type(tierData) == "table" then
+						tiers[#tiers+1] = {index = tonumber(tierIndex) or 0, data = tierData}
+					end
+				end
+
+				table.sort(tiers, function(a, b)
+					return a.index < b.index
+				end)
+
+				for _, tier in ipairs(tiers) do
+					local tierData = tier.data
+					local requirementText = joinRequirements(tierData.requirements)
+					local unlockedTitle = type(tierData.titleUnlocked) == "string" and tierData.titleUnlocked or ""
+					local isUnlocked = tierData.satisfied == true
+					local hasVisibleTitle = unlockedTitle ~= ""
+
+					local id = tonumber(tierData.id)
+					if not id then
+						id = (tonumber(category.id) or 0) * 100 + tier.index
+					end
+
+					local name = hasVisibleTitle and unlockedTitle or categoryTitle
+					if not isUnlocked and not hasVisibleTitle then
+						name = "?????"
+					end
+
+					local desc = requirementText ~= "" and ("Requirements: " .. requirementText) or "Requirements unavailable"
+					if not isUnlocked and requirementText == "" then
+						desc = "?????"
+					end
+
+					output[#output+1] = {
+						ID = id,
+						Name = name,
+						Desc = desc,
+						Unlocked = isUnlocked,
+						PercentEarned = tonumber(tierData.percentEarned) or 0,
+						Requirements = requirementText,
+						Category = categoryTitle,
+						Hidden = (not hasVisibleTitle and not isUnlocked),
+					}
+				end
+			end
+		end
+
+		table.sort(output, function(a, b)
+			return (a.ID or 0) < (b.ID or 0)
+		end)
+
+		return output
+	end
+
+	local ReadJSONFile = function(path)
+		if not FILEMAN:DoesFileExist(path) then return nil end
+
+		local f = RageFileUtil:CreateRageFile()
+		local data = nil
+		if f:Open(path, 1) then
+			data = JsonDecode(f:Read())
+			f:Close()
+		end
+		f:destroy()
+		return data
+	end
+
 	local profile_slot = {
 		[PLAYER_1] = "ProfileSlot_Player1",
 		[PLAYER_2] = "ProfileSlot_Player2"
@@ -108,19 +193,47 @@ RetrieveProfileAchievements = function(player)
 	local pn = ToEnumShortString(player)
 	local path = dir .. "Achievements.json"
 	
-	if FILEMAN:DoesFileExist(path) then
-		local f = RageFileUtil:CreateRageFile()
-		local achievements = {}
-		if f:Open(path, 1) then
-			local data = JsonDecode(f:Read())
-			if data ~= nil then
-				achievements = data
+	local achievements = {}
+	local existing = ReadJSONFile(path)
+	if existing ~= nil then
+		achievements = existing
+	end
+
+	local itlPath = dir .. "ITL-achievements.json"
+	local itlData = ReadJSONFile(itlPath)
+	if itlData == nil then
+		local samplePath = THEME:GetCurrentThemeDirectory() .. "Other/Achievements/ITL/sample.json"
+		itlData = ReadJSONFile(samplePath)
+	end
+	if itlData ~= nil then
+		local parsedITL = BuildITLAchievementsFromEventData(itlData)
+		local previousById = {}
+		if type(achievements.ITL) == "table" then
+			for _, previous in ipairs(achievements.ITL) do
+				if type(previous) == "table" and previous.ID ~= nil then
+					previousById[previous.ID] = previous
+				end
 			end
 		end
-		f:destroy()
-		return achievements
+
+		achievements.ITL = {}
+		for i, entry in ipairs(parsedITL) do
+			local previous = previousById[entry.ID]
+			achievements.ITL[i] = {
+				ID = entry.ID,
+				Name = entry.Name,
+				Desc = entry.Desc,
+				Unlocked = entry.Unlocked,
+				Date = previous and previous.Date or nil,
+				PercentEarned = entry.PercentEarned,
+				Requirements = entry.Requirements,
+				Category = entry.Category,
+				Hidden = entry.Hidden,
+			}
+		end
 	end
-	return {}
+
+	return achievements
 end
 
 -- function assigned to "CustomLoadFunction" under [Profile] in metrics.ini

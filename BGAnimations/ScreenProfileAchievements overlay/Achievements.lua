@@ -31,6 +31,95 @@ local CountUnlockedAchievements = function(achievements)
 end
 
 local accolades = SL.Accolades.Achievements
+local pn = ToEnumShortString(player)
+
+local GetPackAchievements = function(params)
+    if not params or type(params.activePack) ~= "string" then return nil end
+    if type(accolades[params.activePack]) ~= "table" then return nil end
+    return accolades[params.activePack]
+end
+
+local GetPlayerAchievement = function(params)
+    if not params or type(params.activePack) ~= "string" or not params.achievements then return nil end
+    if type(params.achievements[params.activePack]) ~= "table" then return nil end
+    return params.achievements[params.activePack][params.achievementIndex]
+end
+
+local IsITLPack = function(params)
+    return params and params.activePack == "ITL"
+end
+
+local GetDisplayName = function(params)
+    local pack = GetPackAchievements(params)
+    local definition = pack and pack[params.achievementIndex] or nil
+    local playerAchievement = GetPlayerAchievement(params)
+
+    if IsITLPack(params) then
+        if playerAchievement and type(playerAchievement.Name) == "string" and playerAchievement.Name ~= "" then
+            return playerAchievement.Name
+        end
+        if definition and type(definition.DynamicName) == "function" then
+            return definition.DynamicName(pn)
+        end
+    end
+
+    if definition and type(definition.Name) == "string" and definition.Name ~= "" then
+        return definition.Name
+    end
+
+    return "N/A"
+end
+
+local GetDisplayDescription = function(params)
+    local pack = GetPackAchievements(params)
+    local definition = pack and pack[params.achievementIndex] or nil
+    local playerAchievement = GetPlayerAchievement(params)
+
+    if IsITLPack(params) then
+        if playerAchievement and type(playerAchievement.Desc) == "string" and playerAchievement.Desc ~= "" then
+            return playerAchievement.Desc
+        end
+        if definition and type(definition.DynamicDesc) == "function" then
+            return definition.DynamicDesc(pn)
+        end
+    end
+
+    if definition and type(definition.Desc) == "string" and definition.Desc ~= "" then
+        return definition.Desc
+    end
+
+    return "N/A"
+end
+
+local GetDifficultyOrPercentText = function(params)
+    local pack = GetPackAchievements(params)
+    local definition = pack and pack[params.achievementIndex] or nil
+    local playerAchievement = GetPlayerAchievement(params)
+
+    if IsITLPack(params) then
+        local percent = nil
+        if playerAchievement and playerAchievement.PercentEarned ~= nil then
+            percent = tonumber(playerAchievement.PercentEarned)
+        elseif definition and type(definition.DynamicPercentEarned) == "function" then
+            percent = tonumber(definition.DynamicPercentEarned(pn))
+        end
+
+        if percent ~= nil then
+            return string.format("Percent Earned: %.1f%%", percent)
+        end
+        return "Percent Earned: N/A"
+    end
+
+    if definition and type(definition.Difficulty) == "number" then
+        local str = "Difficulty: "
+        for _ = 1, definition.Difficulty do
+            str = str .. "⭐"
+        end
+        return str
+    end
+
+    return "N/A"
+end
 local binfo = {
     -- 35 * -5
     y = row_height * -5,
@@ -248,16 +337,9 @@ return Def.ActorFrame {
             end,
             SetCommand = function(self, params)
                 if params == nil then
-                    -- SM(params)
-                    self:settext(params.displayname)
+					self:settext("N/A")
                 else
-                    if accolades[params.activePack][params.achievementIndex] then
-                        self:settext(
-                            accolades[params.activePack][params.achievementIndex]
-                                .Name)
-                    else
-                        self:settext("N/A")
-                    end
+                    self:settext(GetDisplayName(params))
                 end
             end
         },
@@ -269,16 +351,9 @@ return Def.ActorFrame {
             end,
             SetCommand = function(self, params)
                 if params == nil then
-                    --	SM(params)
-                    self:settext(params.displayname)
+					self:settext("N/A")
                 else
-                    if accolades[params.activePack][params.achievementIndex] then
-                        self:settext(
-                            accolades[params.activePack][params.achievementIndex]
-                                .Desc)
-                    else
-                        self:settext("N/A")
-                    end
+                    self:settext(GetDisplayDescription(params))
                 end
             end
         },
@@ -292,8 +367,7 @@ return Def.ActorFrame {
                 if params == nil or not params.achievements or
                     not params.achievements[params.activePack] or
                     not params.achievements[params.activePack][params.achievementIndex] then
-                    -- SM(params)
-                    self:settext(params.displayname)
+					self:settext("Not Unlocked")
                 else
                     if params.achievements[params.activePack][params.achievementIndex]
                         .Date then
@@ -314,19 +388,9 @@ return Def.ActorFrame {
             end,
             SetCommand = function(self, params)
                 if params == nil then
-                    -- SM(params)
-                    self:settext(params.displayname)
+					self:settext("N/A")
                 else
-                    if accolades[params.activePack][params.achievementIndex] then
-                        local str = "Difficulty: "
-                        for i = 1, accolades[params.activePack][params.achievementIndex]
-                            .Difficulty do
-                            str = str .. "⭐"
-                        end
-                        self:settext(str)
-                    else
-                        self:settext("N/A")
-                    end
+                    self:settext(GetDifficultyOrPercentText(params))
                 end
             end
         },
@@ -383,14 +447,16 @@ return Def.ActorFrame {
                     self:settext("0 of 0 unlocked")
                 elseif not params.achievements or
                     not params.achievements[params.activePack] then
-                    self:settext("0 of " .. #accolades[params.activePack] ..
-                                     " unlocked")
+                    local pack = GetPackAchievements(params) or {}
+                    self:settext("0 of " .. #pack .. " unlocked")
                 else
-                    -- self:settext(math.random(0,binfo.rows * binfo.cols) .. " of " .. binfo.rows * binfo.cols .. " unlocked.")
-                    self:settext(CountUnlockedAchievements(
-                                     params.achievements[params.activePack]) ..
-                                     " of " .. #accolades[params.activePack] ..
-                                     " unlocked.")
+                    local total = #params.achievements[params.activePack]
+                    if total == 0 then
+                        local pack = GetPackAchievements(params) or {}
+                        total = #pack
+                    end
+                    self:settext(CountUnlockedAchievements(params.achievements[params.activePack]) ..
+                                     " of " .. total .. " unlocked.")
                 end
             end
         },

@@ -1,0 +1,4713 @@
+{
+    "success": true,
+    "message": "",
+    "data": [
+        {
+            "id": 1,
+            "title": "Charts Passed",
+            "info": {
+                "0": {
+                    "id": 100,
+                    "requirements": [
+                        {
+                            "requirement": "Pass 1 Chart"
+                        }
+                    ],
+                    "titleUnlocked": "Played ITL Online 2026",
+                    "satisfied": true,
+                    "percentEarned": 98.7
+                },
+                "1": {
+                    "id": 101,
+                    "requirements": [
+                        {
+                            "requirement": "Pass 5 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "ITL Tourist",
+                    "satisfied": true,
+                    "percentEarned": 93.3
+                },
+                "2": {
+                    "id": 102,
+                    "requirements": [
+                        {
+                            "requirement": "Pass 10 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Deca Dancer",
+                    "satisfied": true,
+                    "percentEarned": 86.9
+                },
+                "3": {
+                    "id": 103,
+                    "requirements": [
+                        {
+                            "requirement": "Pass 25 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "I've Got Next!",
+                    "satisfied": true,
+                    "percentEarned": 69.7
+                },
+                "4": {
+                    "id": 104,
+                    "requirements": [
+                        {
+                            "requirement": "Pass 75 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Filled Out Their Ranking Points",
+                    "satisfied": true,
+                    "percentEarned": 38.2
+                }
+            },
+            "highestTier": 4,
+            "playstyle": 1
+        },
+        {
+            "id": 2,
+            "title": "Combo Collector",
+            "info": {
+                "0": {
+                    "id": 200,
+                    "requirements": [
+                        {
+                            "requirement": "FC 1 Chart"
+                        }
+                    ],
+                    "titleUnlocked": "Combo Curious",
+                    "satisfied": true,
+                    "percentEarned": 92.9
+                },
+                "1": {
+                    "id": 201,
+                    "requirements": [
+                        {
+                            "requirement": "FC 5 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Five-piece Combo Meal",
+                    "satisfied": true,
+                    "percentEarned": 78.7
+                },
+                "2": {
+                    "id": 202,
+                    "requirements": [
+                        {
+                            "requirement": "FC 10 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Ten-piece Combo Meal",
+                    "satisfied": true,
+                    "percentEarned": 68.2
+                },
+                "3": {
+                    "id": 203,
+                    "requirements": [
+                        {
+                            "requirement": "FC 25 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Quarter Pounder Combo",
+                    "satisfied": true,
+                    "percentEarned": 47
+                }
+            },
+            "highestTier": 3,
+            "playstyle": 1
+        },
+        {
+            "id": 3,
+            "title": "FEC Collector",
+            "info": {
+                "0": {
+                    "id": 300,
+                    "requirements": [
+                        {
+                            "requirement": "FEC 1 Chart"
+                        }
+                    ],
+                    "titleUnlocked": "Gold Plated",
+                    "satisfied": true,
+                    "percentEarned": 75.3
+                },
+                "1": {
+                    "id": 301,
+                    "requirements": [
+                        {
+                            "requirement": "FEC 5 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Gold Digger",
+                    "satisfied": true,
+                    "percentEarned": 58.1
+                },
+                "2": {
+                    "id": 302,
+                    "requirements": [
+                        {
+                            "requirement": "FEC 10 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Like Gold Duuuuuuuuuust",
+                    "satisfied": true,
+                    "percentEarned": 46.5
+                },
+                "3": {
+                    "id": 303,
+                    "requirements": [
+                        {
+                            "requirement": "FEC 25 Charts"
+                        }
+                    ],
+                    "titleUnlocked": "Stay Gold",
+                    "satisfied": true,
+                    "percentEarned": 28.5
+                }
+            },
+            "highestTier": 3,
+            "playstyle": 1
+        },
+        {
+            "id": 4,
+            "title": "Quad Collector",
+            "info": {
+                "0": {
+                    "id": 400,
+                    "requirements": [
+                        {
+                            "requirement": "Quad 1 Chart"
+                        }
+                    ],
+                    "titleUnlocked": "Fantastic",
+                    "satisfied": true,
+                    "percentEarned": 36.8
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 5,
+            "title": "Quint Collector",
+            "info": {
+                "0": {
+                    "id": 500,
+                    "requirements": [
+                        {
+                            "requirement": "Quint 1 Chart"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 5.8
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 6,
+            "title": "Burgers",
+            "info": {
+                "0": {
+                    "id": 600,
+                    "requirements": [
+                        {
+                            "requirement": "Earn 1000 points on a chart"
+                        }
+                    ],
+                    "titleUnlocked": "Ate a Burger",
+                    "satisfied": true,
+                    "percentEarned": 96
+                },
+                "1": {
+                    "id": 601,
+                    "requirements": [
+                        {
+                            "requirement": "Earn 2000 points on a chart"
+                        }
+                    ],
+                    "titleUnlocked": "Double Double",
+                    "satisfied": true,
+                    "percentEarned": 83.9
+                },
+                "2": {
+                    "id": 602,
+                    "requirements": [
+                        {
+                            "requirement": "Earn 3000 points on a chart"
+                        }
+                    ],
+                    "titleUnlocked": "Beefy",
+                    "satisfied": true,
+                    "percentEarned": 66.2
+                },
+                "3": {
+                    "id": 603,
+                    "requirements": [
+                        {
+                            "requirement": "Earn 4000 points on a chart"
+                        }
+                    ],
+                    "titleUnlocked": "Bun Believable",
+                    "satisfied": true,
+                    "percentEarned": 48.5
+                },
+                "4": {
+                    "id": 604,
+                    "requirements": [
+                        {
+                            "requirement": "Earn 5000 points on a chart"
+                        }
+                    ],
+                    "titleUnlocked": "Patty Stacker",
+                    "satisfied": true,
+                    "percentEarned": 31.3
+                }
+            },
+            "highestTier": 4
+        },
+        {
+            "id": 7,
+            "title": "In the Club",
+            "info": {
+                "0": {
+                    "id": 700,
+                    "requirements": [
+                        {
+                            "requirement": "Ranking Points of 75000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "75K Club!",
+                    "satisfied": true,
+                    "percentEarned": 59.4
+                },
+                "1": {
+                    "id": 701,
+                    "requirements": [
+                        {
+                            "requirement": "Ranking Points of 150000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "150K Club!!",
+                    "satisfied": true,
+                    "percentEarned": 41.4
+                },
+                "2": {
+                    "id": 702,
+                    "requirements": [
+                        {
+                            "requirement": "Ranking Points of 225000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "225K Club!!!",
+                    "satisfied": true,
+                    "percentEarned": 30.1
+                }
+            },
+            "highestTier": 2,
+            "playstyle": 1
+        },
+        {
+            "id": 8,
+            "title": "Block Pass",
+            "info": {
+                "0": {
+                    "id": 800,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "New Kid on the Block",
+                    "satisfied": true,
+                    "percentEarned": 91.5
+                },
+                "1": {
+                    "id": 801,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 8 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 87.8
+                },
+                "2": {
+                    "id": 802,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 9 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 87.2
+                },
+                "3": {
+                    "id": 803,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 10 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 76.9
+                },
+                "4": {
+                    "id": 804,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 11 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 65.4
+                },
+                "5": {
+                    "id": 805,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 12 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 48.5
+                },
+                "6": {
+                    "id": 806,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 13 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 35.1
+                },
+                "7": {
+                    "id": 807,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 14 on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 20.1
+                }
+            },
+            "highestTier": 7,
+            "playstyle": 1
+        },
+        {
+            "id": 9,
+            "title": "Block Full Combo",
+            "info": {
+                "0": {
+                    "id": 900,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and Full Combo or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 84.3
+                },
+                "1": {
+                    "id": 901,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 8 and Full Combo or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 78.4
+                },
+                "2": {
+                    "id": 902,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 9 and Full Combo or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 72.5
+                },
+                "3": {
+                    "id": 903,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 10 and Full Combo or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 58.6
+                },
+                "4": {
+                    "id": 904,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 11 and Full Combo or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 45.2
+                }
+            },
+            "highestTier": 4,
+            "playstyle": 1
+        },
+        {
+            "id": 10,
+            "title": "Block FEC",
+            "info": {
+                "0": {
+                    "id": 1000,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and FEC or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 68.2
+                },
+                "1": {
+                    "id": 1001,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 8 and FEC or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 60.9
+                },
+                "2": {
+                    "id": 1002,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 9 and FEC or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 52.7
+                },
+                "3": {
+                    "id": 1003,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 10 and FEC or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 38
+                }
+            },
+            "highestTier": 3,
+            "playstyle": 1
+        },
+        {
+            "id": 11,
+            "title": "Block Quad",
+            "info": {
+                "0": {
+                    "id": 1100,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and FFC or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 32.4
+                },
+                "2": {
+                    "id": 1102,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 9 and FFC or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 19.9
+                }
+            },
+            "highestTier": 2,
+            "playstyle": 1
+        },
+        {
+            "id": 12,
+            "title": "Block Quint",
+            "info": {
+                "0": {
+                    "id": 1200,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and FBFC or Better on Singles"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 4.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 13,
+            "title": "Block 99% EX",
+            "info": {
+                "0": {
+                    "id": 1300,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and 99% EX Score or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 36.4
+                },
+                "1": {
+                    "id": 1301,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 8 and 99% EX Score or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 33.5
+                },
+                "3": {
+                    "id": 1303,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 10 and 99% EX Score or Better on Singles"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 18.1
+                }
+            },
+            "highestTier": 3,
+            "playstyle": 1
+        },
+        {
+            "id": 14,
+            "title": "Song Points",
+            "info": {
+                "0": {
+                    "id": 1400,
+                    "requirements": [
+                        {
+                            "requirement": "Song Points of 25000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 78.2
+                },
+                "1": {
+                    "id": 1401,
+                    "requirements": [
+                        {
+                            "requirement": "Song Points of 50000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 65.7
+                },
+                "2": {
+                    "id": 1402,
+                    "requirements": [
+                        {
+                            "requirement": "Song Points of 100000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 50.5
+                },
+                "3": {
+                    "id": 1403,
+                    "requirements": [
+                        {
+                            "requirement": "Song Points of 200000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 31.9
+                }
+            },
+            "highestTier": 3,
+            "playstyle": 1
+        },
+        {
+            "id": 15,
+            "title": "EX Points",
+            "info": {
+                "0": {
+                    "id": 1500,
+                    "requirements": [
+                        {
+                            "requirement": "EX Points of 1000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 72.9
+                },
+                "1": {
+                    "id": 1501,
+                    "requirements": [
+                        {
+                            "requirement": "EX Points of 5000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 50.4
+                },
+                "2": {
+                    "id": 1502,
+                    "requirements": [
+                        {
+                            "requirement": "EX Points of 10000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 34.3
+                }
+            },
+            "highestTier": 2,
+            "playstyle": 1
+        },
+        {
+            "id": 16,
+            "title": "Total Points",
+            "info": {
+                "0": {
+                    "id": 1600,
+                    "requirements": [
+                        {
+                            "requirement": "Total Points of 50000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "Toilet Paper User",
+                    "satisfied": true,
+                    "percentEarned": 67.2
+                },
+                "1": {
+                    "id": 1601,
+                    "requirements": [
+                        {
+                            "requirement": "Total Points of 100000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 52.2
+                },
+                "2": {
+                    "id": 1602,
+                    "requirements": [
+                        {
+                            "requirement": "Total Points of 150000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 42.2
+                },
+                "3": {
+                    "id": 1603,
+                    "requirements": [
+                        {
+                            "requirement": "Total Points of 200000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 35
+                },
+                "4": {
+                    "id": 1604,
+                    "requirements": [
+                        {
+                            "requirement": "Total Points of 250000 or Higher"
+                        }
+                    ],
+                    "titleUnlocked": "",
+                    "satisfied": true,
+                    "percentEarned": 30.8
+                }
+            },
+            "highestTier": 4
+        },
+        {
+            "id": 17,
+            "title": "Scores Submitted",
+            "info": {
+                "0": {
+                    "id": 1700,
+                    "requirements": [
+                        {
+                            "requirement": "Submit 1 Score"
+                        }
+                    ],
+                    "titleUnlocked": "ITL Online 2026 Participant",
+                    "satisfied": true,
+                    "percentEarned": 100
+                },
+                "1": {
+                    "id": 1701,
+                    "requirements": [
+                        {
+                            "requirement": "Submit 10 Scores"
+                        }
+                    ],
+                    "titleUnlocked": "ITL Dabbler",
+                    "satisfied": true,
+                    "percentEarned": 90.1
+                },
+                "2": {
+                    "id": 1702,
+                    "requirements": [
+                        {
+                            "requirement": "Submit 25 Scores"
+                        }
+                    ],
+                    "titleUnlocked": "ITL Explorer",
+                    "satisfied": true,
+                    "percentEarned": 75.1
+                },
+                "3": {
+                    "id": 1703,
+                    "requirements": [
+                        {
+                            "requirement": "Submit 67 Scores"
+                        }
+                    ],
+                    "titleUnlocked": "Six Sevennnnn",
+                    "satisfied": true,
+                    "percentEarned": 51.6
+                }
+            },
+            "highestTier": 3
+        },
+        {
+            "id": 18,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 1800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 10,
+                    "percentEarned": 0
+                }
+            }
+        },
+        {
+            "id": 19,
+            "title": "Charts Passed (Doubles)",
+            "info": {
+                "0": {
+                    "id": 1900,
+                    "requirements": [
+                        {
+                            "requirement": "Pass 1 Chart"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 11.7
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 20,
+            "title": "Block Pass (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2000,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 on Doubles"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 10.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 21,
+            "title": "Block FC (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2100,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and Full Combo or Better on Doubles"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 7.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 22,
+            "title": "Block FEC (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2200,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and FEC or Better on Doubles"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 4.6
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 23,
+            "title": "Block Quad (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2300,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and FFC or Better on Doubles"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.6
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 24,
+            "title": "Block Quint (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2400,
+                    "requirements": [
+                        {
+                            "requirement": "Any Chart Rated 7 and FBFC or Better on Doubles"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 25,
+            "title": "EX Points (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2500,
+                    "requirements": [
+                        {
+                            "requirement": "EX Points of 1000 or Higher"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 4.7
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 26,
+            "title": "In the Club (Doubles)",
+            "info": {
+                "0": {
+                    "id": 2600,
+                    "requirements": [
+                        {
+                            "requirement": "Ranking Points of 50000 or Higher"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 27,
+            "title": "Combo Collector (Double)",
+            "info": {
+                "0": {
+                    "id": 2700,
+                    "requirements": [
+                        {
+                            "requirement": "FC 1 Chart"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 8
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 28,
+            "title": "FEC Collector (Double)",
+            "info": {
+                "0": {
+                    "id": 2800,
+                    "requirements": [
+                        {
+                            "requirement": "FEC 1 Chart"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 5.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 29,
+            "title": "Quad Collector (Double)",
+            "info": {
+                "0": {
+                    "id": 2900,
+                    "requirements": [
+                        {
+                            "requirement": "Quad 1 Chart"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.8
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 30,
+            "title": "Quint Collector (Double)",
+            "info": {
+                "0": {
+                    "id": 3000,
+                    "requirements": [
+                        {
+                            "requirement": "Quint 1 Chart"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 31,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            }
+        },
+        {
+            "id": 32,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 58.7
+                }
+            }
+        },
+        {
+            "id": 33,
+            "title": "Flag Master",
+            "info": {
+                "0": {
+                    "id": 3300,
+                    "requirements": [
+                        {
+                            "requirement": "Get exactly 1 Miss and no Way Offs or Decents."
+                        }
+                    ],
+                    "titleUnlocked": "oops",
+                    "satisfied": true,
+                    "styleTier": 7,
+                    "percentEarned": 83.5
+                },
+                "1": {
+                    "id": 3301,
+                    "requirements": [
+                        {
+                            "requirement": "Get exactly 1 Great and no Misses, Way Offs, or Decents."
+                        }
+                    ],
+                    "titleUnlocked": "oops!",
+                    "satisfied": true,
+                    "styleTier": 4,
+                    "percentEarned": 75.5
+                },
+                "2": {
+                    "id": 3302,
+                    "requirements": [
+                        {
+                            "requirement": "Get exactly 1 Excellent and no Greats, Misses, Way Offs, or Decents."
+                        }
+                    ],
+                    "titleUnlocked": "oops!!",
+                    "satisfied": true,
+                    "styleTier": 9,
+                    "percentEarned": 36.4
+                }
+            },
+            "highestTier": 2
+        },
+        {
+            "id": 34,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            }
+        },
+        {
+            "id": 35,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            }
+        },
+        {
+            "id": 36,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.1
+                }
+            }
+        },
+        {
+            "id": 37,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 1,
+                    "percentEarned": 4.4
+                }
+            }
+        },
+        {
+            "id": 38,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 5,
+                    "percentEarned": 0
+                }
+            }
+        },
+        {
+            "id": 39,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 3900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            }
+        },
+        {
+            "id": 40,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            }
+        },
+        {
+            "id": 41,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 42,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 1,
+                    "percentEarned": 3.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 43,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 2,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 44,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 1,
+                    "percentEarned": 0.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 45,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 2,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 46,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 1,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 47,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 2,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 48,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 49,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 4900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 50,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 51,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 52,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 53,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 8.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 54,
+            "title": "I'm Walkin Over 'Ere!",
+            "info": {
+                "0": {
+                    "id": 5400,
+                    "requirements": [
+                        {
+                            "requirement": "[2075] [8] BROOKLYN and 98% EX Score or Better"
+                        }
+                    ],
+                    "titleUnlocked": "I'm Walkin Over 'Ere!",
+                    "satisfied": true,
+                    "percentEarned": 22
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 55,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 16.8
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 56,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 57,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 9.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 58,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 4.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 59,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 5900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "styleTier": 7,
+                    "percentEarned": 5.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 60,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 61,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 62,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 63,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 64,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 65,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 66,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 67,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 68,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 69,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 6900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 70,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 71,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 72,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 73,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 74,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 75,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 76,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 77,
+            "title": "Deja Vu",
+            "info": {
+                "0": {
+                    "id": 7700,
+                    "requirements": [
+                        {
+                            "requirement": "[2074] [8] Deja Vu and Pass 1 Times"
+                        }
+                    ],
+                    "titleUnlocked": "i forgor",
+                    "satisfied": true,
+                    "percentEarned": 44.8
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 78,
+            "title": "Bay Area Baddies",
+            "info": {
+                "0": {
+                    "id": 7800,
+                    "requirements": [
+                        {
+                            "requirement": "[4396] [10] Folded"
+                        },
+                        {
+                            "requirement": "[5816] [11] Stupid (can't run from the urge)"
+                        }
+                    ],
+                    "titleUnlocked": "Bay Bae",
+                    "satisfied": true,
+                    "percentEarned": 8
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 79,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 7900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 9.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 80,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 81,
+            "title": "Meet Burfus",
+            "info": {
+                "0": {
+                    "id": 8100,
+                    "requirements": [
+                        {
+                            "requirement": "[4447] [10] witchcraft"
+                        },
+                        {
+                            "requirement": "[5261] [10] SOUR @vrif250"
+                        }
+                    ],
+                    "titleUnlocked": "Acquaintance of Burfus",
+                    "satisfied": true,
+                    "percentEarned": 18.3
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 82,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 83,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 84,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 8.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 85,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 86,
+            "title": "Unc",
+            "info": {
+                "0": {
+                    "id": 8600,
+                    "requirements": [
+                        {
+                            "requirement": "[3457] [9] Disconnected Disco"
+                        },
+                        {
+                            "requirement": "[3522] [9] STOP! & Go"
+                        }
+                    ],
+                    "titleUnlocked": "Unc",
+                    "satisfied": true,
+                    "percentEarned": 14.1
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 87,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 88,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 28.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 89,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 8900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 21.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 90,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 21.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 91,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 26.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 92,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 93,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 94,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 7.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 95,
+            "title": "ITL Please Come To Brazil",
+            "info": {
+                "0": {
+                    "id": 9500,
+                    "requirements": [
+                        {
+                            "requirement": "[2493] [8] Samba Do Brasil"
+                        }
+                    ],
+                    "titleUnlocked": "Vai Brasil",
+                    "satisfied": true,
+                    "percentEarned": 48.2
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 96,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 23
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 97,
+            "title": "Expert Detective",
+            "info": {
+                "0": {
+                    "id": 9700,
+                    "requirements": [
+                        {
+                            "requirement": "[2226] [8] Spot A Fake"
+                        }
+                    ],
+                    "titleUnlocked": "Expert Detective",
+                    "satisfied": true,
+                    "percentEarned": 43.6
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 98,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 5.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 99,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 9900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 11.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 100,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 9.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 101,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 24.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 102,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 29.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 103,
+            "title": "I HATE MY ITGMANIA (ALL MY SYNC DRIFTS ARE INSIDE IT)",
+            "info": {
+                "0": {
+                    "id": 10300,
+                    "requirements": [
+                        {
+                            "requirement": "[2476] [8] I HATE MY PUTER (ALL MY ENEMIES ARE INSIDE IT)"
+                        }
+                    ],
+                    "titleUnlocked": "(UnDeads your Sync)",
+                    "satisfied": true,
+                    "percentEarned": 32.7
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 104,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 9.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 105,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 106,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 107,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 108,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 109,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 10900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 7.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 110,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.9
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 111,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.5
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 112,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 26.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 113,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 7.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 114,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 115,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 116,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 8.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 117,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 32.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 118,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 6.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 119,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 11900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 7.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 120,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 12.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 121,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 30.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 122,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 11.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 123,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 124,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 125,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 126,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.8
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 127,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 4.6
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 128,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 14.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 129,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 12900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 130,
+            "title": "ユ！",
+            "info": {
+                "0": {
+                    "id": 13000,
+                    "requirements": [
+                        {
+                            "requirement": "[4803] [10] イガク"
+                        }
+                    ],
+                    "titleUnlocked": "ユ！",
+                    "satisfied": true,
+                    "percentEarned": 22.1
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 131,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.6
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 132,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 133,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.3
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 134,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 5.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 135,
+            "title": "Flow State",
+            "info": {
+                "0": {
+                    "id": 13500,
+                    "requirements": [
+                        {
+                            "requirement": "[2075] [8] BROOKLYN"
+                        },
+                        {
+                            "requirement": "[2288] [8] Butterflies"
+                        }
+                    ],
+                    "titleUnlocked": "Actualized",
+                    "satisfied": true,
+                    "percentEarned": 30.7
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 136,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 137,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 17.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 138,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 23.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 139,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 13900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 15
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 140,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 47.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 141,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 11.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 142,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 18.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 143,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 144,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 145,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.5
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 146,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 147,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 148,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.3
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 149,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 14900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 150,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 151,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.6
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 152,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 153,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 154,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 155,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 156,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 157,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 28.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 158,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 10.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 159,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 15900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 160,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 161,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 162,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.8
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 163,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 164,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 165,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 166,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 167,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 168,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 169,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 16900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 170,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 10.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 171,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 172,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 173,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 13.7
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 174,
+            "title": "RootReducer's Ride or Die",
+            "info": {
+                "0": {
+                    "id": 17400,
+                    "requirements": [
+                        {
+                            "requirement": "[3357] [9] MOTEUR ACTION"
+                        }
+                    ],
+                    "titleUnlocked": "RootReducer's Ride or Die",
+                    "satisfied": true,
+                    "percentEarned": 20.1
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 175,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.8
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 176,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 3.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 177,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 178,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.1
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 179,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 17900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.8
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 180,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 181,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 182,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 183,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.6
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 184,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 185,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 11
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 186,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18600,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 19.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 187,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.3
+                }
+            },
+            "playstyle": 2
+        },
+        {
+            "id": 188,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18800,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 25.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 189,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 18900,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 190,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19000,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 191,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19100,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.1
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 192,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19200,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 0.2
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 193,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19300,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 4.5
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 194,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19400,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        },
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 1.4
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 195,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19500,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 36.9
+                }
+            },
+            "playstyle": 1
+        },
+        {
+            "id": 196,
+            "title": "I'm So Fly",
+            "info": {
+                "0": {
+                    "id": 19600,
+                    "requirements": [
+                        {
+                            "requirement": "[1000] [7] FLY"
+                        }
+                    ],
+                    "titleUnlocked": "Stylish",
+                    "satisfied": true,
+                    "percentEarned": 70.7
+                }
+            },
+            "highestTier": 0,
+            "playstyle": 1
+        },
+        {
+            "id": 197,
+            "title": "?????",
+            "info": {
+                "0": {
+                    "id": 19700,
+                    "requirements": [
+                        {
+                            "requirement": "?????"
+                        }
+                    ],
+                    "satisfied": false,
+                    "percentEarned": 2.9
+                }
+            },
+            "playstyle": 1
+        }
+    ]
+}

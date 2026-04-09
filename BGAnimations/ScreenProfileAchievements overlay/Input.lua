@@ -32,6 +32,79 @@ local mpn = GAMESTATE:GetMasterPlayerNumber()
 
 local Handle = {}
 
+local OrderedAchievementPacks = function(data)
+    local preferred = {"Default", "Trials", "ITL"}
+    local seen = {}
+    local packs = {}
+
+    for _, pack in ipairs(preferred) do
+        if type(SL.Accolades.Achievements[pack]) == "table" and #SL.Accolades.Achievements[pack] > 0 then
+            seen[pack] = true
+            packs[#packs+1] = pack
+        end
+    end
+
+    for pack, entries in pairs(SL.Accolades.Achievements) do
+        if type(entries) == "table" and #entries > 0 and not seen[pack] then
+            seen[pack] = true
+            packs[#packs+1] = pack
+        end
+    end
+
+    if data and type(data.achievements) == "table" then
+        for pack, entries in pairs(data.achievements) do
+            if type(entries) == "table" and #entries > 0 and not seen[pack] then
+                seen[pack] = true
+                packs[#packs+1] = pack
+            end
+        end
+    end
+
+    if #packs == 0 then
+        packs[1] = "Default"
+    end
+
+    return packs
+end
+
+local ClampAchievementIndex = function(data)
+    local pack = data.activePack
+    local size = 0
+
+    if data.achievements and type(data.achievements[pack]) == "table" and #data.achievements[pack] > 0 then
+        size = #data.achievements[pack]
+    elseif type(SL.Accolades.Achievements[pack]) == "table" then
+        size = #SL.Accolades.Achievements[pack]
+    end
+
+    if size <= 0 then
+        data.achievementIndex = 1
+        return
+    end
+
+    if data.achievementIndex < 1 then data.achievementIndex = 1 end
+    if data.achievementIndex > size then data.achievementIndex = size end
+end
+
+local CyclePack = function(data, step)
+    local packs = OrderedAchievementPacks(data)
+    local currentIndex = 1
+
+    for i, pack in ipairs(packs) do
+        if pack == data.activePack then
+            currentIndex = i
+            break
+        end
+    end
+
+    local nextIndex = currentIndex + step
+    if nextIndex < 1 then nextIndex = #packs end
+    if nextIndex > #packs then nextIndex = 1 end
+
+    data.activePack = packs[nextIndex]
+    ClampAchievementIndex(data)
+end
+
 Handle.Start = function(event)
 	local topscreen = SCREENMAN:GetTopScreen()
 	-- if the input event came from a side that is not currently registered as a human player, we'll either
@@ -63,13 +136,14 @@ Handle.MenuLeft = function(event)
 			if SL.Global.AchievementMenuActive then
 				local achievements = af:GetChild('AchievementFrame')
 				if event.button == "MenuLeft" then
-					data.activePack = data.activePack == "Default" and "Trials" or "Default"
+                    CyclePack(data, -1)
 				else
 					data.achievementIndex = data.achievementIndex - (string.match(event.button, "Up") and 8 or 1)
 					if data.achievementIndex < 1 then
 						data.achievementIndex = 1
 					end
 				end
+                ClampAchievementIndex(data)
 				achievements:playcommand("Set", data)
 			elseif SL.Global.AchievementPackMenu then
 				local achievementPacks = af:GetChild('AchievementPacksFrame')
@@ -94,13 +168,11 @@ Handle.MenuRight = function(event)
             local data = profile_data[event.PlayerNumber]
             local achievements = af:GetChild('AchievementFrame')
             if event.button == "MenuRight" then
-                data.activePack = data.activePack == "Default" and "Trials" or "Default"
+                CyclePack(data, 1)
             else
                 data.achievementIndex = data.achievementIndex + (string.match(event.button, "Down") and 8 or 1)
-                if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-                    data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-                end
             end
+            ClampAchievementIndex(data)
             achievements:playcommand("Set", data)
         elseif SL.Global.AchievementPackMenu then
             local achievementPacks = af:GetChild('AchievementPacksFrame')
@@ -125,12 +197,7 @@ Handle.EffectUp = function(event)
         local data = profile_data[event.PlayerNumber]
         local achievements = af:GetChild('AchievementFrame')
         data.achievementIndex = data.achievementIndex + (event.GameButton == "MenuDown" and 8 or 1)
-        if data.achievementIndex > #SL.Accolades.Achievements[data.activePack] then
-            data.achievementIndex = #SL.Accolades.Achievements[data.activePack]
-        end
-        if data.achievementIndex > 24 then
-            data.achievementIndex = 24
-        end
+        ClampAchievementIndex(data)
         achievements:playcommand("Set", data)
 	end
 end
