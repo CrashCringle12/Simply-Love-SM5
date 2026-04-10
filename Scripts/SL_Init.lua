@@ -495,13 +495,17 @@ SL = {
             Downloaded = {},
             LastDownloadTime = {},
         },
+        ITLMapping = {
+            Data = LoadITLMapping(),
+            LastUpdated = 0,
+        },
         Notifications = {
             P1 = {
-                current = 0,
+				currentlyNotifying = false,
                 achievements = {},
             },
             P2 = {
-                current = 0,
+				currentlyNotifying = false,
                 achievements = {},
             }
         }

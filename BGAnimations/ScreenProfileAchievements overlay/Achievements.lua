@@ -323,30 +323,37 @@ return Def.ActorFrame {
         FrameBackground2(0, color("#f5f5f5"), player, frame.w * 3.2,
                          frame.h * 0.59),
         LoadFont("Common Normal") .. {
-            Text = "Accolades",
+            Text = "Achievements",
             InitCommand = function(self)
                 self:valign(0):horizalign(left):zoom(1):diffusealpha(0.9):xy(
                     -330, -190):diffuse(color("#FFFFFF"))
             end,
             SetCommand = function(self, params)
                 if params == nil then
-                    self:settext("Accolades")
+                    self:settext("Achievements")
                 else
-                    self:settext("Accolades")
+                    self:settext(params.displayname .. "'s Achievements")
                 end
             end
         },
         LoadFont("Common Header") .. {
-            Text = "Cabby's Achievements",
+            Text = "Achievements",
             InitCommand = function(self)
                 self:valign(0):horizalign(left):zoom(0.4):diffusealpha(0.9):xy(
                     -332, -148):diffuse(color("#FFFFFF"))
             end,
             SetCommand = function(self, params)
-                if params == nil then
+                if params == nil or type(params.activePack) ~= "string" then
                     self:settext("Achievements")
                 else
-                    self:settext(params.displayname .. "'s Achievements")
+                    -- replace underscores with spaces
+                    local packName = params.activePack:gsub("_", " ")
+                    if packName == "ITL" then
+                        -- We'll update this to be scalable by year later.
+                        -- For now just hardcoding
+                        packName = "ITL Online 2026"
+                    end
+                    self:settext(packName)
                 end
             end
         },
@@ -369,7 +376,7 @@ return Def.ActorFrame {
             InitCommand = function(self)
                 self:valign(0):horizalign(left):zoom(1):diffusealpha(0.9):xy(
                     -330, -100):diffuse(color("#c7cbd9"))
-                self:wrapwidthpixels(600)
+                self:wrapwidthpixels(680)
             end,
             SetCommand = function(self, params)
                 if params == nil then

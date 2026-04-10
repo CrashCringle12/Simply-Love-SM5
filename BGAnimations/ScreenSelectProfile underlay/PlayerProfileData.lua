@@ -162,14 +162,8 @@ local RetrieveProfileAchievements = function(profile, dir)
 					end
 
 					local name = hasVisibleTitle and unlockedTitle or categoryTitle
-					if not isUnlocked and not hasVisibleTitle then
-						name = "?????"
-					end
 
 					local desc = requirementText ~= "" and ("Requirements: " .. requirementText) or "Requirements unavailable"
-					if not isUnlocked and requirementText == "" then
-						desc = "?????"
-					end
 
 					output[#output+1] = {
 						ID = id,

@@ -11,7 +11,6 @@ local activePack = "Default"
 local rowOffset = 0
 
 local fallbackIcon = "medal 4x3.png"
-local itlTrophyIcon = THEME:GetCurrentThemeDirectory() .. "Other/Achievements/ITL/Trophy.png"
 
 local GetPackTable = function(packName)
 	if type(SL) == "table" and type(SL.Accolades) == "table" and type(SL.Accolades.Achievements) == "table" then
@@ -29,12 +28,12 @@ local GetAchievementAt = function(packName, index)
 end
 
 local ResolveIconPath = function(packName, achievement)
-	if packName == "ITL" and FILEMAN:DoesFileExist(itlTrophyIcon) then
-		return itlTrophyIcon
+	if packName == "ITL"  then
+		return THEME:GetPathO("", "Achievements/ITL/Trophy.png")
 	end
 
 	if type(achievement) == "table" and type(achievement.Icon) == "string" and achievement.Icon ~= "" then
-		local custom = THEME:GetCurrentThemeDirectory() .. "Other/Achievements/" .. packName .. "/" .. achievement.Icon
+		local custom = THEME:GetPathO("", "Achievements/" .. packName .. "/" .. achievement.Icon)
 		if FILEMAN:DoesFileExist(custom) then
 			return custom
 		end

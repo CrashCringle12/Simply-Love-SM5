@@ -95,6 +95,8 @@ local af = Def.ActorFrame{
 	LoadActor("./SongDescription/SongDescription.lua"),
 	-- Banner Art
 	LoadActor("./Banner.lua"),
+	-- Local ITL nearby leaderboard panel
+	LoadActor("./ITLNearbyLeaderboard.lua"),
 
 	-- ---------------------------------------------------
 	-- finally, load the overlay used for sorting the MusicWheel (and more), hidden by default

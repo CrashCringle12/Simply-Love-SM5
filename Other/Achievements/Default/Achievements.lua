@@ -179,7 +179,7 @@ return {
         ID = 11
     }, {
         Name = "Mine v1",
-        Icon = "Fallback Tap Mine 4x2",
+        Icon = "Fallback Tap Mine 4x2.png",
         Condition = function(pn)
             return TimingWindowCheck(pn, "HitMine", 10, true)
         end,
@@ -363,7 +363,7 @@ return {
     }, {
         Name = "Gold Star",
         Icon = "star.png",
-        UnlockedDiffuse = {0.93, 1.00, 0.94, 1.00},
+        UnlockedDiffuse = {0.73, 1.00, 0.74, 1.00},
         Difficulty = 2,
         ID = 26,
         Desc = "Get your first star!",
@@ -385,7 +385,7 @@ return {
     }, {
         Name = "Superb!",
         Icon = "s-plus.png",
-        UnlockedDiffuse = {0.93, 1.00, 0.94, 1.00},
+        UnlockedDiffuse = {0.73, 1.00, 0.74, 1.00},
         Difficulty = 2,
         ID = 27,
         Desc = "Get your first S!",
@@ -407,7 +407,7 @@ return {
     }, {
         Name = "A for Effort",
         Icon = "a-plus.png",
-        UnlockedDiffuse = {0.93, 1.00, 0.94, 1.00},
+        UnlockedDiffuse = {0.73, 1.00, 0.74, 1.00},
         Difficulty = 1,
         Desc = "Get your first A!",
         ID = 28,
@@ -451,7 +451,8 @@ return {
     }, -- Achievement for passing a song titled "e"
     {
         Name = "e",
-        Icon = "e 3x2.png",
+        Icon = "e.png",
+        UnlockedDiffuse = {0.73, 1.00, 0.74, 1.00},
         Desc = "e",
         Difficulty = 6,
         ID = 30,
@@ -470,8 +471,7 @@ return {
     }, -- Achievement for passing a song titled "e"
     {
         Name = "mc^2",
-        Icon = "e.png",
-        UnlockedDiffuse = {0.93, 1.00, 0.94, 1.00},
+        Icon = "e 3x2.png",
         Desc = "Can you make the letter sound?",
         Difficulty = 4,
         ID = 31,

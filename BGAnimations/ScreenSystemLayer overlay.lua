@@ -615,11 +615,11 @@ gui_actors = {
 }
 SL.Accolades.Notifications = {
     P1 = {
-        current = 0,
+		currentlyNotifying = false,
         achievements = {},
     },
     P2 = {
-        current = 0,
+		currentlyNotifying = false,
         achievements = {},
     }
 }
@@ -637,6 +637,10 @@ t[#t+1] = Def.ActorFrame {
 		self:queuecommand("On")
 	end,
     AchievementUnlockedP1MessageCommand=function(self, params)
+		if SL.Accolades.Notifications["P1"].currentlyNotifying then
+			return
+		end
+
 		local NumPlayers = #GAMESTATE:GetHumanPlayers()
 		if (#SL.Accolades.Notifications["P1"].achievements > 0 and #SL.Accolades.Notifications["P2"].achievements > 0) then
 			self:y(-75)
@@ -644,13 +648,14 @@ t[#t+1] = Def.ActorFrame {
 			self:y(0)
 		end
 		
-        -- Process SL.Accolades.Notifications.achievements
+		-- Process SL.Accolades.Notifications.achievements
         -- For each one, queue a command to display it
         if #SL.Accolades.Notifications["P1"].achievements > 0 then
-            for i, achievement in ipairs(SL.Accolades.Notifications["P1"].achievements) do
-                Trace("Queue up achievement "..i .. " ".. achievement.Name)
-                self:queuecommand("Unlocked"):sleep(7*i)
-            end
+			SL.Accolades.Notifications["P1"].currentlyNotifying = true
+			for i, achievement in ipairs(SL.Accolades.Notifications["P1"].achievements) do
+				Trace("Queue up achievement "..i .. " ".. achievement.Name)
+				self:queuecommand("Unlocked"):sleep(7*i)
+			end
         end
     end,
     Def.Sprite{
@@ -702,13 +707,15 @@ t[#t+1] = Def.ActorFrame {
         OnCommand=function(self) gui_actors["P1"].sound = self end,
         PlayCommand=function(self) self:stop():play() end,
         StopCommand=function(self) self:stop() end,
-        UnlockedCommand=function(self, params)
-            if #SL.Accolades.Notifications["P1"].achievements > 0 then
-                AchievementUnlocked(SL.Accolades.Notifications["P1"].achievements[1].Name, SL.Accolades.Notifications["P1"].achievements[1].Desc, "P1")
-                -- Remove
-                table.remove(SL.Accolades.Notifications["P1"].achievements, 1)
-            end
-        end
+		UnlockedCommand=function(self, params)
+			if #SL.Accolades.Notifications["P1"].achievements > 0 then
+				AchievementUnlocked(SL.Accolades.Notifications["P1"].achievements[1].Name, SL.Accolades.Notifications["P1"].achievements[1].Desc, "P1")
+				table.remove(SL.Accolades.Notifications["P1"].achievements, 1)
+			end
+			if #SL.Accolades.Notifications["P1"].achievements == 0 then
+				SL.Accolades.Notifications["P1"].currentlyNotifying = false
+			end
+		end
     }
 }
 
@@ -718,9 +725,12 @@ t[#t+1] = Def.ActorFrame {
 		self:queuecommand("On")
 	end,
 	AchievementUnlockedP2MessageCommand=function(self, params)
-		-- Process SL.Accolades.Notifications.achievements
-		-- For each one, queue a command to display it
+		if SL.Accolades.Notifications["P2"].currentlyNotifying then
+			return
+		end
+
 		if #SL.Accolades.Notifications["P2"].achievements > 0 then
+			SL.Accolades.Notifications["P2"].currentlyNotifying = true
 			for i, achievement in ipairs(SL.Accolades.Notifications["P2"].achievements) do
 				Trace("Queue up achievement "..i .. " ".. achievement.Name)
 				self:queuecommand("Unlocked"):sleep(7*i)
@@ -778,8 +788,10 @@ t[#t+1] = Def.ActorFrame {
 		UnlockedCommand=function(self, params)
 			if #SL.Accolades.Notifications["P2"].achievements > 0 then
 				AchievementUnlocked(SL.Accolades.Notifications["P2"].achievements[1].Name, SL.Accolades.Notifications["P2"].achievements[1].Desc, "P2")
-				-- Remove
 				table.remove(SL.Accolades.Notifications["P2"].achievements, 1)
+			end
+			if #SL.Accolades.Notifications["P2"].achievements == 0 then
+				SL.Accolades.Notifications["P2"].currentlyNotifying = false
 			end
 		end
 	}

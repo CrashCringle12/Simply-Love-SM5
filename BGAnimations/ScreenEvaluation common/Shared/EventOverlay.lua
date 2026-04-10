@@ -536,6 +536,12 @@ local GetItlPaneFunctions = function(eventAf, itlData, player)
 					achievement["title"]
 				))
 
+				table.insert(SL.Accolades.Notifications[pn].achievements, {
+					Name = achievement["title"],
+					Desc = "An ITL Online 2026 Achievement",
+				})
+				MESSAGEMAN:Broadcast("AchievementUnlocked"..pn)
+
 				for reward in ivalues(achievement["rewards"]) do
 					local tier = reward["tier"]
 					if tostring(tier) ~= "0" then

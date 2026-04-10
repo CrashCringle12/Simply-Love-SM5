@@ -141,14 +141,8 @@ RetrieveProfileAchievements = function(player)
 					end
 
 					local name = hasVisibleTitle and unlockedTitle or categoryTitle
-					if not isUnlocked and not hasVisibleTitle then
-						name = "?????"
-					end
 
 					local desc = requirementText ~= "" and ("Requirements: " .. requirementText) or "Requirements unavailable"
-					if not isUnlocked and requirementText == "" then
-						desc = "?????"
-					end
 
 					output[#output+1] = {
 						ID = id,
@@ -263,6 +257,9 @@ LoadProfileCustom = function(profile, dir)
 		SL[pn].AchievementData = RetrieveProfileAchievements(player)
 		-- SM("Achievement Data Loaded")
 		SL[pn].Stages = stages
+
+		-- Fetch latest ITL achievements in the background on profile login
+		RefreshITLAchievementsForPlayer(player)
 	end
 
 	if pn and FILEMAN:DoesFileExist(path) then
@@ -344,6 +341,10 @@ end
 
 ValidateAchievements = function(player)
  	local pn = ToEnumShortString(player)
+
+	-- Only validate achievements if the player has a loaded profile
+	if not PROFILEMAN:IsPersistentProfile(player) then return end
+
 	-- Loop through all available achievement packs
 	for pack,achievements in pairs(SL.Accolades.Achievements) do
 		-- If the pack has achievements proceed

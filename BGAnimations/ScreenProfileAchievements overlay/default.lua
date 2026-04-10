@@ -106,7 +106,8 @@ local t = Def.ActorFrame {
 	FinishCommand=function(self)
 		if SL.Global.AchievementMenuActive then
 			SL.Global.AchievementMenuActive = false
-            SL.Global.AchievementPackMenuActive = false
+			SL.Global.AchievementPackMenuActive = false
+			if SL.Accolades then SL.Accolades.AchievementMenuPlayer = nil end
 		end
         SCREENMAN:GetTopScreen():Cancel()
 	end,
