@@ -74,7 +74,7 @@ return {
                 "429d726213656886" or SL[pn].Streams.Hash == "3f921fc09897e2c4" or
                 SL[pn].Streams.Hash == "b8f2ab5ccdd3be28" or SL[pn].Streams.Hash ==
                 "768c577db008a310" then
-                return TimingWindowCheck(pn, "HitMine", 100, true)
+                return TimingWindowCheck(pn, "HitMine", 70, true)
             end
             return false
         end,
