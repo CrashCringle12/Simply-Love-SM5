@@ -10,7 +10,7 @@ local accolades = binfo.achievements
 local activePack = "Default"
 local rowOffset = 0
 
-local fallbackIcon = THEME:GetCurrentThemeDirectory() .. "BGAnimations/ScreenProfileAchievements overlay/medal 4x3.png"
+local fallbackIcon = "medal 4x3.png"
 local itlTrophyIcon = THEME:GetCurrentThemeDirectory() .. "Other/Achievements/ITL/Trophy.png"
 
 local GetPackTable = function(packName)

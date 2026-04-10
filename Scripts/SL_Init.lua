@@ -489,6 +489,12 @@ SL = {
     -- Load Valid Achievements from file
     Accolades = {
         Achievements = LoadAllAchievements(),
+        Unlocks = {
+            MenuActive = false,
+            Nav = {},
+            Downloaded = {},
+            LastDownloadTime = {},
+        },
         Notifications = {
             P1 = {
                 current = 0,

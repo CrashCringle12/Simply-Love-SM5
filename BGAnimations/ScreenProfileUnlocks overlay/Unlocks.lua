@@ -5,6 +5,7 @@ local guest_data = args.GuestData
 local avatars = args.Avatars
 local pn = ToEnumShortString(player)
 local frame = {w = 225, h = 368, border = 6}
+local downloadStatus
 
 -- -----------------------------------------------------------------------
 -- JSON reading utility
@@ -112,9 +113,8 @@ local nav = {
     chains = chains,
 }
 
--- Store nav on SL.Global so Input.lua can access it
-if not SL.Global.UnlockNav then SL.Global.UnlockNav = {} end
-SL.Global.UnlockNav[pn] = nav
+-- Store nav on SL.Accolades.Unlocks so Input.lua can access it
+SL.Accolades.Unlocks.Nav[pn] = nav
 
 -- -----------------------------------------------------------------------
 -- Helpers
@@ -290,6 +290,7 @@ local t = Def.ActorFrame {
             scrollOffset = nav.scrollOffset,
             displayname = params and params.displayname or (initial_data and initial_data.displayname or ""),
             index = params and params.index or (initial_data and initial_data.index or 0),
+            downloadStatus = params and params.downloadStatus or nil,
         })
     end,
 }
@@ -308,9 +309,9 @@ local inner = Def.ActorFrame {
     FrameBackground3(0, color("#575867"), player, frame.w * 3.2, frame.h * 0.3),
     FrameBackground2(0, color("#f5f5f5"), player, frame.w * 3.2, frame.h * 0.59),
 
-    -- Header: "Accolades" label
+    -- Header: "Unlocks" label
     LoadFont("Common Normal") .. {
-        Text = "Accolades",
+        Text = "Unlocks",
         InitCommand = function(self)
             self:valign(0):horizalign(left):zoom(1):diffusealpha(0.9):xy(-330, -190):diffuse(color("#FFFFFF"))
         end,
@@ -401,6 +402,54 @@ local inner = Def.ActorFrame {
                 end
             else
                 self:settext("")
+            end
+        end,
+    },
+
+    -- Download status
+    LoadFont("Common Normal") .. {
+        Text = "",
+        Name = "DownloadStatus",
+        InitCommand = function(self)
+            self:valign(0):horizalign(right):zoom(0.9):diffusealpha(0.9):xy(350, -90):diffuse(color("#FFFFFF"))
+            downloadStatus = self
+        end,
+        UnlockUpdateMessageCommand = function(self, params)
+            if params.Player ~= player then return end
+            local chain = chains[params.chainIndex]
+            if not chain or not chain.nodes[params.nodeIndex] then
+                self:settext("")
+                return
+            end
+            local node = chain.nodes[params.nodeIndex].node
+            local dirs = node.data and node.data.chartsSongDirs
+            local link = node.data and node.data.downloadLink
+
+            -- Check if all songs are already downloaded
+            local allDownloaded = false
+            if dirs and #dirs > 0 then
+                allDownloaded = true
+                for _, dir in ipairs(dirs) do
+                    if not SONGMAN:FindSong(dir) then
+                        allDownloaded = false
+                        break
+                    end
+                end
+            end
+            local nodeId = tostring(node.id or node.data and node.data.id or "")
+
+            -- If a download was just triggered, show downloading state
+            if params.downloadStatus == "downloading" then
+                self:settext("Downloading..."):diffuse(color("#FF9800"))
+                return
+            end
+
+            if allDownloaded or SL.Accolades.Unlocks.Downloaded[nodeId] then
+                self:settext("Load New Songs"):diffuse(color("#4CAF50"))
+            elseif link and link ~= "" then
+                self:settext("&START; to DOWNLOAD"):diffuse(color("#FFC107"))
+            else
+                self:settext("Unavailable"):diffuse(color("#9E9E9E"))
             end
         end,
     },

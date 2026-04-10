@@ -30,8 +30,8 @@ local t = Def.ActorFrame {
         self:sleep(0.75):queuecommand("Finish")
     end,
     FinishCommand = function(self)
-        if SL.Global.UnlockMenuActive then
-            SL.Global.UnlockMenuActive = false
+        if SL.Accolades.Unlocks.MenuActive then
+            SL.Accolades.Unlocks.MenuActive = false
         end
         SCREENMAN:GetTopScreen():Cancel()
     end,
