@@ -193,7 +193,6 @@ Handle.MenuDown = Handle.MenuRight
 Handle.DownRight = Handle.MenuRight
 Handle.EffectUp = function(event)
 	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) then
-		local index = type(info)=="table" and info.index or 0
         local data = profile_data[event.PlayerNumber]
         local achievements = af:GetChild('AchievementFrame')
         data.achievementIndex = data.achievementIndex + (event.GameButton == "MenuDown" and 8 or 1)
@@ -218,7 +217,7 @@ Handle.Back = function(event)
 		SL.Global.AchievementMenuActive = false
 	elseif SL.Global.AchievementPackMenu then
 		local achievementPacks = af:GetChild('AchievementPacksFrame')
-		achievementPacks:playcommand("Hide", data)
+        achievementPacks:playcommand("Hide", profile_data[event.PlayerNumber])
 		SL.Global.AchievementPackMenu = false
 	end
 end

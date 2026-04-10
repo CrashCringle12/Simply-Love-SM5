@@ -87,6 +87,7 @@ local t = Def.ActorFrame {
 	end,
 	InitInputCommand=function(self) SCREENMAN:GetTopScreen():AddInputCallback( LoadActor("./Input.lua", {af=self, Scrollers=scrollers, ProfileData=profile_data, GuestData=guest_data}) ) end,
 
+
 	CheckMenuTimerCommand=function(self)
 		-- if the MenuTimer has reached 0, it's time to queue the OffCommand and force a transition to the next screen
 		if SCREENMAN:GetTopScreen():GetChild("Timer"):GetSeconds() <= 0 then

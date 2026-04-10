@@ -4,10 +4,107 @@ local apple = ""
 local pages = binfo.pages
 local currPage = 0;
 local rows = binfo.rows
+local maxRows = math.max(rows, 4)
 local cols = binfo.cols 
 local accolades = binfo.achievements
 local activePack = "Default"
 local rowOffset = 0
+
+local fallbackIcon = THEME:GetCurrentThemeDirectory() .. "BGAnimations/ScreenProfileAchievements overlay/medal 4x3.png"
+local itlTrophyIcon = THEME:GetCurrentThemeDirectory() .. "Other/Achievements/ITL/Trophy.png"
+
+local GetPackTable = function(packName)
+	if type(SL) == "table" and type(SL.Accolades) == "table" and type(SL.Accolades.Achievements) == "table" then
+		local pack = SL.Accolades.Achievements[packName]
+		if type(pack) == "table" then return pack end
+	end
+	return nil
+end
+
+local GetAchievementAt = function(packName, index)
+	local pack = GetPackTable(packName)
+	if not pack then return nil end
+	if type(index) ~= "number" or index < 1 then return nil end
+	return pack[index]
+end
+
+local ResolveIconPath = function(packName, achievement)
+	if packName == "ITL" and FILEMAN:DoesFileExist(itlTrophyIcon) then
+		return itlTrophyIcon
+	end
+
+	if type(achievement) == "table" and type(achievement.Icon) == "string" and achievement.Icon ~= "" then
+		local custom = THEME:GetCurrentThemeDirectory() .. "Other/Achievements/" .. packName .. "/" .. achievement.Icon
+		if FILEMAN:DoesFileExist(custom) then
+			return custom
+		end
+	end
+
+	if FILEMAN:DoesFileExist(fallbackIcon) then
+		return fallbackIcon
+	end
+
+	return nil
+end
+
+local GetProfilePack = function(params)
+	if not params or type(params.achievements) ~= "table" then return nil end
+	local pack = params.achievements[params.activePack]
+	if type(pack) == "table" then return pack end
+	return nil
+end
+
+local GetTotalForPack = function(params)
+	local pack = GetPackTable(params.activePack)
+	local machineTotal = pack and #pack or 0
+	local profilePack = GetProfilePack(params)
+	local profileTotal = profilePack and #profilePack or 0
+	if machineTotal > profileTotal then return machineTotal end
+	return profileTotal
+end
+
+local ResolveUnlockedDiffuse = function(params, index)
+	local packName = params and params.activePack
+	if type(packName) ~= "string" then return nil end
+
+	local definition = GetAchievementAt(packName, index)
+	if type(definition) ~= "table" then return nil end
+
+	local c = definition.UnlockedDiffuse
+	if type(c) ~= "table" then return nil end
+
+	local r = tonumber(c[1] or c.r)
+	local g = tonumber(c[2] or c.g)
+	local b = tonumber(c[3] or c.b)
+	local a = tonumber(c[4] or c.a) or 1
+	if not r or not g or not b then return nil end
+
+	return r, g, b, a
+end
+
+local GetRowsForPack = function(params)
+	local total = GetTotalForPack(params)
+	if total > 100 then
+		return 4
+	end
+	return rows
+end
+
+local GetGridMetrics = function(activeRows)
+	if activeRows >= 4 then
+		return {
+			badgeSize = 40,
+			yStep = 46,
+			baseY = -25,
+		}
+	end
+
+	return {
+		badgeSize = 50,
+		yStep = 68,
+		baseY = -25,
+	}
+end
 local achievements = Def.ActorFrame {
 	Name="Badges",
 	-- Def.Quad {
@@ -62,7 +159,7 @@ for p=1,pages do
 	local pI = ((p-1)*cols)
 	local pY = ((p-1)*rows)
 	-- 
-	for j=1,rows do
+	for j=1,maxRows do
 		for i=1,cols do
 				badges[#badges+1] = Def.ActorFrame {
 					InitCommand=function(self)
@@ -70,11 +167,19 @@ for p=1,pages do
 						self:visible(true)
 					end,
 					Def.Sprite {
-						Texture="medal 4x3.png",
+						Texture=fallbackIcon,
 						InitCommand=function(self)
+							local metrics = GetGridMetrics(rows)
+							local index = (j-1)*cols + i+pI+rowOffset+rowOffset
+							local achievement = GetAchievementAt(activePack, index)
+							local iconPath = ResolveIconPath(activePack, achievement)
 							self:visible(true):diffusealpha(1)
-							self:Load(SL.Accolades.Achievements[activePack][(j-1)*cols + i+pI+rowOffset + rowOffset ] and THEME:GetPathO("", "Achievements/"..activePack.."/"..SL.Accolades.Achievements[activePack][(j-1)*cols + i+pI+rowOffset+ rowOffset].Icon) or "medal 4x3.png")
-							self:zoomto(50,50):align(0,0):xy(-400+(90*i),-25+(68*((j-1)%rows))):diffusealpha(0)
+							if iconPath then
+								self:Load(iconPath)
+							else
+								self:visible(false)
+							end
+							self:zoomto(metrics.badgeSize,metrics.badgeSize):align(0,0):xy(-400+(90*i),metrics.baseY+(metrics.yStep*((j-1)%maxRows))):diffusealpha(0)
 							self:diffuse(0.1,0,0.1,1)
 							--self:setstate(math.random(1,11))
 							if math.random(0,100) % 30 == 0 then
@@ -93,18 +198,24 @@ for p=1,pages do
 							self:stopeffect()
 						end,
 						PageMessageCommand=function(self, params)
-							if (activePack == "Trials") then
-								self:Load("medal 4x3.png")
-							else
-							end
+							-- no-op; icon selection occurs in MigratoMessageCommand
 						end,
 						MigratoMessageCommand=function(self, params)
+							local activeRows = GetRowsForPack(params)
+							local pageCapacity = activeRows * cols
+							local metrics = GetGridMetrics(activeRows)
+
+							if j > activeRows then
+								self:visible(false)
+								self:queuecommand("UnGlow")
+								return
+							end
 							-- TODO FIX THISSSS
 							if params.achievements then
 								-- If we exceed the number of rows * cols then increment the row offset
-								if params.achievementIndex > (rows*cols+rowOffset) then
+								if params.achievementIndex > (pageCapacity+rowOffset) then
 									rowOffset = rowOffset + cols
-								elseif params.achievementIndex <= (rows*cols+rowOffset-(rows*cols)) then
+								elseif params.achievementIndex <= (pageCapacity+rowOffset-pageCapacity) then
 									rowOffset = rowOffset - cols
 								end
 							end
@@ -112,10 +223,19 @@ for p=1,pages do
 								rowOffset = params.Page
 							end
 							if true then
-								self:Load(SL.Accolades.Achievements[params.activePack][(j-1)*cols + i+pI+rowOffset] and THEME:GetPathO("", "Achievements/"..params.activePack .."/"..SL.Accolades.Achievements[params.activePack][(j-1)*cols + i+pI+rowOffset].Icon) or "medal 4x3.png")
-								self:zoomto(50,50):align(0,0):xy(-400+(90*i),-25+(68*((j-1)%rows))):diffusealpha(0)
+								local index = (j-1)*cols + i+pI+rowOffset
+								local machineAchievement = GetAchievementAt(params.activePack, index)
+								local profileAchievement = params.achievements and params.achievements[params.activePack] and params.achievements[params.activePack][index] or nil
+								local achievement = machineAchievement or profileAchievement
+								local iconPath = ResolveIconPath(params.activePack, achievement)
+								if iconPath then
+									self:Load(iconPath)
+									self:visible(true)
+								else
+									self:visible(false)
+								end
+								self:zoomto(metrics.badgeSize,metrics.badgeSize):align(0,0):xy(-400+(90*i),metrics.baseY+(metrics.yStep*((j-1)%maxRows))):diffusealpha(0)
 								self:diffuse(0.1,0,0.1,1)
-								self:visible(true)
 								--self:setstate(math.random(1,11))
 								if math.random(0,100) % 30 == 0 then
 									self:SetAllStateDelays(0.3)
@@ -127,11 +247,19 @@ for p=1,pages do
 								end
 							end
 							if params.achievements then
-								if ((j-1)*cols + i+pI+rowOffset) <= #SL.Accolades.Achievements[params.activePack] then
+								local index = (j-1)*cols + i+pI+rowOffset
+								local total = GetTotalForPack(params)
+								if index <= total then
+									self:visible(true)
 									if params.achievements[params.activePack     ] then
-										if params.achievements[params.activePack     ][(j-1)*cols + i+pI+rowOffset] then
-											if params.achievements[params.activePack     ][(j-1)*cols + i+pI+rowOffset].Unlocked then
-												self:diffuse(1,1,1,1)
+										if params.achievements[params.activePack     ][index] then
+											if params.achievements[params.activePack     ][index].Unlocked then
+												local r, g, b, a = ResolveUnlockedDiffuse(params, index)
+												if r then
+													self:diffuse(r, g, b, a)
+												else
+													self:diffuse(1,1,1,1)
+												end
 											else
 												self:diffuse(0.1,0,0.1,0.5)
 											end
@@ -142,7 +270,6 @@ for p=1,pages do
 										self:diffuse(0.1,0,0.1,0.5)
 									end
 								else
-									--self:diffuse(0.1,0,0.1,0.5)
 									self:visible(false)
 								end
 							end

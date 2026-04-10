@@ -67,6 +67,10 @@ local GetDisplayName = function(params)
         return definition.Name
     end
 
+    if playerAchievement and type(playerAchievement.Name) == "string" and playerAchievement.Name ~= "" then
+        return playerAchievement.Name
+    end
+
     return "N/A"
 end
 
@@ -88,6 +92,10 @@ local GetDisplayDescription = function(params)
         return definition.Desc
     end
 
+    if playerAchievement and type(playerAchievement.Desc) == "string" and playerAchievement.Desc ~= "" then
+        return playerAchievement.Desc
+    end
+
     return "N/A"
 end
 
@@ -105,9 +113,9 @@ local GetDifficultyOrPercentText = function(params)
         end
 
         if percent ~= nil then
-            return string.format("Percent Earned: %.1f%%", percent)
+            return string.format("%.1f%% of Players have earned.", percent)
         end
-        return "Percent Earned: N/A"
+        return "N/A of Players have earned."
     end
 
     if definition and type(definition.Difficulty) == "number" then
@@ -138,7 +146,7 @@ local avatar_dim = 85
 
 -- account for the possibility that there are no local profiles and
 -- we want "[ Guest ]" to start in the middle, with focus
-if PROFILEMAN:GetNumLocalProfiles() <= 0 then scroller.y = row_height * -4 end
+-- no scroller exists on this screen; keep this block intentionally empty
 -- -----------------------------------------------------------------------
 
 local initial_data = guest_data
@@ -275,6 +283,19 @@ return Def.ActorFrame {
         end
         MESSAGEMAN:Broadcast("Page",
                              {Player = player, Page = counter})
+        self:queuecommand("Prime")
+    end,
+    PrimeCommand = function(self)
+        local data = initial_data or guest_data or {}
+
+        if data.achievementIndex == nil then
+            data.achievementIndex = 1
+        end
+        if type(data.activePack) ~= "string" or data.activePack == "" then
+            data.activePack = "Default"
+        end
+
+        self:playcommand("Set", data)
     end,
     SetCommand = function(self, params)
         -- local test = params
@@ -348,6 +369,7 @@ return Def.ActorFrame {
             InitCommand = function(self)
                 self:valign(0):horizalign(left):zoom(1):diffusealpha(0.9):xy(
                     -330, -100):diffuse(color("#c7cbd9"))
+                self:wrapwidthpixels(600)
             end,
             SetCommand = function(self, params)
                 if params == nil then
@@ -369,13 +391,27 @@ return Def.ActorFrame {
                     not params.achievements[params.activePack][params.achievementIndex] then
 					self:settext("Not Unlocked")
                 else
-                    if params.achievements[params.activePack][params.achievementIndex]
-                        .Date then
-                        self:settext(
-                            params.achievements[params.activePack][params.achievementIndex]
-                                .Date)
+                    local achievement = params.achievements[params.activePack][params.achievementIndex]
+                    if IsITLPack(params) then
+                        if achievement.Unlocked then
+                            local unlockedTitle = type(achievement.TitleUnlocked) == "string" and achievement.TitleUnlocked or ""
+                            if unlockedTitle == "" and type(achievement.Name) == "string" and achievement.Name ~= "?????" then
+                                unlockedTitle = achievement.Name
+                            end
+                            if unlockedTitle ~= "" then
+                                self:settext("Title Unlocked: " .. unlockedTitle)
+                            else
+                                self:settext("Unlocked")
+                            end
+                        else
+                            self:settext("Not Unlocked")
+                        end
                     else
-                        self:settext("Not Unlocked")
+                        if achievement.Date then
+                            self:settext(achievement.Date)
+                        else
+                            self:settext("Not Unlocked")
+                        end
                     end
                 end
             end
