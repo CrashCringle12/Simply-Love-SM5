@@ -421,7 +421,8 @@ local t = Def.ActorFrame {
 					{{"View", "Gallery"}},
 					{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
 					{ {"GrooveStats", "Leaderboard"}, function() return GAMESTATE:GetCurrentSong() ~= nil end },	
-					{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
+					{{"View", "Achievements"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end },
+					{{"View", "Unlocks"}, function() return PROFILEMAN:IsPersistentProfile(GAMESTATE:GetMasterPlayerNumber()) end }
 				}
 			},
 		}
@@ -507,6 +508,10 @@ local t = Def.ActorFrame {
 		DirectInputToEngine(self)
 		-- Then add the ScreenAchievements on top.
 		SCREENMAN:AddNewScreenToTop("ScreenProfileAchievements")
+	end,
+	DirectInputToEngineForUnlocksCommand=function(self)
+		DirectInputToEngine(self)
+		SCREENMAN:AddNewScreenToTop("ScreenProfileUnlocks")
 	end,
 
 	AssessAvailableChoicesCommand=function(self)

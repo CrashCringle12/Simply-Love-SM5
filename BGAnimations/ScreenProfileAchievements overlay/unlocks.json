@@ -1,0 +1,1942 @@
+{
+    "success": true,
+    "message": "",
+    "data": {
+        "nodes": [
+            {
+                "id": "6",
+                "title": "BR+XO",
+                "status": "in-progress",
+                "conditions": [
+                    {
+                        "id": "6-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "6-cond-1",
+                        "text": "[6804] [12] Godspeed",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 6,
+                    "title": "BR+XO",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[6804] [12] Godspeed"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "InProgress",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "57",
+                "title": "DDR 0",
+                "status": "in-progress",
+                "conditions": [
+                    {
+                        "id": "57-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "57-cond-1",
+                        "text": "[3301] [9] Deep tenDon Reflex",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 57,
+                    "title": "DDR 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[3301] [9] Deep tenDon Reflex"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "InProgress",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "52",
+                "title": "BEMANI 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "52-cond-0",
+                        "text": "[3200] [9] FUNKY BINGO PARADISE",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "52-unlock-chart-0",
+                        "text": "[4470] [10] 夢縁",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 52,
+                    "title": "BEMANI 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3200] [9] FUNKY BINGO PARADISE"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4470] [10] 夢縁"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Yume enishi (SH) [forcednature]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        53
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/8855483095.zip",
+                    "dateCompleted": "2026-04-05T23:33:14.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "69",
+                "title": "Animals 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "69-cond-0",
+                        "text": "[2288] [8] Butterflies",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "69-cond-1",
+                        "text": "[3189] [9] Bee My Honey",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "69-unlock-chart-0",
+                        "text": "[4608] [10] Sippin Yak' (DENNETT Remix)",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 69,
+                    "title": "Animals 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[2288] [8] Butterflies"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[3189] [9] Bee My Honey"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4608] [10] Sippin Yak' (DENNETT Remix)"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Sippin Yak' (DENNETT Remix) (SX) [Burner]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        70
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/1754500331.zip",
+                    "dateCompleted": "2026-04-04T00:10:23.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "90",
+                "title": "GAYCORE",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "90-cond-0",
+                        "text": "[2117] [8] Abracadabra",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "90-cond-1",
+                        "text": "[2226] [8] Spot A Fake",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "90-unlock-chart-0",
+                        "text": "[5648] [11] GAYCORE",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 90,
+                    "title": "GAYCORE",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[2117] [8] Abracadabra"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[2226] [8] Spot A Fake"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5648] [11] GAYCORE"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] GAYCORE (SX) [Scrypts]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/4872051688.zip",
+                    "dateCompleted": "2026-03-29T03:36:59.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "18",
+                "title": "Brackets 3",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "18-cond-0",
+                        "text": "[8002] [13] SOLAR ECLIPSE",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "18-cond-1",
+                        "text": "[7957] [13] MEGAHEARTZ",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "18-unlock-chart-0",
+                        "text": "[8898] [14] Ö<3rf10₩",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "18-unlock-chart-1",
+                        "text": "[9175] [14] Vector Field",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 18,
+                    "title": "Brackets 3",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[8002] [13] SOLAR ECLIPSE"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[7957] [13] MEGAHEARTZ"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[8898] [14] Ö<3rf10₩",
+                        "[9175] [14] Vector Field"
+                    ],
+                    "chartsSongDirs": [
+                        "[14] Ov3rf10W (SX) [som1sezhi]",
+                        "[14] Vector Field (SX) [Nav]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        27,
+                        28
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/8199137388.zip",
+                    "dateCompleted": "2026-03-23T02:00:30.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "17",
+                "title": "Brackets 2",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "17-cond-0",
+                        "text": "[5816] [11] Stupid (can't run from the urge)",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "17-cond-1",
+                        "text": "[6804] [12] Godspeed",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "17-unlock-chart-0",
+                        "text": "[8002] [13] SOLAR ECLIPSE",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "17-unlock-chart-1",
+                        "text": "[7957] [13] MEGAHEARTZ",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 17,
+                    "title": "Brackets 2",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[5816] [11] Stupid (can't run from the urge)"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[6804] [12] Godspeed"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[8002] [13] SOLAR ECLIPSE",
+                        "[7957] [13] MEGAHEARTZ"
+                    ],
+                    "chartsSongDirs": [
+                        "[13] SOLAR ECLIPSE (SM) [erictran0]",
+                        "[13] MEGAHEARTZ (SX) [bkirz]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        18
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/7656042005.zip",
+                    "dateCompleted": "2026-03-23T01:50:30.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "22",
+                "title": "Jumps 1",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "22-cond-0",
+                        "text": "[4491] [10] Ska Cha Cha",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "22-cond-1",
+                        "text": "[4347] [10] PUMP THE STEREO",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "22-unlock-chart-0",
+                        "text": "[5777] [11] Acid Drift",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "22-unlock-chart-1",
+                        "text": "[5669] [11] Jump Now",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 22,
+                    "title": "Jumps 1",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[4491] [10] Ska Cha Cha"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[4347] [10] PUMP THE STEREO"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5777] [11] Acid Drift",
+                        "[5669] [11] Jump Now"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] Acid Drift (SX) [Clionne]",
+                        "[11] Jump Now (SX) [Litter]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        23
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/1618499846.zip",
+                    "dateCompleted": "2026-03-23T01:42:31.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "20",
+                "title": "BR+JU",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "20-cond-0",
+                        "text": "[4801] [10] More",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "20-cond-1",
+                        "text": "[4491] [10] Ska Cha Cha",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "20-unlock-chart-0",
+                        "text": "[5996] [11] Speed Dating",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 20,
+                    "title": "BR+JU",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[4801] [10] More"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[4491] [10] Ska Cha Cha"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5996] [11] Speed Dating"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] Speed Dating (SH) [midtown]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/5431491110.zip",
+                    "dateCompleted": "2026-03-23T01:39:34.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "12",
+                "title": "BR+FS 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "12-cond-0",
+                        "text": "[4447] [10] witchcraft",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "12-cond-1",
+                        "text": "[5261] [10] SOUR @vrif250",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "12-unlock-chart-0",
+                        "text": "[6564] [11] BOUNCE",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 12,
+                    "title": "BR+FS 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[4447] [10] witchcraft"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[5261] [10] SOUR @vrif250"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[6564] [11] BOUNCE"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] BOUNCE (SX) [SilverElectron]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        13
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/6984278671.zip",
+                    "dateCompleted": "2026-03-23T01:36:50.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "16",
+                "title": "Brackets 1",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "16-cond-0",
+                        "text": "[4801] [10] More",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "16-cond-1",
+                        "text": "[5015] [10] MANTIS RITUAL",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "16-cond-2",
+                        "text": "[5261] [10] SOUR @vrif250",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "16-unlock-chart-0",
+                        "text": "[5816] [11] Stupid (can't run from the urge)",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "16-unlock-chart-1",
+                        "text": "[6804] [12] Godspeed",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 16,
+                    "title": "Brackets 1",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[4801] [10] More"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[5015] [10] MANTIS RITUAL"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[5261] [10] SOUR @vrif250"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5816] [11] Stupid (can't run from the urge)",
+                        "[6804] [12] Godspeed"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] Stupid (can't run from the urge) (SX) [StarUndrscre]",
+                        "[12] Godspeed (SX) [G. Rosewood]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        17,
+                        42,
+                        48,
+                        6
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/2569708268.zip",
+                    "dateCompleted": "2026-03-23T01:36:50.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "19",
+                "title": "the ritual has succeeded",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "19-cond-0",
+                        "text": "[5015] [10] MANTIS RITUAL",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "19-unlock-chart-0",
+                        "text": "[5750] [10] Mantis",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 19,
+                    "title": "the ritual has succeeded",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[5015] [10] MANTIS RITUAL"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5750] [10] Mantis"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Mantis (SX) [Implode]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/9201763263.zip",
+                    "dateCompleted": "2026-03-23T00:27:09.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "8",
+                "title": "Footswitches 1",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "8-cond-0",
+                        "text": "[4429] [10] Shining Star",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "8-cond-1",
+                        "text": "[4447] [10] witchcraft",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "8-unlock-chart-0",
+                        "text": "[5513] [11] GOODMEN",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "8-unlock-chart-1",
+                        "text": "[5675] [11] Gasoline",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 8,
+                    "title": "Footswitches 1",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[4429] [10] Shining Star"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[4447] [10] witchcraft"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5513] [11] GOODMEN",
+                        "[5675] [11] Gasoline"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] GOODMEN (SH) [wrsw]",
+                        "[11] Gasoline (SX) [altic]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        9
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/5388828208.zip",
+                    "dateCompleted": "2026-03-23T00:21:05.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "2",
+                "title": "Crossovers 1",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "2-cond-0",
+                        "text": "[3770] [9] Robot Loves Smoked-Salmon",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "2-cond-1",
+                        "text": "[4419] [10] Hush hush",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "2-unlock-chart-0",
+                        "text": "[5421] [11] LubedeR",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "2-unlock-chart-1",
+                        "text": "[5567] [11] Svensk Sås",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "2-unlock-chart-2",
+                        "text": "[6596] [12] Lawes's Parotia",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 2,
+                    "title": "Crossovers 1",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3770] [9] Robot Loves Smoked-Salmon"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[4419] [10] Hush hush"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5421] [11] LubedeR",
+                        "[5567] [11] Svensk Sås",
+                        "[6596] [12] Lawes's Parotia"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] LubedeR (SH) [DDDAAA]",
+                        "[11] Svensk Sas (SX) [zaniel]",
+                        "[12] Lawes's Parotia (SX) [Gameoson]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        3,
+                        6
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/2956378895.zip",
+                    "dateCompleted": "2026-03-23T00:16:15.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "43",
+                "title": "Gimmicks 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "43-cond-0",
+                        "text": "[4293] [9] カシカ",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "43-cond-1",
+                        "text": "[3522] [9] STOP! & Go",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "43-unlock-chart-0",
+                        "text": "[4534] [10] Haunted House",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "43-unlock-chart-1",
+                        "text": "[5049] [10] NULCTRL",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 43,
+                    "title": "Gimmicks 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[4293] [9] カシカ"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[3522] [9] STOP! & Go"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4534] [10] Haunted House",
+                        "[5049] [10] NULCTRL"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Haunted House (SX) [CondorTalon]",
+                        "[10] NULCTRL (SX) [DRILLBOT]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        44
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/1702503611.zip",
+                    "dateCompleted": "2026-03-23T00:09:26.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "64",
+                "title": "Jacks 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "64-cond-0",
+                        "text": "[3245] [9] Baddie",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "64-cond-1",
+                        "text": "[3789] [9] The One",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "64-unlock-chart-0",
+                        "text": "[4571] [10] SPACE INVADER (short cut)",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "64-unlock-chart-1",
+                        "text": "[4317] [10] Satisfy",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 64,
+                    "title": "Jacks 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3245] [9] Baddie"
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[3789] [9] The One"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4571] [10] SPACE INVADER (short cut)",
+                        "[4317] [10] Satisfy"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] SPACE INVADER (short cut) (SH) [dimo, ITL Revise]",
+                        "[10] Satisfy (SX) [Benpai]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        65
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/2837712963.zip",
+                    "dateCompleted": "2026-03-23T00:01:24.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "29",
+                "title": "Doublesteps 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "29-cond-0",
+                        "text": "[3222] [9] ミラレルミラー",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "29-unlock-chart-0",
+                        "text": "[4242] [10] Still the party will come with no mercy,やったー",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "29-unlock-chart-1",
+                        "text": "[4695] [10] 365 featuring shygirl",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 29,
+                    "title": "Doublesteps 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3222] [9] ミラレルミラー"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4242] [10] Still the party will come with no mercy,やったー",
+                        "[4695] [10] 365 featuring shygirl"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Still the party will come with no mercy, yatta! (SM) [mdx]",
+                        "[10] 365 featuring shygirl (SX) [IIIIIIIIIIII]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        30
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/6518799523.zip",
+                    "dateCompleted": "2026-03-22T23:58:46.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "21",
+                "title": "Jumps 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "21-cond-0",
+                        "text": "[3487] [9] Bungee (Fall in Love)",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "21-unlock-chart-0",
+                        "text": "[4491] [10] Ska Cha Cha",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "21-unlock-chart-1",
+                        "text": "[4347] [10] PUMP THE STEREO",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 21,
+                    "title": "Jumps 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3487] [9] Bungee (Fall in Love)"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4491] [10] Ska Cha Cha",
+                        "[4347] [10] PUMP THE STEREO"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Ska Cha Cha (SX) [valgrind]",
+                        "[10] PUMP THE STEREO (SM) [Wafles]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        20,
+                        22
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/6966017470.zip",
+                    "dateCompleted": "2026-03-22T23:56:04.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "7",
+                "title": "Footswitches 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "7-cond-0",
+                        "text": "[3423] [9] BOCA",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "7-unlock-chart-0",
+                        "text": "[4429] [10] Shining Star",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "7-unlock-chart-1",
+                        "text": "[4447] [10] witchcraft",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 7,
+                    "title": "Footswitches 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3423] [9] BOCA"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4429] [10] Shining Star",
+                        "[4447] [10] witchcraft"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] Shining Star (SX) [Scrypts]",
+                        "[10] witchcraft (SH) [ZSL]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        12,
+                        8
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/1772176041.zip",
+                    "dateCompleted": "2026-03-22T23:53:19.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "15",
+                "title": "Brackets 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "15-cond-0",
+                        "text": "[3384] [9] Banger",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "15-unlock-chart-0",
+                        "text": "[4801] [10] More",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "15-unlock-chart-1",
+                        "text": "[5015] [10] MANTIS RITUAL",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "15-unlock-chart-2",
+                        "text": "[5261] [10] SOUR @vrif250",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 15,
+                    "title": "Brackets 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3384] [9] Banger"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[4801] [10] More",
+                        "[5015] [10] MANTIS RITUAL",
+                        "[5261] [10] SOUR @vrif250"
+                    ],
+                    "chartsSongDirs": [
+                        "[10] More (SX) [valgrind]",
+                        "[10] MANTIS RITUAL (SM) [RakkiiCB]",
+                        "[10] SOUR @vrif250 (SM) [erictran0]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        12,
+                        16,
+                        19,
+                        20
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/7895706446.zip",
+                    "dateCompleted": "2026-03-22T23:50:47.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "49",
+                "title": "Kickswitch 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "49-cond-0",
+                        "text": "[3301] [9] Deep tenDon Reflex",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "49-unlock-chart-0",
+                        "text": "[5339] [11] saving flowers (with Rina Sawayama)",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 49,
+                    "title": "Kickswitch 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[3301] [9] Deep tenDon Reflex"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[5339] [11] saving flowers (with Rina Sawayama)"
+                    ],
+                    "chartsSongDirs": [
+                        "[11] saving flowers (with Rina Sawayama) (SX) [Ritz]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        50
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/5627648589.zip",
+                    "dateCompleted": "2026-03-22T23:46:40.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "33",
+                "title": "Rhythms 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "33-cond-0",
+                        "text": "[2900] [8] File Select ",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "33-cond-1",
+                        "text": "[2904] [8] MaMa Beat (feat. Gain)",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "33-unlock-chart-0",
+                        "text": "[3750] [9] Candid Glitched Friend",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "33-unlock-chart-1",
+                        "text": "[3790] [9] stayinit",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 33,
+                    "title": "Rhythms 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[2900] [8] File Select "
+                        },
+                        {
+                            "satisfied": true,
+                            "requirement": "[2904] [8] MaMa Beat (feat. Gain)"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[3750] [9] Candid Glitched Friend",
+                        "[3790] [9] stayinit"
+                    ],
+                    "chartsSongDirs": [
+                        "[09] Candid Glitched Friend (SH) [warpdrive]",
+                        "[09] stayinit (SH) [dimo]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        34
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/9389911877.zip",
+                    "dateCompleted": "2026-03-22T23:36:04.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "46",
+                "title": "Sideswitches 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "46-cond-0",
+                        "text": "[2645] [8] Move Mint (VIP)",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "46-unlock-chart-0",
+                        "text": "[3403] [9] Love You Back",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 46,
+                    "title": "Sideswitches 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[2645] [8] Move Mint (VIP)"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[3403] [9] Love You Back"
+                    ],
+                    "chartsSongDirs": [
+                        "[09] Love You Back (SX) [CopperPuppy]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        42,
+                        47
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/2139502602.zip",
+                    "dateCompleted": "2026-03-22T23:30:46.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "1",
+                "title": "Crossovers 0",
+                "status": "complete",
+                "conditions": [
+                    {
+                        "id": "1-cond-0",
+                        "text": "[2493] [8] Samba Do Brasil",
+                        "status": "complete"
+                    }
+                ],
+                "unlocks": [
+                    {
+                        "id": "1-unlock-chart-0",
+                        "text": "[3770] [9] Robot Loves Smoked-Salmon",
+                        "status": "complete"
+                    },
+                    {
+                        "id": "1-unlock-chart-1",
+                        "text": "[4419] [10] Hush hush",
+                        "status": "complete"
+                    }
+                ],
+                "data": {
+                    "id": 1,
+                    "title": "Crossovers 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": true,
+                            "requirement": "[2493] [8] Samba Do Brasil"
+                        }
+                    ],
+                    "chartsUnlocked": [
+                        "[3770] [9] Robot Loves Smoked-Salmon",
+                        "[4419] [10] Hush hush"
+                    ],
+                    "chartsSongDirs": [
+                        "[09] Robot Loves Smoked-Salmon (SX) [Fengli]",
+                        "[10] Hush hush (SX) [Kheirn]"
+                    ],
+                    "adHoc": [],
+                    "childIds": [
+                        2
+                    ],
+                    "status": "Complete",
+                    "downloadLink": "https://www.groovestats.com/ITL2026/6195522019.zip",
+                    "dateCompleted": "2026-03-22T23:27:58.000Z",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "3",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "3-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "3-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "3-cond-2",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 3,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "9",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "9-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "9-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 9,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "13",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "13-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 13,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "23",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "23-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "23-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 23,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "24",
+                "title": "Footspeed 0",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "24-cond-0",
+                        "text": "[6205] [12] Darkside",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 24,
+                    "title": "Footspeed 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "[6205] [12] Darkside"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "30",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "30-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "30-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 30,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "34",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "34-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "34-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 34,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "36",
+                "title": "Stamtech 0",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "36-cond-0",
+                        "text": "[5612] [11] Aseptiqa",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 36,
+                    "title": "Stamtech 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "[5612] [11] Aseptiqa"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "44",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "44-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "44-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 44,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "47",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "47-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 47,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "50",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "50-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 50,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "53",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "53-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 53,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "65",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "65-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "65-cond-1",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 65,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "70",
+                "title": "?????",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "70-cond-0",
+                        "text": "?????",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 70,
+                    "title": "?????",
+                    "description": "?????",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "?????"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "81",
+                "title": "Mix 0",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "81-cond-0",
+                        "text": "[7999] [13] [Mix] FREQUENCY VOID",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 81,
+                    "title": "Mix 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "[7999] [13] [Mix] FREQUENCY VOID"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            },
+            {
+                "id": "83",
+                "title": "Stamina 0",
+                "status": "not-started",
+                "conditions": [
+                    {
+                        "id": "83-cond-0",
+                        "text": "[5446] [11] Afraid to Feel",
+                        "status": "not-started"
+                    },
+                    {
+                        "id": "83-cond-1",
+                        "text": "[5182] [11] f0rbiidden l0ve$tory",
+                        "status": "not-started"
+                    }
+                ],
+                "data": {
+                    "id": 83,
+                    "title": "Stamina 0",
+                    "description": "",
+                    "requirements": [
+                        {
+                            "satisfied": false,
+                            "requirement": "[5446] [11] Afraid to Feel"
+                        },
+                        {
+                            "satisfied": false,
+                            "requirement": "[5182] [11] f0rbiidden l0ve$tory"
+                        }
+                    ],
+                    "chartsUnlocked": [],
+                    "chartsSongDirs": [],
+                    "adHoc": [],
+                    "childIds": [],
+                    "status": "NotStarted",
+                    "playstyle": 1
+                }
+            }
+        ],
+        "edges": [
+            {
+                "from": "52",
+                "to": "53"
+            },
+            {
+                "from": "69",
+                "to": "70"
+            },
+            {
+                "from": "17",
+                "to": "18"
+            },
+            {
+                "from": "22",
+                "to": "23"
+            },
+            {
+                "from": "12",
+                "to": "13"
+            },
+            {
+                "from": "16",
+                "to": "17"
+            },
+            {
+                "from": "16",
+                "to": "6"
+            },
+            {
+                "from": "8",
+                "to": "9"
+            },
+            {
+                "from": "2",
+                "to": "3"
+            },
+            {
+                "from": "2",
+                "to": "6"
+            },
+            {
+                "from": "43",
+                "to": "44"
+            },
+            {
+                "from": "64",
+                "to": "65"
+            },
+            {
+                "from": "29",
+                "to": "30"
+            },
+            {
+                "from": "21",
+                "to": "20"
+            },
+            {
+                "from": "21",
+                "to": "22"
+            },
+            {
+                "from": "7",
+                "to": "12"
+            },
+            {
+                "from": "7",
+                "to": "8"
+            },
+            {
+                "from": "15",
+                "to": "12"
+            },
+            {
+                "from": "15",
+                "to": "16"
+            },
+            {
+                "from": "15",
+                "to": "19"
+            },
+            {
+                "from": "15",
+                "to": "20"
+            },
+            {
+                "from": "49",
+                "to": "50"
+            },
+            {
+                "from": "33",
+                "to": "34"
+            },
+            {
+                "from": "46",
+                "to": "47"
+            },
+            {
+                "from": "1",
+                "to": "2"
+            }
+        ]
+    }
+}

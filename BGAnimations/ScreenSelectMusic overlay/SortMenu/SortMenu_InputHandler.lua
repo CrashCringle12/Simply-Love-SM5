@@ -170,6 +170,9 @@ local input = function(event)
 				elseif focus.new_overlay == "Achievements" then
 					SL.Global.AchievementMenuActive = true
 					overlay:queuecommand("DirectInputToEngineForAchievements")
+				elseif focus.new_overlay == "Unlocks" then
+					SL.Global.UnlockMenuActive = true
+					overlay:queuecommand("DirectInputToEngineForUnlocks")
 				elseif focus.new_overlay == "Gallery" then
 					ThemePrefs.Set("SortPlayer", event.PlayerNumber)
 					overlay:playcommand("ViewGallery")
