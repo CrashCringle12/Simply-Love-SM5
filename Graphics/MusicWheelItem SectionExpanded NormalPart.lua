@@ -24,5 +24,45 @@ return Def.ActorFrame{
 				self:diffusealpha(0.5)
 			end
 		end
-	}
+	},
+	Def.ActorFrame{
+		Name="FolderStack",
+		InitCommand=function(self)
+			self:x(-3)
+		end,
+		SetCommand=function(self, params)
+			local is_parent = params and params.IsSeries
+			self:GetChild("FolderBack"):visible(is_parent)
+			self:GetChild("FolderFront"):visible(is_parent)
+			self:GetChild("FolderMid"):visible(true)
+		end,
+
+		Def.Sprite{
+			Name="FolderBack",
+			Texture=THEME:GetPathG("", "folder-solid.png"),
+			InitCommand=function(self)
+				self:horizalign(left):zoom(0.175)
+				self:x(-4 + self:GetWidth()*self:GetZoom() - 8, -4)
+				self:diffuse(color("#516777"))
+			end
+		},
+		Def.Sprite{
+			Name="FolderMid",
+			Texture=THEME:GetPathG("", "folder-solid.png"),
+			InitCommand=function(self)
+				self:horizalign(left):zoom(0.175)
+				self:xy( 0 + self:GetWidth()*self:GetZoom() - 8, 1 )
+				self:diffuse(color("#677f91"))
+			end,
+		},
+		Def.Sprite{
+			Name="FolderFront",
+			Texture=THEME:GetPathG("", "folder-solid.png"),
+			InitCommand=function(self)
+				self:horizalign(left):zoom(0.175)
+				self:xy( 4 + self:GetWidth()*self:GetZoom() - 8, 2)
+				self:diffuse(color("#7793a7"))
+			end
+		},
+	},
 }
