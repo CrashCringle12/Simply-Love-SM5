@@ -35,6 +35,11 @@ return Def.ActorFrame{
 			self:GetChild("FolderBack"):visible(is_parent)
 			self:GetChild("FolderFront"):visible(is_parent)
 			self:GetChild("FolderMid"):visible(true)
+			if not is_parent then
+				self:GetChild("FolderMid"):diffuse(params.Color)
+			else
+				self:GetChild("FolderMid"):diffuse(color("#677f91"))
+			end
 		end,
 
 		Def.Sprite{
@@ -52,7 +57,6 @@ return Def.ActorFrame{
 			InitCommand=function(self)
 				self:horizalign(left):zoom(0.175)
 				self:xy( 0 + self:GetWidth()*self:GetZoom() - 8, 1 )
-				self:diffuse(color("#677f91"))
 			end,
 		},
 		Def.Sprite{
