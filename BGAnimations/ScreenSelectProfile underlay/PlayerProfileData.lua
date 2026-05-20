@@ -312,7 +312,8 @@ GetMachineProfileData = function()
 		achievementIndex = 1,
 		packIndex = 1,
 		achievements = nil,
-		activePack = "Default"
+		activePack = "Default",
+		inUse = false,
 	}
 	return data
 end
@@ -348,8 +349,8 @@ for i=1, PROFILEMAN:GetNumLocalProfiles() do
 		guid = profile:GetGUID(),
 		achievementIndex = 1,
 		achievements = RetrieveProfileAchievements(profile, dir),
-		activePack = "Default"
-
+		activePack = "Default",
+		inUse = isProfileLocked({index = i, dir = dir, displayname = profile:GetDisplayName()}),
 	}
 
 	table.insert(profile_data, data)

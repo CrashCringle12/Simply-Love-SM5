@@ -551,6 +551,21 @@ function InitializeSimplyLove()
 	-- Make sure we reset to no preferred style on init
 	ThemePrefs.Set("PreferredStyle", "none")
 	THEME:ReloadMetrics()
+	
+	-- loop through every profile directory and set any session.lock files to empty if they contain a guid that matches a profile on this machine. This is to prevent profiles from being locked indefinitely if the game crashes while a profile is in use.
+	for i=1, PROFILEMAN:GetNumLocalProfiles() do
+		-- GetLocalProfileFromIndex() expects indices to start at 0
+		local profile = PROFILEMAN:GetLocalProfileFromIndex(i-1)
+		-- GetLocalProfileIDFromIndex() also expects indices to start at 0
+		local id = PROFILEMAN:GetLocalProfileIDFromIndex(i-1)
+		local dir = PROFILEMAN:LocalProfileIDToDir(id)
+		if profile and id and dir then
+			if isProfileLockedByMachine({index = i, dir = dir}) then
+				unlockProfile({index = i, dir = dir})
+			end
+		end
+	 end
+	
 end
 
 InitializeSimplyLove()

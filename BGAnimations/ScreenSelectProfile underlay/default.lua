@@ -261,9 +261,20 @@ local t = Def.ActorFrame {
 		IsAction=true,
 		InvalidChoiceMessageCommand=function(self)
 			self:play()
-			if PREFSMAN:GetPreference("EasterEggs") and invalid_count then
+			if invalid_count then
 				invalid_count = invalid_count + 1
-				if invalid_count >= 10 then MESSAGEMAN:Broadcast("What"); invalid_count = nil end
+				if invalid_count >= 10 then 
+					if PREFSMAN:GetPreference("EasterEggs") then
+						MESSAGEMAN:Broadcast("What"); 
+					end
+					local p1_index = scrollers[PLAYER_1]:get_info_at_focus_pos().index
+					local p2_index = scrollers[PLAYER_2]:get_info_at_focus_pos().index
+					unlockProfile(profile_data[p1_index])
+					unlockProfile(profile_data[p2_index])
+					if p1_index > 0 then profile_data[p1_index].inUse = false end
+					if p2_index > 0 then profile_data[p2_index].inUse = false end
+					invalid_count = nil 
+				end
 			end
 		end
 	},

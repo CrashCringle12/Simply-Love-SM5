@@ -29,6 +29,17 @@ return {
 
 			af[#af+1] = txt
 
+			local lockIcon = Def.Sprite{
+				Texture=THEME:GetPathG("", "lock.png"),
+				InitCommand=function(subself)
+					self.lockIcon = subself
+					subself:MaskDest()
+					subself:animate(false):visible(false):zoom(0.015):x(45):y(-5)
+				end,
+			}
+
+			af[#af+1] = lockIcon
+
 			return af
 		end,
 		transform = function(self, item_index, num_items, has_focus)
@@ -52,6 +63,11 @@ return {
 			if not info then self.bmt:settext(""); return end
 			self.info = info
 			self.bmt:settext(info.displayname or ""):zoom(0.9)
+			if info.inUse then
+				self.lockIcon:visible(true)
+			else
+				self.lockIcon:visible(false)
+			end
 		end
 	}
 }

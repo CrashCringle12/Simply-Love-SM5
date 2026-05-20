@@ -201,3 +201,66 @@ function roundToDecimal(num, numDecimalPlaces)
 	local mult = 10^(numDecimalPlaces or 0)
 	return math.floor(num * mult + 0.5) / mult
 end
+
+
+
+-- Check if a profile is locked by checking for the existence of a "session.lock" file in the profile's directory
+-- and comparing the contents to the machine profile's guid.
+-- If the contents of the file do not match the machine profile's guid, then the profile is locked.
+-- If the profile is the machine profile, then it is not locked.
+isProfileLocked = function(profileData)
+	if profileData == nil then return false end
+	if profileData.index == nil or profileData.index <= 0 then return false end
+	local path = profileData.dir .. "session.lock"
+	local file = RageFileUtil.CreateRageFile()
+	if file:Open(path, 1) then
+		local guid = file:Read()
+		file:Close()
+		file:destroy()
+		return guid ~= "" and guid ~= PROFILEMAN:GetMachineProfile():GetGUID()
+	else
+		return false
+	end
+end
+
+isProfileLockedByMachine = function(profileData)
+	if profileData == nil then return false end
+	if profileData.index == nil or profileData.index <= 0 then return false end
+	local path = profileData.dir .. "session.lock"
+	local file = RageFileUtil.CreateRageFile()
+	if file:Open(path, 1) then
+		local guid = file:Read()
+		file:Close()
+		file:destroy()
+		return guid == PROFILEMAN:GetMachineProfile():GetGUID()
+	else
+		return false
+	end
+end
+
+-- Lock a profile by writing a file called "session.lock" in the profile's directory
+-- with the machine profile's guid.
+lockProfile = function(profileData)
+	if profileData == nil then return end
+	if profileData.index == nil or profileData.index <= 0 then return end
+	local path = profileData.dir .. "session.lock"
+	local file = RageFileUtil.CreateRageFile()
+	if file:Open(path, 2) then
+		file:Write(PROFILEMAN:GetMachineProfile():GetGUID())
+		file:Close()
+		file:destroy()
+	end
+end
+
+-- Unlock a profile by emptying the contents of the "session.lock" file in the profile's directory.
+unlockProfile = function(profileData)
+	if profileData == nil then return; end
+	if profileData.index == nil or profileData.index <= 0 then return; end
+	local path = profileData.dir .. "session.lock"
+	local file = RageFileUtil.CreateRageFile()
+	if file:Open(path, 2) then
+		file:Write("")
+		file:Close()
+		file:destroy()
+	end
+end

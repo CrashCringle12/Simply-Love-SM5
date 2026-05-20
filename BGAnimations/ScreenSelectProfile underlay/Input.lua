@@ -65,6 +65,78 @@ local mpn = GAMESTATE:GetMasterPlayerNumber()
 local activeGenerations = 0
 local Handle = {}
 
+local function playProfileNameTTS(playerNumber)
+	if apiKey == "" then return end
+
+	local raw_name = profile_data[scrollers[playerNumber]:get_info_at_focus_pos().index+1].displayname
+	-- We need to clean this name up before sending it to TTS
+	-- Strip any trailing numbers if they're more than 3 digits
+	-- If there is a hyphen, space or underscore in the name (after the 3rd character), remove everything after it
+	-- If what we have left is less than 3 characters, use the whole name
+	-- Code:
+	local name = raw_name:gsub("(%d%d%d+)$", "") --:gsub("[- _].*$", "")
+	-- -- Remove any special characters at the end or beginning of the name
+	-- name = name:gsub("^[^%w]+", ""):gsub("[^%w]+$", "")
+	-- if #name < 3 then
+	-- 	name = raw_name
+	-- end
+	-- make the name all uppercase
+	-- name = name:upper()
+
+	if #name > 20 then
+		name = "YOU!!"
+	end
+	local voice = "echo"
+	-- Check if the name file already exists:
+	local path = "/"..THEME:GetCurrentThemeDirectory().."Sounds/Generated/"..voice.."/"..name .. ".mp3"
+	if not FILEMAN:DoesFileExist(path) and scrollers[playerNumber]:get_info_at_focus_pos().index > 0 then
+		--SM("File does not exist, generating")
+		-- If the file doesn't exist, generate it
+		if activeGenerations <= 2 then
+			activeGenerations = activeGenerations + 1
+			local uuid = CRYPTMAN:GenerateRandomUUID()
+			NETWORK:HttpRequest{
+			url = "https://api.openai.com/v1/audio/speech",
+			method = "POST",
+			downloadFile=name .. ".mp3",
+			headers = {
+				["Authorization"] = "Bearer "..apiKey,
+				["Content-Type"] = "application/json",
+			},
+			body = '{"model": "tts-1", "input": "...'..name..'!!!!!!!", "voice": "'..voice..'"}',
+			connectTimeout = 60,
+			transferTimeout = 1800,
+			onProgress = function(currentBytes, totalBytes)
+				--SM("Downloaded " .. currentBytes .. " of " .. totalBytes .. " bytes")
+			end,
+			onResponse = function(response)
+				--SM(response, 10)
+
+				if response.error ~= nil then
+					--SM("Error: " .. response.error)
+					return
+				end
+				if response.statusCode == 200 then
+					if response.headers["Content-Type"] == "audio/mpeg" then
+						--SM("Downloaded " .. response.body:len() .. " bytes")
+						FILEMAN:Copy("/Downloads/"..name .. ".mp3", path)
+						SOUND:PlayOnce(path)
+						activeGenerations = activeGenerations - 1
+					else
+						SM("Attempted to download from which is not audio!")
+					end
+				else
+				end
+			end,
+			}
+		end
+	else
+		SOUND:PlayOnce(path)
+	end
+end
+
+
+
 Handle.Start = function(event)
 	-- Nothing to do if the player has already selected a profile
 	if GAMESTATE:IsHumanPlayer(event.PlayerNumber) and readyPlayers[ToEnumShortString(event.PlayerNumber)] then 
@@ -113,73 +185,7 @@ Handle.Start = function(event)
 	else
 
 		local other_player = event.PlayerNumber == PLAYER_1 and PLAYER_2 or PLAYER_1
-		if apiKey ~= "" then
-			local raw_name = profile_data[scrollers[event.PlayerNumber]:get_info_at_focus_pos().index+1].displayname
-			-- We need to clean this name up before sending it to TTS
-			-- Strip any trailing numbers if they're more than 3 digits
-			-- If there is a hyphen, space or underscore in the name (after the 3rd character), remove everything after it
-			-- If what we have left is less than 3 characters, use the whole name
-			-- Code:
-			local name = raw_name:gsub("(%d%d%d+)$", "") --:gsub("[- _].*$", "")
-			-- -- Remove any special characters at the end or beginning of the name
-			-- name = name:gsub("^[^%w]+", ""):gsub("[^%w]+$", "")
-			-- if #name < 3 then
-			-- 	name = raw_name
-			-- end
-			-- make the name all uppercase
-			-- name = name:upper()
-
-			if #name > 20 then
-				name = "YOU!!"
-			end
-			local voice = "echo"
-			-- Check if the name file already exists:
-			local path = "/"..THEME:GetCurrentThemeDirectory().."Sounds/Generated/"..voice.."/"..name .. ".mp3"
-			if not FILEMAN:DoesFileExist(path) and scrollers[event.PlayerNumber]:get_info_at_focus_pos().index > 0 then
-				--SM("File does not exist, generating")
-				-- If the file doesn't exist, generate it
-				if activeGenerations <= 2 then
-					activeGenerations = activeGenerations + 1
-					local uuid = CRYPTMAN:GenerateRandomUUID()
-					NETWORK:HttpRequest{
-					url = "https://api.openai.com/v1/audio/speech",
-					method = "POST",
-					downloadFile=name .. ".mp3",
-					headers = {
-						["Authorization"] = "Bearer "..apiKey,
-						["Content-Type"] = "application/json",
-					},
-					body = '{"model": "tts-1", "input": "...'..name..'!!!!!!!", "voice": "'..voice..'"}',
-					connectTimeout = 60,
-					transferTimeout = 1800,
-					onProgress = function(currentBytes, totalBytes)
-						--SM("Downloaded " .. currentBytes .. " of " .. totalBytes .. " bytes")
-					end,
-					onResponse = function(response)
-						--SM(response, 10)
-
-						if response.error ~= nil then
-							--SM("Error: " .. response.error)
-							return
-						end
-						if response.statusCode == 200 then
-							if response.headers["Content-Type"] == "audio/mpeg" then
-								--SM("Downloaded " .. response.body:len() .. " bytes")
-								FILEMAN:Copy("/Downloads/"..name .. ".mp3", path)
-								SOUND:PlayOnce(path)
-								activeGenerations = activeGenerations - 1
-							else
-								SM("Attempted to download from which is not audio!")
-							end
-						else
-						end
-					end,
-					}
-				end
-			else
-				SOUND:PlayOnce(path)
-			end
-		end
+		playProfileNameTTS(event.PlayerNumber)
 
 		-- we only bother checking scrollers to see if both players are
 		-- trying to choose the same profile if there are scrollers because
@@ -198,10 +204,23 @@ Handle.Start = function(event)
 			MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
 			return
 		end
+		-- If the profile is locked, reject the choice and play the "Common invalid" sound
+		-- otherswise, lock the profile to prevent other machines from using it.
+		if scrollers[event.PlayerNumber]:get_info_at_focus_pos().index > 0 then
+			local profile = profile_data[scrollers[event.PlayerNumber]:get_info_at_focus_pos().index+index_padding]
+			if isProfileLocked(profile) then
+				MESSAGEMAN:Broadcast("InvalidChoice", {PlayerNumber=event.PlayerNumber})
+				SM("Profile is in use on another machine!")
+				return
+			else
+				lockProfile(profile)
+			end
+		end
+
 		MESSAGEMAN:Broadcast("Cursor", {PlayerNumber=event.PlayerNumber})
 		readyPlayers[ToEnumShortString(event.PlayerNumber)] = true
 		MESSAGEMAN:Broadcast("SelectedProfile", {PlayerNumber=event.PlayerNumber})
-
+		
 		if readyPlayers["P1"] and readyPlayers["P2"] then
 			-- Set finished to true so that we don't process any more input
 			finished = true	
@@ -284,7 +303,8 @@ Handle.Back = function(event)
 			readyPlayers[ToEnumShortString(event.PlayerNumber)] = false
 			MESSAGEMAN:Broadcast("BackButton", {PlayerNumber=event.PlayerNumber})
 			MESSAGEMAN:Broadcast("UnselectedProfile", {PlayerNumber=event.PlayerNumber})
-			return
+			-- Now we need to unlock this profile so it's available for other machines to use
+			unlockProfile(profile_data[scrollers[event.PlayerNumber]:get_info_at_focus_pos().index+index_padding])
 		end
 		
 		-- Otherwise they are unjoining.
