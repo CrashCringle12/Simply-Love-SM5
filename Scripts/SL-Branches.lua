@@ -339,7 +339,6 @@ Branch.AfterProfileSaveSummary = function()
 end
 
 Branch.AfterScreenAds = function()
-	SM("ScreenSelectMusic")
 	local randomNum = math.random(0, 28)
 	if (AprilFools() and randomNum % 3 == 0) then
 		return "ScreenSponsors2"
