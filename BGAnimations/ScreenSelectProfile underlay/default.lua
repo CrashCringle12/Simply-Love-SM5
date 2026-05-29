@@ -273,6 +273,13 @@ local t = Def.ActorFrame {
 
 				-- local profile
 				elseif index > 0 then
+					-- Ensure we've unlocked the profile that we just switched away from so that it shows up in the profile scroller again
+					local old_index = SCREENMAN:GetTopScreen():GetProfileIndex(player)
+					if old_index and old_index > 0 then
+						profile_data[old_index].inUse = false
+						unlockProfile(profile_data[old_index])
+					end
+					
 					SCREENMAN:GetTopScreen():SetProfileIndex(player, index)
 
 				-- 0 here is my own stupid hardcoded number, defined over in PlayerFrame.lua for use with the "[Guest]" choice
