@@ -13,7 +13,7 @@ local horizontal_padding = 30
 local height = 30
 local width  = GetNotefieldWidth()
 
--- support double, double8, and couples by constraining the UpperNPSGraph to have the same width as in single
+-- support double, double8, and routine by constraining the UpperNPSGraph to have the same width as in single
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 if styletype == "OnePlayerTwoSides" or styletype == "TwoPlayersSharedSides" then
 	width = width/2
@@ -34,7 +34,7 @@ local xpos = {
 }
 
 
--- center the UpperNPSGraph in double, double8, couples, dance solo, when Center1Player is enabled, etc.
+-- center the UpperNPSGraph in double, double8, routine, dance solo, when Center1Player is enabled, etc.
 if GetNotefieldX(player) == _screen.cx then
 	xpos[PLAYER_1] = _screen.cx - width/2
 	xpos[PLAYER_2] = _screen.cx - width/2

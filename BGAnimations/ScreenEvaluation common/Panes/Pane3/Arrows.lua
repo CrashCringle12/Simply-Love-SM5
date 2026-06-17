@@ -7,7 +7,7 @@ local noteskin = GAMESTATE:GetPlayerState(player):GetCurrentPlayerOptions():Note
 -- NOTESKIN:LoadActorForNoteSkin() expects the noteskin name to be all lowercase(?)
 -- so transform the string to be lowercase
 noteskin = noteskin:lower()
-local coupleStatus = false
+local routineStatus = false
 
 -- -----------------------------------------------------------------------
 local game  = GAMESTATE:GetCurrentGame():GetName()
@@ -23,7 +23,7 @@ local cols = {}
 
 -- loop num_columns number of time to fill the cols table with
 -- info about each column for this game
--- each game (dance, pump, techno, etc.) and each style (single, double, couples, etc.)
+-- each game (dance, pump, techno, etc.) and each style (single, double, routine, etc.)
 -- within each game will have its own unique columns
 for i=1,num_columns do
 	table.insert(cols, style:GetColumnInfo(player, i))
@@ -32,10 +32,10 @@ end
 local box_width  = 230
 local box_height = 146
 
--- more space for double and couples
+-- more space for double and routine
 local styletype = ToEnumShortString(style:GetStyleType())
 
-if (styletype == "OnePlayerTwoSides" or (styletype == "TwoPlayersSharedSides" and coupleStatus) ) then
+if (styletype == "OnePlayerTwoSides" or (styletype == "TwoPlayersSharedSides" and routineStatus) ) then
 	box_width = 520
 end
 
@@ -45,20 +45,20 @@ local row_height = box_height/#rows
 -- -----------------------------------------------------------------------
 
 local af = Def.ActorFrame{}
-af.InitCommand=function(self) self:xy((styletype == "TwoPlayersSharedSides" and not coupleStatus) and -102 or -104, _screen.cy-40) end
+af.InitCommand=function(self) self:xy((styletype == "TwoPlayersSharedSides" and not routineStatus) and -102 or -104, _screen.cy-40) end
 
 
 for i, column in ipairs( cols ) do
 
 	local _x = col_width * i
 
-	-- Calculating column positioning like this in techno game, dance solo, and pump couples
+	-- Calculating column positioning like this in techno game, dance solo, and pump routine
 	-- results in each column being ~10px too far left; this does not happen in other games
 	-- that I've tested.  There's probably a cleaner fix involving scaling column.XOffset to
 	-- fit within the bounds of box_width but this is easer for now.  -quietly
 	if game == "techno"
 	or (game == "dance" and style_name == "solo")
-	or (style_name == "couple")
+	or (style_name == "routine")
 	then
 		_x = _x + 10
 	end

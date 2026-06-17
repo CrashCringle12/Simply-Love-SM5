@@ -64,7 +64,7 @@ end
 
 -- then handle hands/ex, holds, mines, rolls
 for index, RCType in ipairs(RadarCategories.Types) do
-	-- Replace hands with the Couples Score if we're in couples mode
+	-- Replace hands with the Routine Score if we're in routine mode
 	if index == 1 and (styletype == "TwoPlayersSharedSides") then
 		local PercentDP = pss:GetPercentDancePoints()
 		percent = FormatPercentScore(PercentDP)

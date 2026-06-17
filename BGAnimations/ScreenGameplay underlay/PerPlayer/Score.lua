@@ -33,7 +33,7 @@ local pos = {
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 
 if styletype == "TwoPlayersSharedSides" then
-	pss = STATSMAN:GetCurStageStats():GetSharedPlayerStageStats()
+	pss = STATSMAN:GetCurStageStats():GetRoutineStageStats()
 end
 
 local StepsOrTrail = (GAMESTATE:IsCourseMode() and GAMESTATE:GetCurrentTrail(player)) or GAMESTATE:GetCurrentSteps(player)

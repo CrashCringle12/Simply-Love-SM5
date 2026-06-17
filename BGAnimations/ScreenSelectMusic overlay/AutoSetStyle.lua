@@ -1,5 +1,5 @@
 -- if Metric.ini's [Common] has AutoSetStyle=true
--- this will allow stepcharts from disparate styles (single, double, couples, halfdouble, etc.)
+-- this will allow stepcharts from disparate styles (single, double, routine, halfdouble, etc.)
 -- to appear side-by-side in the same MusicWheel.  It's pretty cool.
 --
 -- But like most things in StepMania, the feature has some UX quirks

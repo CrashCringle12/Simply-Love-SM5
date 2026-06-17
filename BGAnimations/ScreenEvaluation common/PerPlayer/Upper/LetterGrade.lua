@@ -3,9 +3,9 @@ local player = ...
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
 local playerStats = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
-local coupleStatus = SL.Global.CoupleStatus
+local routineStatus = SL.Global.RoutineStatus
 if (styletype == "TwoPlayersSharedSides") then
-	playerStats = STATSMAN:GetCurStageStats():GetSharedPlayerStageStats()
+	playerStats = STATSMAN:GetCurStageStats():GetRoutineStageStats()
 end
 local grade = playerStats:GetGrade()
 

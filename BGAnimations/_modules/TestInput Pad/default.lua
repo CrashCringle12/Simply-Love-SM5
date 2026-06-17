@@ -65,7 +65,7 @@ for panel,values in pairs(Highlights) do
 			local style = GAMESTATE:GetCurrentStyle()
 			local styletype = style and style:GetStyleType() or nil
 
-			-- if double or couples
+			-- if double or routine
 			if styletype == "StyleType_OnePlayerTwoSides" or styletype == "StyleType_TwoPlayersSharedSides" then
 
 				-- in double, we can't rely on checking the input event's "PlayerNumber" key (only one human player is joined)

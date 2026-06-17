@@ -86,7 +86,7 @@ end
 
 -- labels: hands/ex, holds, mines, rolls
 for index, label in ipairs(RadarCategories) do
-	-- Replace hands with the Couples Score if we're in couples mode
+	-- Replace hands with the Routine Score if we're in routine mode
 	if index == 1 and (styletype == "TwoPlayersSharedSides") then
 		t[#t+1] = LoadFont("Wendy/_wendy small")..{
 			Text=controller == PLAYER_1 and "P1" or "P2",
