@@ -31,7 +31,7 @@ return Def.ActorFrame{
 			self:x(-3)
 		end,
 		SetCommand=function(self, params)
-			local is_parent = params and params.IsSeries
+			local is_parent = params and params.IsParentSection
 			self:GetChild("FolderBack"):visible(is_parent)
 			self:GetChild("FolderFront"):visible(is_parent)
 			self:GetChild("FolderMid"):visible(true):diffuse(params.Color)
@@ -50,7 +50,7 @@ return Def.ActorFrame{
 					self:diffuse(color("#5c6972"))
 			end,
 			SetCommand=function(self, params)
-				local is_parent = params and params.IsSeries
+				local is_parent = params and params.IsParentSection
 				self:diffuse(color("#5c6972"))
 			end
 		},
@@ -63,7 +63,7 @@ return Def.ActorFrame{
 				self:diffuse(color("#74818b"))
 			end,
 			SetCommand=function(self, params)
-				local is_parent = params and params.IsSeries
+				local is_parent = params and params.IsParentSection
 				if not is_parent then
 					self:diffuse(params.Color)
 				else
