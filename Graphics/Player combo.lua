@@ -105,7 +105,6 @@ local combo_bmt = LoadFont("_Combo Fonts/" .. combo_font .."/" .. combo_font)..{
 		elseif params.Misses then
 			self:stopeffect():diffuse( Color.Red ) -- Miss Combo; no effect, always just #ff0000
 		end
-
 	end
 }
 

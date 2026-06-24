@@ -66,7 +66,7 @@ local t = Def.ActorFrame{
 			choices[#choices+1] = choice
 			choice_actors[#choice_actors+1] = TopScreen:GetChild("IconChoice"..choice)
 		end
-		SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
+    	SCREENMAN:GetTopScreen():AddInputCallback(InputHandler)
 
 		self:queuecommand("Update")
 	end,

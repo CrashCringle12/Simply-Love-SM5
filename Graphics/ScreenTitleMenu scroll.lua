@@ -1,5 +1,6 @@
 local index = Var("GameCommand"):GetIndex()
 local has_focus = false
+
 local t = Def.ActorFrame{}
 
 -- this renders the text of a single choice in the scroller
@@ -26,7 +27,7 @@ t[#t+1] = LoadFont("Common Bold")..{
 	UpdateColorCommand=function(self)
 		if has_focus then
 			local textColor = PlayerColor(PLAYER_2)
-			if ThemePrefs.Get("VisualStyle") == "SRPG9" then
+			if ThemePrefs.Get("VisualStyle") == "SRPG10" then
 				textColor = GetCurrentColor(true)
 			end
 			self:diffuse(textColor)
@@ -35,8 +36,8 @@ t[#t+1] = LoadFont("Common Bold")..{
 			if ThemePrefs.Get("RainbowMode") then
 				textColor = Color.White
 			end
-			if ThemePrefs.Get("VisualStyle") == "SRPG9" then
-				textColor = color(SL.SRPG9.TextColor)
+			if ThemePrefs.Get("VisualStyle") == "SRPG10" then
+				textColor = color(SL.SRPG10.TextColor)
 			end
 			self:diffuse(textColor)
 		end

@@ -63,6 +63,9 @@ local GetMachineTag = function(gsEntry)
 end
 
 local GetScoresRequestProcessor = function(res, params)
+	local screen = SCREENMAN:GetTopScreen()
+	if not screen or screen:GetName() ~= "ScreenSelectMusic" then return end
+
 	local master = params.master
 	if master == nil then return end
 	-- If we're not hovering over a song when we get the request, then we don't
@@ -344,23 +347,7 @@ local af = Def.ActorFrame{ Name="PaneDisplayMaster" }
 
 af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 	Name="GetScoresRequester",
-	OnCommand=function(self)
-		-- Create variables for both players, even if they're not currently active.
-		self.IsParsing = {false, false}
-	end,
-	-- Broadcasted from ./PerPlayer/DensityGraph.lua
-	P1ChartParsingMessageCommand=function(self)	self.IsParsing[1] = true end,
-	P2ChartParsingMessageCommand=function(self)	self.IsParsing[2] = true end,
-	P1ChartParsedMessageCommand=function(self)
-		self.IsParsing[1] = false
-
-		self:queuecommand("ChartParsed")
-	end,
-	P2ChartParsedMessageCommand=function(self)
-		self.IsParsing[2] = false
-		self:queuecommand("ChartParsed")
-	end,
-	ChartParsedCommand=function(self)
+	ChartParsedMessageCommand=function(self)
 		local master = self:GetParent()
 
 		if not IsServiceAllowed(SL.GrooveStats.GetScores) then
@@ -375,9 +362,6 @@ af[#af+1] = RequestResponseActor(17, IsUsingWideScreen() and 50 or 42)..{
 			end
 			return
 		end
-
-		-- Make sure we're still not parsing either chart.
-		if self.IsParsing[1] or self.IsParsing[2] then return end
 
 		-- This makes sure that the Hash in the ChartInfo cache exists.
 		local sendRequest = false

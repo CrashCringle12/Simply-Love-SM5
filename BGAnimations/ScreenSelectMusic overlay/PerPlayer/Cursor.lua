@@ -19,7 +19,6 @@ return Def.Sprite{
 	InitCommand=function(self)
 		self:visible( GAMESTATE:IsHumanPlayer(player) and not auto_style )
 		self:halign( p ):zoom(0.575)
-
 		-- FIXME: SM5.1-beta's EffectClock enum includes constants for
 		--   CLOCK_BGM_BEAT_PLAYER1 and CLOCK_BGM_BEAT_PLAYER2 but
 		--   but effectclock(), the only method currently available via

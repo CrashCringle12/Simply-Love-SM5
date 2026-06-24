@@ -3,14 +3,14 @@
 -- this is defined in:  ./Scripts/SL_Init.lua
 InitializeSimplyLove()
 
-if ThemePrefs.Get("VisualStyle") == "SRPG9" then
-	SL.SRPG9:MaybeRandomizeColor()
+if ThemePrefs.Get("VisualStyle") == "SRPG10" then
+	SL.SRPG10:MaybeRandomizeColor()
 end
-
 
 -- -----------------------------------------------------------------------
 -- preliminary Lua setup is done
 -- now define actors to be passed back to the SM engine
+
 local af = Def.ActorFrame{}
 af.InitCommand=function(self) self:Center() end
 

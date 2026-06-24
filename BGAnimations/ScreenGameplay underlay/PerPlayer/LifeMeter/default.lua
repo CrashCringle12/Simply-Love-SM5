@@ -5,13 +5,13 @@ local lifemeter_actor
 if GAMESTATE:GetPlayMode() == 'PlayMode_Oni' then
 	lifemeter_actor = LoadActor("Battery.lua", player)
 else
-	-- in ITG and FA+, we have the choice a "Standard" LifeMeter (at the top of the screen)
-	-- a "Surround" LifeMeter, which occupies the space behind the arrows,
-	-- or a "Vertical" LifeMeter, which mimics the sizing and positioning used in ITG2.
-	if SL.Global.GameMode == "ITG" or SL.Global.GameMode == "FA+" then
-		local lifemeter_type = SL[ToEnumShortString(player)].ActiveModifiers.LifeMeterType or CustomOptionRow("LifeMeterType").Choices[1]
-		lifemeter_actor = LoadActor(lifemeter_type .. ".lua", player)
-	end
+-- in ITG, we have the choice a "Standard" LifeMeter (at the top of the screen)
+-- a "Surround" LifeMeter, which occupies the space behind the arrows,
+-- or a "Vertical" LifeMeter, which mimics the sizing and positioning used in ITG2.
+   if SL.Global.GameMode == "ITG" then
+	local lifemeter_type = SL[ToEnumShortString(player)].ActiveModifiers.LifeMeterType or CustomOptionRow("LifeMeterType").Choices[1]
+	lifemeter_actor = LoadActor(lifemeter_type .. ".lua", player)
+   end
 end
 
 -- Casual doesn't have a LifeMeter, so in Casual GameMode,

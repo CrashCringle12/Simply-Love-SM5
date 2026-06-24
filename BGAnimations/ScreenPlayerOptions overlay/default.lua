@@ -16,6 +16,41 @@ local speedmod_def = {
 	R = { upper=3000, increment=10}
 }
 
+-- In Routine (couples) mode, default players to the red and blue couples skins
+-- if they aren't already on a couples noteskin.
+if IsRoutine() then
+	local couples_noteskin
+	for skin in ivalues(NOTESKIN:GetNoteSkinNames(false)) do
+		if skin:lower() == "couples" then
+			couples_noteskin = skin
+			break
+		end
+	end
+
+	if couples_noteskin then
+		local already_on_couples = true
+		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+			local current = SL[ToEnumShortString(player)].ActiveModifiers.NoteSkin or ""
+			if current:lower() ~= couples_noteskin:lower() then
+				already_on_couples = false
+				break
+			end
+		end
+
+		if not already_on_couples then
+			local variants = NOTESKIN:GetVariantNamesForNoteSkin(couples_noteskin) or {}
+			local defaults = { P1 = "couples__blue", P2 = "couples__red" }
+			for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+				local pn = ToEnumShortString(player)
+				SL[pn].ActiveModifiers.NoteSkin = couples_noteskin
+				if defaults[pn] then
+					SL[pn].ActiveModifiers.NoteSkinVariant = defaults[pn]
+				end
+			end
+		end
+	end
+end
+
 local variants_def = {}
 for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 	local pn = ToEnumShortString(player)
@@ -24,7 +59,9 @@ for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 		if NOTESKIN:HasVariants(noteskin_name) then
 			variants_def[pn] = NOTESKIN:GetVariantNamesForNoteSkin(noteskin_name)
 			-- Put the current NoteSkin at the front of the list of variants so that it's the default selection when we refresh the OptionRow
-			table.insert(variants_def[pn], 1, noteskin_name)
+			if not IsRoutine() then
+				table.insert(variants_def[pn], 1, noteskin_name)
+			end
 		else
 			variants_def[pn] = {noteskin_name}
 		end
@@ -32,8 +69,6 @@ for player in ivalues( GAMESTATE:GetHumanPlayers() ) do
 end
 
 local song = GAMESTATE:GetCurrentSong()
-
-
 
 -- Use this function to find an OptionRow by name so that you can manipulate its text as needed.
 --     first argument is a screen object provided by SCREENMAN:GetTopScreen()
@@ -249,7 +284,6 @@ local t = Def.ActorFrame{
 			if variant_bmt then
 				local current_variant = SL[pn].ActiveModifiers.NoteSkinVariant or ""
 				local screen = SCREENMAN:GetTopScreen()
-
 				MESSAGEMAN:Broadcast("RefreshActorProxy", {Player=player, Name="NoteSkinVariant", Value=current_variant})
 				screen:RedrawOptions() 
 			end
@@ -342,13 +376,13 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			elseif  SL[pn].ActiveModifiers.SpeedModType == "R" then
 				text = tostring(SL[pn].ActiveModifiers.SpeedMod) .. "R"
 			end
+
 			if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
 				local otherPn = pn == "P1" and "P2" or "P1"
 				SpeedModBMTs[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())]:settext( text )
 			else
 				SpeedModBMTs[pn]:settext( text )
 			end
-
 			self:GetParent():queuecommand("Refresh")
 		end,
 		["Set" .. pn .. "VariantCommand"]=function(self)
