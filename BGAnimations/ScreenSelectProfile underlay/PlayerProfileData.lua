@@ -119,30 +119,6 @@ local RetrieveProfileData = function(profile, dir)
 	return false
 end
 
-local RetrieveGrooveStatsData = function(dir)
-	local path = dir .. "GrooveStats.ini"
-	if not FILEMAN:DoesFileExist(path) then
-		return {ApiKey = "", Username = "", IsPadPlayer = 0}
-	end
-
-	local contents = IniFile.ReadFile(path)
-	if type(contents) ~= "table" or type(contents.GrooveStats) ~= "table" then
-		return {ApiKey = "", Username = "", IsPadPlayer = 0}
-	end
-
-	local data = contents.GrooveStats
-	local apiKey = type(data.ApiKey) == "string" and data.ApiKey or ""
-	if #apiKey ~= 64 then
-		apiKey = ""
-	end
-
-	return {
-		ApiKey = apiKey,
-		Username = type(data.Username) == "string" and data.Username or "",
-		IsPadPlayer = (data.IsPadPlayer == 1 or data.IsPadPlayer == "1") and 1 or 0,
-	}
-end
-
 local RetrieveProfileAchievements = function(profile, dir)
 	local BuildITLAchievementsFromEventData = function(data)
 		if type(data) ~= "table" or type(data.data) ~= "table" then return {} end
@@ -351,7 +327,6 @@ for i=1, PROFILEMAN:GetNumLocalProfiles() do
 	local id = PROFILEMAN:GetLocalProfileIDFromIndex(i-1)
 	local dir = PROFILEMAN:LocalProfileIDToDir(id)
 	local userprefs = RetrieveProfileData(profile, dir)
-	local groovestats = RetrieveGrooveStatsData(dir)
 	local mods, noteskin, judgment, speedMod, speedModType, lifeMeterType = RecentMods(userprefs)
 	local sweatLevel, ribbon = SweatLevelRibbon(profile)
 	local data = {
@@ -372,7 +347,6 @@ for i=1, PROFILEMAN:GetNumLocalProfiles() do
 		noteskin = noteskin,
 		judgment = judgment,
 		guid = profile:GetGUID(),
-		apikey = groovestats and groovestats.ApiKey or "",
 		achievementIndex = 1,
 		achievements = RetrieveProfileAchievements(profile, dir),
 		activePack = "Default",

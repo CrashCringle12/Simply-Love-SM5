@@ -3,46 +3,6 @@ local qrModulePath = THEME:GetPathB("", "_modules/QR Code/SL-QRCode.lua")
 local uuid = CRYPTMAN:GenerateRandomUUID():gsub("-", ""):upper()
 local ws = nil
 
-local ResolvePlayerForCardTap = function(params)
-  local pnFromParams = params and (params.PlayerNumber or params.Player)
-  if pnFromParams and GAMESTATE:IsHumanPlayer(pnFromParams) then
-    return pnFromParams
-  end
-
-  for _, player in ipairs(GAMESTATE:GetHumanPlayers()) do
-    local pn = ToEnumShortString(player)
-    if SL[pn].ApiKey == "" then
-      return player
-    end
-  end
-
-  local humans = GAMESTATE:GetHumanPlayers()
-  if humans and humans[1] then
-    return humans[1]
-  end
-
-  return nil
-end
-
-local ApplyGrooveStatsCardLogin = function(player, apiKey, username, playerOptions, isPadPlayer)
-  if not player then return end
-  if type(apiKey) ~= "string" or #apiKey ~= 64 then return end
-
-  local pn = ToEnumShortString(player)
-
-  if playerOptions then
-    SetPlayerOptionsJsonFromGroovestats(player, playerOptions)
-  end
-
-  SL[pn].ApiKey = apiKey
-  SL[pn].GrooveStatsUsername = type(username) == "string" and username or ""
-  SL[pn].IsPadPlayer = isPadPlayer == true
-
-  local displayName = (type(username) == "string" and username ~= "") and username or "Card Login"
-  MESSAGEMAN:Broadcast("SetCreditsText", {pn=pn, username=displayName})
-  MESSAGEMAN:Broadcast("HideQr", {pn=pn, username=displayName})
-end
-
 local ResetGrooveStatsSettings = function(pn)
   SL[pn].ApiKey = ""
   SL[pn].GrooveStatsUsername = ""
@@ -118,15 +78,6 @@ local af = Def.ActorFrame{
   end,
   OffCommand=function(self)
     ws:Close()
-  end,
-  NFCCardTappedMessageCommand=function(self, params)
-    local player = ResolvePlayerForCardTap(params)
-    if not player then return end
-
-    local cardData = ReadGrooveStatsCardData()
-    if type(cardData) ~= "table" then return end
-
-    ApplyGrooveStatsCardLogin(player, cardData.ApiKey, cardData.Username, cardData.playerOptions, cardData.IsPadPlayer)
   end,
 
   LoadFont("Common Normal")..{

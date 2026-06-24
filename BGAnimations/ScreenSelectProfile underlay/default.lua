@@ -3,7 +3,6 @@
 -- If PreferredStyle is either "single" or "double", we don't want to load
 -- SelectProfileFrames for both PLAYER_1 and PLAYER_2, but only the MasterPlayerNumber
 local PreferredStyle = ThemePrefs.Get("PreferredStyle")
-local DEBUG_NFC_GROOVESTATS = true -- i'll remove this debugging stuffs later but keeping for now so it's easy
 
 -- retrieve the MasterPlayerNumber now, at initialization, so that if AutoStyle is set
 -- to "single" or "double" and that singular player unjoins, we still have a handle on
@@ -23,15 +22,7 @@ local readyPlayers = {
 	["P1"] = false,
 	["P2"] = false,
 }
-
-local pendingNFCTapUID = nil
-local handledNFCTapUIDs = {}
 local selectionFinished = false
-
-local function DebugMessage(message)
-	if not DEBUG_NFC_GROOVESTATS then return end
-	Trace("[SelectProfile NFC] " .. tostring(message))
-end
 
 -- ----------------------------------------------------
 
@@ -73,123 +64,6 @@ local HandleStateChange = function(self, Player)
 		seltext:visible(false)
 		usbsprite:visible(false)
 	end
-end
-
-local AllJoinedPlayersReady = function()
-	for _, player in ipairs(GAMESTATE:GetHumanPlayers()) do
-		if not readyPlayers[ToEnumShortString(player)] then
-			return false
-		end
-	end
-
-	return #GAMESTATE:GetHumanPlayers() > 0
-end
-
-local GetFirstJoinedUnreadyPlayer = function()
-	for _, player in ipairs(GAMESTATE:GetHumanPlayers()) do
-		if not readyPlayers[ToEnumShortString(player)] then
-			return player
-		end
-	end
-
-	return nil
-end
-
-local FindProfileDataByApiKey = function(apiKey)
-	if type(apiKey) ~= "string" or #apiKey ~= 64 then return nil end
-
-	for _, profile in ipairs(profile_data) do
-		if type(profile) == "table" and type(profile.apikey) == "string" and profile.apikey == apiKey then
-			return profile
-		end
-	end
-
-	return nil
-end
-
-local SetScrollerToProfile = function(self, player, profile)
-	if not player or type(profile) ~= "table" or type(profile.index) ~= "number" then return false end
-
-	local scroller = scrollers[player]
-	if not scroller then return false end
-
-	local info = scroller:get_info_at_focus_pos()
-	local currentIndex = type(info) == "table" and info.index or 0
-	local delta = profile.index - currentIndex
-
-	if delta ~= 0 then
-		scroller:scroll_by_amount(delta)
-	end
-
-	local frame = self:GetChild(ToEnumShortString(player) .. 'Frame')
-	if frame then
-		local selectedText = frame:GetChild("SelectedProfileText")
-		if selectedText then
-			selectedText:settext(profile.displayname or "")
-		end
-		frame:playcommand("Set", profile)
-	end
-
-	return true
-end
-
-local HandleProfileSelected = function(self, params)
-	if type(params) ~= "table" then return end
-
-	local player = params.Player or params.PlayerNumber
-	if not player then return end
-
-	readyPlayers[ToEnumShortString(player)] = true
-	HandleStateChange(self, player)
-
-	if not selectionFinished and AllJoinedPlayersReady() then
-		selectionFinished = true
-		MESSAGEMAN:Broadcast("StartButton")
-		SCREENMAN:GetTopScreen():queuecommand("Off"):sleep(0.4)
-	end
-end
-
-local HandleNFCTapFallback = function(self)
-	local uid = pendingNFCTapUID
-	pendingNFCTapUID = nil
-
-	if type(uid) ~= "string" or uid == "" then
-		DebugMessage("Ignored tap with empty UID")
-		return
-	end
-	if handledNFCTapUIDs[uid] then
-		DebugMessage("Ignored already handled UID: " .. uid)
-		return
-	end
-
-	DebugMessage("Processing tap UID: " .. uid)
-
-	local apiKey = ReadGrooveStatsCardApiKey()
-	local profile = FindProfileDataByApiKey(apiKey)
-	if not profile then
-		DebugMessage("No matching local profile by card ApiKey (len=" .. tostring(#apiKey) .. ")")
-		return
-	end
-
-	local player = GetFirstJoinedUnreadyPlayer()
-	if not player then
-		DebugMessage("No joined unready player available for NFC fallback")
-		return
-	end
-	DebugMessage("Api Key: " .. apiKey .. ", matched profile index: " .. tostring(profile.index) .. ", assigning to " .. ToEnumShortString(player))
-	if not SetScrollerToProfile(self, player, profile) then
-		DebugMessage("Failed to sync scroller to matched profile for " .. ToEnumShortString(player))
-		return
-	end
-	SCREENMAN:GetTopScreen():SetProfileIndex(player, profile.index)
-	DebugMessage("Fallback selected profile index " .. tostring(profile.index) .. " for " .. ToEnumShortString(player))
-	MESSAGEMAN:Broadcast("NFCProfileSelected", {
-		Player = player,
-		PlayerNumber = player,
-		ProfileIndex = profile.index,
-		UID = uid,
-		ApiKey = apiKey,
-	})
 end
 
 -- ----------------------------------------------------
@@ -355,24 +229,8 @@ local t = Def.ActorFrame {
 	PlayerJoinedMessageCommand=function(self, params) self:playcommand('Update', {player=params.Player}) end,
 	PlayerUnjoinedMessageCommand=function(self, params) self:playcommand('Update', {player=params.Player}) end,
 	SelectedProfileMessageCommand=function(self, params)
-		HandleProfileSelected(self, params)
-	end,
-	NFCProfileSelectedMessageCommand=function(self, params)
-		if params and type(params.UID) == "string" and params.UID ~= "" then
-			handledNFCTapUIDs[params.UID] = true
-			DebugMessage("Marked UID handled: " .. params.UID)
-		end
-		HandleProfileSelected(self, params)
-	end,
-	NFCCardTappedMessageCommand=function(self, params)
-		if params then
-			pendingNFCTapUID = params.UID or params.CardUID or params.uid or params.cardUID
-		end
-		DebugMessage("Received NFCCardTapped message")
-		self:queuecommand("ProcessNFCTap")
-	end,
-	ProcessNFCTapCommand=function(self)
-		HandleNFCTapFallback(self)
+		readyPlayers[ToEnumShortString(params.PlayerNumber)] = true
+		HandleStateChange(self, params.PlayerNumber)
 	end,
 	UnselectedProfileMessageCommand=function(self, params)
 		readyPlayers[ToEnumShortString(params.PlayerNumber)] = false
