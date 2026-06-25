@@ -60,6 +60,11 @@ SL_CustomPrefs.Get = function()
 			Default = "ITG",
 			Choices = { "ITG", "IIDX" }
 		},
+		ParentSectionStyle =
+		{
+			Default = "ITG",
+			Choices = { "ITG", "IIDX" }
+		},
 		AllowDanceSolo =
 		{
 			Default = false,
