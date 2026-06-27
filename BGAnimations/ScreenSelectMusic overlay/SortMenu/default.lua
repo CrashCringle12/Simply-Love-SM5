@@ -434,7 +434,7 @@ local t = Def.ActorFrame {
 					{ {"TakeABreather", "LoadNewSongs"}, not GAMESTATE:IsCourseMode() },
 					{ {"NeedMoreRam", "ViewDownloads"}, DownloadsExist },
 					{ {"SetSummaryText", "SetSummary"}, SL.Global.Stages.PlayedThisGame > 0 },
-					{ {"BottomText", "OnlineLobbies"}, ThemePrefs.Get("EnableOnlineLobbies") and GAMESTATE:IsEventMode() and not GAMESTATE:IsCourseMode() },
+					{ {"BottomText", "OnlineLobbies"}, ThemePrefs.Get("EnableOnlineLobbies") and not GAMESTATE:IsCourseMode() },
 				}
 			},
 			{
