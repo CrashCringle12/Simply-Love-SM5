@@ -133,13 +133,22 @@ local GetJudgmentCounts = function(player)
   return judgmentCounts
 end
 
-local GetMachineState = function()
+local GetMachineState = function(params)
   -- NOTE(teejusb): Keep in mind that SCREENMAN:GetTopScreen() might return nil since we might be
   -- transitioning screens when we receive any messages from the server.
+
+  if params == nil then
+    params = {}
+  end
 
   local screen = SCREENMAN:GetTopScreen()
   -- Use a "NoScreen" fallback in case we're transitioning screens.
   local screenName = screen and screen:GetName() or "NoScreen"
+
+  -- If the caller provided a screenName, use that instead of the current screen.
+  if params.screenName ~= nil then
+    screenName = params.screenName
+  end
 
   local players = {}
   for player in ivalues(GAMESTATE:GetEnabledPlayers()) do
@@ -529,9 +538,9 @@ CreateOnlineHandler = function()
           }
         end
       end,
-      UpdateOnlineStateMessageCommand=function(self)
+      UpdateOnlineStateMessageCommand=function(self, params)
         if self.connected and self.socket ~= nil and self.inLobby then
-          local request = CreateRequest("updateMachine", GetMachineState())
+          local request = CreateRequest("updateMachine", GetMachineState(params))
           self.socket:Send(request)
         end
       end,

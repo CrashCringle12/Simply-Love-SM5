@@ -330,9 +330,11 @@ local function GetChangeableStyles()
 			elseif style == "couple" then
 				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
 				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
+				table.insert(available_styles, {{"ChangeStyle", "All"}})
 			elseif style == "routine" then
 				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})
+				table.insert(available_styles, {{"ChangeStyle", "All"}})
 			elseif style == "versus" then
 				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
 				table.insert(available_styles, {{"ChangeStyle", "Couple"}})

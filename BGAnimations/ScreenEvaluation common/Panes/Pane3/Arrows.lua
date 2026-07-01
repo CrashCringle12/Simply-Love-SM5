@@ -79,13 +79,6 @@ for i, column in ipairs( cols ) do
 		if SL[pn].ActiveModifiers.TimingWindows[j] or j==#rows or (mods.ShowFaPlusWindow and mods.ShowFaPlusPane and SL[pn].ActiveModifiers.TimingWindows[j-1]) then
 			-- add a BitmapText actor to be the number for this column
 			local judgementText = 0
-			-- if (styletype == "TwoPlayersSharedSides") then
-			-- 	for _pn in ivalues( PlayerNumber ) do
-			-- 		judgementText = judgementText + SL[ToEnumShortString(_pn)].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i][judgment]
-			-- 	end
-			-- else 
-			-- 	 judgementText =SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i][judgment]
-			-- end
 			judgementText =SL[pn].Stages.Stats[SL.Global.Stages.PlayedThisGame + 1].column_judgments[i][judgment]
 
 			af[#af+1] = LoadFont("Common Normal")..{

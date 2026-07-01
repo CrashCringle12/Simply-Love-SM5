@@ -104,7 +104,7 @@ SL_CustomPrefs.Get = function()
 				THEME:GetString("ScreenSelectStyle", "Versus"),
 				THEME:GetString("ScreenSelectStyle", "Double")
 			},
-			Values = { "none", 'auto', "single", "versus", "double" }
+			Values = { "none", "auto", "single", "versus", "double" }
 		},
 		RandomVisualStyle = {
 			Default = false,

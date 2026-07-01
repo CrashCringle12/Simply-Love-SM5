@@ -4,7 +4,6 @@ local pn = ToEnumShortString(player)
 local stats = STATSMAN:GetCurStageStats():GetPlayerStageStats(pn)
 local pss = STATSMAN:GetCurStageStats():GetPlayerStageStats(player)
 local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
-
 local tns_string = "TapNoteScore" .. (SL.Global.GameMode=="ITG" and "" or SL.Global.GameMode)
 
 local firstToUpper = function(str)

@@ -366,18 +366,11 @@ local Overrides = {
 					for steps in ivalues( SongUtil.GetPlayableSteps(song) ) do
 						local choice
 						if steps:IsAnEdit() then
-							--choices[#choices+1] = ("%s %i"):format(steps:GetDescription(), steps:GetMeter())
 							choice = ("%s\n%s %i"):format(steps:GetStepsType():gsub("%w+_%w+_", ""):lower(), steps:GetDescription(), steps:GetMeter())
 						else
-							--choices[#choices+1] = ("%s %i"):format(THEME:GetString("Difficulty", ToEnumShortString(steps:GetDifficulty())), steps:GetMeter())
 							choice = ("%s\n%s %i"):format(steps:GetStepsType():gsub("%w+_%w+_", ""):lower(), THEME:GetString("Difficulty", ToEnumShortString(steps:GetDifficulty())), steps:GetMeter())
 						end
 						table.insert(choices, choice)
-						-- if steps:IsAnEdit() then
-						-- 	choices[#choices+1] = ("%s %i"):format(steps:GetDescription(), steps:GetMeter())
-						-- else
-						-- 	choices[#choices+1] = ("%ss %i"):format(THEME:GetString("StepsType", ToEnumShortString(steps:GetStepsType())), steps:GetMeter())
-						-- end
 					end
 				end
 			else
@@ -564,7 +557,7 @@ local Overrides = {
 		SelectType = "SelectMultiple",
 		Values = function()
 			-- GameplayExtras will be presented as a single OptionRow when WideScreen
-			local vals = { "ColumnFlashOnMiss", "SubtractiveScoring", "Pacemaker", "NPSGraphAtTop" }
+			local vals = { "SubtractiveScoring", "Pacemaker", "NPSGraphAtTop" }
 
 			-- if not WideScreen (traditional DDR cabinets running at 640x480)
 			-- remove the last two choices to be appended an additional OptionRow (GameplayExtrasB below).
