@@ -23,9 +23,7 @@ local apiKey = getAPIKey()
 -- a simple boolean flag we'll use to ignore input once profiles have been
 -- selected and the screen's OffCommand has been queued.
 --
--- aside: SM's screen cla
-
-ss does have a RemoveInputCallback() method,
+-- aside: SM's screen class does have a RemoveInputCallback() method,
 -- but it needs a reference to the original input handler funtion as
 -- a passed-in argument, and that's tricky with how I've split
 -- ScreenSelectProfile's code across multiple files.
