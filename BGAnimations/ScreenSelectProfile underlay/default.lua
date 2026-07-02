@@ -4,7 +4,7 @@
 -- SelectProfileFrames for both PLAYER_1 and PLAYER_2, but only the MasterPlayerNumber
 local PreferredStyle = ThemePrefs.Get("PreferredStyle")
 
--- retrieve the MasterPlayerNumber now, at initialization, so that if AutoStyle is set
+-- retrieve the MasterPlayerNumber now, at initialization, so that if PreferredStyle is set
 -- to "single" or "double" and that singular player unjoins, we still have a handle on
 -- which PlayerNumber they're supposed to be...
 local mpn = GAMESTATE:GetMasterPlayerNumber()
@@ -120,9 +120,9 @@ local t = Def.ActorFrame {
 	-- sleep for 0.5 seconds to give the PlayerFrames time to tween out
 	-- and queue a call to Finish() so that the engine can wrap things up
 	OffCommand=function(self)
-		-- Update the lobby state in case we're online. This won't do anything
-		-- if we're not connected to a lobby.
-		MESSAGEMAN:Broadcast("UpdateOnlineState")
+		-- Replace the screen with ScreenSelectMusic so we don't send ScreenSelectProfile as the
+		-- current screen to the lobby.
+		MESSAGEMAN:Broadcast("UpdateOnlineState", {screenName="ScreenSelectMusic"})
 		selectionFinished = true
 		self:sleep(0.5):queuecommand("Finish")
 	end,

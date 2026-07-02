@@ -388,7 +388,7 @@ local af = Def.ActorFrame{
 			-- Technically this should always be true since otherwise we wouldn't even get to this screen.
 			if sendRequest then
 				self:playcommand("MakeGrooveStatsRequest", {
-					endpoint="player-leaderboards.php?"..NETWORK:EncodeQueryParameters(query),
+					endpoint="?action=playerLeaderboards&"..NETWORK:EncodeQueryParameters(query),
 					method="GET",
 					headers=headers,
 					timeout=10,
@@ -577,7 +577,7 @@ for player in ivalues( PlayerNumber ) do
 
 			LoadFont("Common Normal").. {
 				Name="Text",
-				Text="More Leaderboards",
+				Text=THEME:GetString("GrooveStats", "MoreLeaderboards"),
 				InitCommand=function(self)
 					self:diffuse(Color.White)
 				end,
@@ -633,7 +633,7 @@ for player in ivalues( PlayerNumber ) do
 
 			LoadFont("Common Normal").. {
 				Name="Name",
-				Text=(i==1 and "Loading" or ""),
+				Text=(i==1 and THEME:GetString("GrooveStats", "Loading") or ""),
 				InitCommand=function(self)
 					self:horizalign(center)
 					self:maxwidth(130)
@@ -641,7 +641,7 @@ for player in ivalues( PlayerNumber ) do
 					self:diffuse(Color.White)
 				end,
 				ResetEntryMessageCommand=function(self)
-					self:settext(i==1 and "Loading" or "")
+					self:settext(i==1 and THEME:GetString("GrooveStats", "Loading") or "")
 					self:diffuse(Color.White)
 				end
 			},

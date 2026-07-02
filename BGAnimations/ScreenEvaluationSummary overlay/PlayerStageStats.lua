@@ -194,6 +194,7 @@ af[#af+1] = Def.ActorProxy{
 
 
 -- numbers
+
 for i=1,#TNSTypes do
 
 	af[#af+1] = LoadFont("Common Bold")..{
