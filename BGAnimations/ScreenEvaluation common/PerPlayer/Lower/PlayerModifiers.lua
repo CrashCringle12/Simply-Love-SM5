@@ -2,7 +2,6 @@ if SL.Global.GameMode == "Casual" then return end
 
 local player = ...
 
-
 local font_zoom = 0.7
 local width = THEME:GetMetric("GraphDisplay", "BodyWidth")
 

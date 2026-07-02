@@ -42,10 +42,6 @@ if style == "OnePlayerOneSide" or style == "TwoPlayersTwoSides" then
 		Text=THEME:GetString("ScreenEvaluation",  "TestInputInstructions"),
 		InitCommand=function(self) self:zoom(0.8):xy(-140,255):_wrapwidthpixels(100/0.8):align(0,0):vertspacing(-4) end
 	}
-
--- for couples style, squeeze two pads to fit within the space of a single-width pane
--- since the SM engine currently considers routine to have two unique human players,
--- each with their own distinct set of judgments, we need to keep P1 and P2's panes separated
 elseif style == "TwoPlayersSharedSides" then
 
 	pane[#pane+1] = LoadFont("Common normal")..{

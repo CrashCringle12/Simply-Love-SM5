@@ -39,7 +39,6 @@ local function randomXD(t)
 	return (math.sin(t * 3229.3) * 43758.5453) % 1 end
 end
 
-
 -- background
 t[#t+1] = Def.Quad {
 	InitCommand=function(self)

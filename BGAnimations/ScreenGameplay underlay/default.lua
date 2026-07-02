@@ -5,46 +5,7 @@ end
 
 local Players = GAMESTATE:GetHumanPlayers()
 local holdingCtrl = false
-local po = {}
-for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-	po[player] = GAMESTATE:GetPlayerState(player):GetPlayerOptions('ModsLevel_Song')
-end
 
-------
-
--- For each player check if speed mod type is R
--- If it is, set the speed mod to the value in the SL table
-for player in ivalues(Players) do
-	local pn = ToEnumShortString(player)
-	if SL[pn].ActiveModifiers.SpeedModType == "R" then
-		local mini = tonumber(SL[pn].ActiveModifiers.Mini:sub(1, -2)) / 100
-		local rmod = 720000/(SL[pn].ActiveModifiers.SpeedMod * (2-mini))
-		GAMESTATE:ApplyGameCommand("mod,m"..rmod, pn)
-	end
-end
--- If the style is TwoPlayersSharedSides, we need to set the speed mod for the routine as well
-if GAMESTATE:GetCurrentStyle():GetStyleType() == "StyleType_TwoPlayersSharedSides" then
-	local xmod = po[GAMESTATE:GetMasterPlayerNumber()]:XMod()
-	local mmod = po[GAMESTATE:GetMasterPlayerNumber()]:MMod()
-	local cmod = po[GAMESTATE:GetMasterPlayerNumber()]:CMod()
-
-	local mini = tonumber(SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.Mini:sub(1, -2)) / 100
-
-	local speedmod = SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.SpeedMod
-	local speedmod_str = (cmod ~= nil and "CMod") or (mmod ~= nil and "MMod") or (xmod ~= nil and "XMod")
-
-	local fmt = {
-		XMod = "mod,%.2fx",
-		MMod = "mod,m%d",
-		CMod = "mod,c%d",
-	}
-	local gcString = fmt[speedmod_str]:format(speedmod)
-
-	gcString = gcString ..""
-	GAMESTATE:ApplyGameCommand(gcString.."mod,"..SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.Mini.." mini", PLAYER_2)
-	GAMESTATE:ApplyGameCommand(gcString.."mod,"..SL[ToEnumShortString(GAMESTATE:GetMasterPlayerNumber())].ActiveModifiers.Mini.." mini", PLAYER_1)
-
-end
 local RestartHandler = function(event)
 	if not event then return end
 

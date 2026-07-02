@@ -19,7 +19,6 @@ local af = Def.ActorFrame {
 	end,
 	OnCommand=function(self)
 		self:accelerate(0.8):diffusealpha(1)
-
 	end,
 	VisualStyleSelectedMessageCommand=function(self)
 		local style = ThemePrefs.Get("VisualStyle")
