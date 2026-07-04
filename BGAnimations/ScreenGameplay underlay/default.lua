@@ -3,8 +3,20 @@ if PREFSMAN:GetPreference("MenuTimer") then
 	SL.Global.MenuTimer.ScreenSelectMusic = ThemePrefs.Get("ScreenSelectMusicMenuTimer")
 end
 
+
 local Players = GAMESTATE:GetHumanPlayers()
 local holdingCtrl = false
+
+-- For each player check if speed mod type is R
+-- If it is, set the speed mod to the value in the SL table
+for player in ivalues(Players) do
+	local pn = ToEnumShortString(player)
+	if SL[pn].ActiveModifiers.SpeedModType == "R" then
+		local mini = tonumber(SL[pn].ActiveModifiers.Mini:sub(1, -2)) / 100
+		local rmod = 720000/(SL[pn].ActiveModifiers.SpeedMod * (2-mini))
+		GAMESTATE:ApplyGameCommand("mod,m"..rmod, pn)
+	end
+end
 
 local RestartHandler = function(event)
 	if not event then return end
