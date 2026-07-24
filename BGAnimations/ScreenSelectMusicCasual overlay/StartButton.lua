@@ -1,31 +1,89 @@
-local w, h = 75, 33
+-- StartButton.lua
+--
+-- Big pulsing green pill rendered at the bottom-center of the modal
+-- overlay.  Hidden by default; shown once both joined players have
+-- advanced through every option row to the terminal Exit row.
+--
+-- Message contract (broadcast from Input.lua):
+--   SwitchFocusToSingleSong          : modal opened -- reset button state
+--   SwitchFocusToSongs / SingleSong* : modal closed -- hide button
+--   BothPlayersAreReady              : light it up, players can commit
+---------------------------------------------------------------------------
+local args = ...
+local panel_geom = args and args.panel_geom or nil
+
+-- Positioned at bottom center between the two panels.  Falls back to
+-- _screen coordinates if panel geometry isn't threaded through.
+local BUTTON_CX = panel_geom and _screen.cx or _screen.cx
+local BUTTON_CY = panel_geom and (panel_geom.cy + panel_geom.h/2 - 32)
+                              or (_screen.h - 60)
+
+local W, H = 160, 44
 
 return Def.ActorFrame{
-	Name="StartButton",
-	InitCommand=function(self) self:diffusealpha(0):xy(_screen.cx, _screen.h-76) end,
-	SwitchFocusToSongsMessageCommand=function(self) self:linear(0.1):diffusealpha(0) end,
-	SwitchFocusToGroupsMessageCommand=function(self) self:linear(0.1):diffusealpha(0) end,
-	SwitchFocusToSingleSongMessageCommand=function(self) self:sleep(0.3):linear(0.1):diffusealpha(1) end,
+	Name = "StartButton",
+	InitCommand = function(self)
+		self:xy(BUTTON_CX, BUTTON_CY):diffusealpha(0)
+	end,
 
+	SwitchFocusToSingleSongMessageCommand = function(self)
+		-- Modal opened; button is present but dim until players are ready.
+		self:sleep(0.25):linear(0.15):diffusealpha(0.55)
+	end,
+	SwitchFocusToSongsMessageCommand = function(self)
+		self:stopeffect():linear(0.15):diffusealpha(0)
+	end,
+	SingleSongCanceledMessageCommand = function(self)
+		self:stopeffect():linear(0.15):diffusealpha(0)
+	end,
+	BothPlayersAreReadyMessageCommand = function(self)
+		self:linear(0.15):diffusealpha(1)
+		-- Extra bounce on the pill quad + text to signal "you can commit now"
+		local quad = self:GetChild("Pill")
+		local text = self:GetChild("Text")
+		if quad then quad:finishtweening():decelerate(0.15):zoomto(W*1.06, H*1.06):accelerate(0.15):zoomto(W, H) end
+		if text then text:finishtweening():decelerate(0.15):zoom(1.05):accelerate(0.15):zoom(1.0) end
+	end,
+	CancelBothPlayersAreReadyMessageCommand = function(self)
+		self:linear(0.15):diffusealpha(0.55)
+	end,
+
+	-- Soft outer glow (pulses when active)
 	LoadActor("./img/start_glow.png")..{
-		Name="Glow",
-		InitCommand=function(self)
-			-- start_glow.png is 600px wide, but the space carved out of the middle is only 500px wide
-			self:zoom( (w/self:GetWidth()) * 1.2 )
+		Name = "Glow",
+		InitCommand = function(self)
+			self:zoom( (W / self:GetWidth()) * 1.3 )
 		end,
-		OnCommand=function(self) self:diffuseshift():effectcolor1(color("#55CC5500")):effectcolor2(color("#55CC55FF")) end,
+		OnCommand = function(self)
+			self:diffuseshift():effectcolor1(color("#55CC5500")):effectcolor2(color("#55CC55FF")):effectperiod(1.6)
+		end,
 	},
 
+	-- Pill body
 	Def.Quad{
-		Name="Quad",
-		InitCommand=function(self) self:diffuseshift():effectcolor1(color("#33aa33")):effectcolor2(color("#55cc55")):zoomto(w, h) end,
+		Name = "Pill",
+		InitCommand = function(self)
+			self:zoomto(W, H):diffuseshift()
+				:effectcolor1(color("#33aa33")):effectcolor2(color("#55cc55")):effectperiod(1.6)
+		end,
 	},
 
-	LoadFont("Common Normal")..{
-		Name="Text",
-		Text=THEME:GetString("ScreenSelectMusicCasual", "Press"),
-		InitCommand=function(self) self:diffuse(Color.Black):zoom(0.9) end,
-		SwitchFocusToSingleSongMessageCommand=function(self) self:settext(THEME:GetString("ScreenSelectMusicCasual", "Press")) end,
-		BothPlayersAreReadyMessageCommand=function(self) self:settext(THEME:GetString("ScreenSelectMusicCasual", "Start")) end
-	}
+	-- Label.  Reads "PRESS" until both players are ready; "START!" then.
+	LoadFont("Wendy/_wendy small")..{
+		Name = "Text",
+		InitCommand = function(self)
+			self:diffuse(Color.Black):zoom(0.5):shadowlength(0):settext(
+				THEME:GetString("ScreenSelectMusicCasual", "Press")
+			)
+		end,
+		BothPlayersAreReadyMessageCommand = function(self)
+			self:settext( THEME:GetString("ScreenSelectMusicCasual", "Start") )
+		end,
+		CancelBothPlayersAreReadyMessageCommand = function(self)
+			self:settext( THEME:GetString("ScreenSelectMusicCasual", "Press") )
+		end,
+		SwitchFocusToSongsMessageCommand = function(self)
+			self:settext( THEME:GetString("ScreenSelectMusicCasual", "Press") )
+		end,
+	},
 }

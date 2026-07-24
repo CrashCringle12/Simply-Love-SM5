@@ -1,0 +1,133 @@
+-- MusicWheel/WheelItemMT.lua
+--
+-- Metatable for a single jacket slot in the horizontal music wheel.
+-- Each slot is a sick_wheel item; the wheel keeps NUM_VISIBLE of them
+-- alive at all times and calls set()/transform() as songs scroll past.
+--
+-- Design notes:
+--   * The center slot (focus_pos) is scaled up, gets a glow border, and
+--     shows the song's jacket/banner at full-quality.  Neighboring slots
+--     shrink and dim with distance from center for the SMX-style filmstrip
+--     look.
+--   * We deliberately do NOT read the theme's song here.  All lookups go
+--     through the Song object we were handed in :set() so the same MT can
+--     be reused for other wheels (e.g. a preview/recent wheel) later.
+--   * Image loading uses SM5.1's LoadFromCached() when available to avoid
+--     hitching when scrolling through big packs.
+---------------------------------------------------------------------------
+
+local args = ...
+local wheel_config = args.wheel_config  -- shared geometry values
+
+local ITEM_W, ITEM_H = wheel_config.item_w, wheel_config.item_h
+
+-- Scale + alpha curve based on distance from center slot.
+-- Index 0 == center; 1/2/3 fall off progressively.
+local scale_for_offset = { [0]=1.00, [1]=0.68, [2]=0.48, [3]=0.34 }
+local alpha_for_offset = { [0]=1.00, [1]=0.85, [2]=0.55, [3]=0.30 }
+local xgap_for_offset  = { [0]=0,    [1]=1.05, [2]=1.85, [3]=2.55 }  -- multiplied by ITEM_W
+
+-- cached fallback texture used when a song has no jacket/banner/background
+local NoJacketTexture = nil
+
+local wheel_item_mt = {
+	__index = {
+		create_actors = function(self, name)
+			self.name = name
+
+			local af = Def.ActorFrame{
+				Name = name,
+				InitCommand = function(subself)
+					self.container = subself
+					subself:diffusealpha(0)
+				end,
+
+				-- Solid dark card behind the jacket so partially-transparent
+				-- jackets read cleanly against whatever bg is behind.  Drawn
+				-- BEFORE the sprite so it lands underneath naturally.
+				Def.Quad{
+					Name = "CardShadow",
+					InitCommand = function(subself)
+						subself:zoomto(ITEM_W + 6, ITEM_H + 6)
+						       :diffuse(0, 0, 0, 0.55)
+					end,
+				},
+
+				-- Jacket sprite -- the star of the show.
+				Def.Sprite{
+					Name = "Jacket",
+					InitCommand = function(subself)
+						self.jacket = subself
+						subself:setsize(ITEM_W, ITEM_H)
+					end,
+				},
+			}
+			return af
+		end,
+
+		-- Called by sick_wheel every time this slot's position changes.
+		-- item_index is 1-based within the visible window.  We use
+		-- math.ceil(num_items/2) to place the focus item at the geometric
+		-- center of the visible window; MusicWheel/default.lua overrides
+		-- SongWheel.focus_pos to match, so has_focus stays truthful.
+		transform = function(self, item_index, num_items, has_focus)
+			local focus_pos = math.ceil(num_items / 2)
+			local off       = math.abs(item_index - focus_pos)
+			local direction = (item_index < focus_pos) and -1 or 1
+
+			local scale = scale_for_offset[off] or scale_for_offset[3]
+			local alpha = alpha_for_offset[off] or 0
+			local xgap  = (xgap_for_offset[off] or xgap_for_offset[3]) * ITEM_W
+
+			self.container:finishtweening():linear(0.18)
+				:x(direction * xgap)
+				:y(0)
+				:zoom(scale)
+				:diffusealpha(alpha)
+
+			-- Slots outside our defined offsets get clamped alpha to 0 so
+			-- they don't bleed onto screen at extreme wheel positions.
+			if off > 3 then self.container:diffusealpha(0) end
+		end,
+
+		-- Called by sick_wheel when this slot needs to display a new Song.
+		set = function(self, song)
+			if not song then
+				self.container:visible(false)
+				return
+			end
+			self.song = song
+			self.container:visible(true)
+
+			-- Pick the best image we have available, in the same priority
+			-- order the old SongMT.lua used: Jacket > Background > Banner.
+			local img_type, img_path = nil, nil
+			if song:HasJacket() then
+				img_type = "Jacket"     ; img_path = song:GetJacketPath()
+			elseif song:HasBackground() then
+				img_type = "Background" ; img_path = song:GetBackgroundPath()
+			elseif song:HasBanner() then
+				img_type = "Banner"     ; img_path = song:GetBannerPath()
+			end
+
+			if img_path then
+				if Sprite.LoadFromCached ~= nil then
+					self.jacket:LoadFromCached(img_type, img_path)
+				else
+					self.jacket:LoadBanner(img_path)
+				end
+			else
+				if NoJacketTexture then
+					self.jacket:SetTexture(NoJacketTexture)
+				else
+					self.jacket:Load( THEME:GetPathB("ScreenSelectMusicCasual", "overlay/img/no-jacket.png") )
+					NoJacketTexture = self.jacket:GetTexture()
+				end
+			end
+
+			self.jacket:scaletoclipped(ITEM_W, ITEM_H)
+		end,
+	}
+}
+
+return wheel_item_mt

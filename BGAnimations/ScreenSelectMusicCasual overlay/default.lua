@@ -1,77 +1,108 @@
+-- default.lua for ScreenSelectMusicCasual (horizontal redesign).
+--
+-- Top-level composer.  Setup.lua does the data prep; this file wires the
+-- visual actors + the wheels shared between subsystems.
+--
+-- Structure:
+--   Base HUD (always visible)
+--     Header, MusicWheel, Player panes, Footer, SoundEffects
+--
+--   Overlays (hidden until opened)
+--     SortMenu     (opened by Select on the wheel)
+--     GroupJumper  (sub-view of SortMenu, opened via "Change Group")
+--
+--   Modal (hidden until Start on the wheel)
+--     PlayerOptionsShared + per-player OptionsWheels + StartButton,
+--     all wrapped in a single fade-controlled ActorFrame.
+--
+-- Wheels owned here (all sick_wheel_mt instances) and passed via args:
+--   SongWheel   -> MusicWheel + Input
+--   GroupWheel  -> GroupJumper + Input
+--   OptionsWheel[pn] and OptionsWheel[pn][i] come from Setup.lua
 ---------------------------------------------------------------------------
--- do as much setup work as possible in another file to keep default.lua
--- from becoming overly cluttered
-
 local setup = LoadActor("./Setup.lua")
 
 if setup == nil then
 	return LoadActor(THEME:GetPathB("ScreenSelectMusicCasual", "overlay/NoValidSongs.lua"))
 end
 
-local steps_type = setup.steps_type
-local Groups = setup.Groups
-local group_index = setup.group_index
-local group_info = setup.group_info
-
-local OptionRows = setup.OptionRows
+---------------------------------------------------------------------------
+local SongWheel    = setmetatable({}, sick_wheel_mt)
+local GroupWheel   = setmetatable({}, sick_wheel_mt)
 local OptionsWheel = setup.OptionsWheel
-local GroupWheel = setmetatable({}, sick_wheel_mt)
-local SongWheel = setmetatable({}, sick_wheel_mt)
+local OptionRows   = setup.OptionRows
+
+local song_list, focus_index = setup.GetSongList(setup.InitialSortMode, setup.InitialGroup)
 
 local row = setup.row
 local col = setup.col
 
-local TransitionTime = 0.5
-local songwheel_y_offset = -13
+---------------------------------------------------------------------------
+-- Modal panel geometry
+local PANEL_W        = WideScale(300, 400)
+local PANEL_H        = 340
+local PANEL_MARGIN_X = 16
+local PANEL_CY       = _screen.cy + 10
+
+local panel_geom = {
+	w     = PANEL_W,
+	h     = PANEL_H,
+	cy    = PANEL_CY,
+	p1_cx = PANEL_MARGIN_X + PANEL_W/2,
+	p2_cx = _screen.w - PANEL_MARGIN_X - PANEL_W/2,
+}
+
+local ITEM_ROW_Y = {
+	[1] = PANEL_CY - 92,
+	[2] = PANEL_CY + 8,
+}
 
 ---------------------------------------------------------------------------
--- a table of params from this file that we pass into the InputHandler file
--- so that the code there can work with them easily
-local params_for_input = { GroupWheel=GroupWheel, SongWheel=SongWheel, OptionsWheel=OptionsWheel, OptionRows=OptionRows }
+-- Input handler.  Receives references to all wheels + overlay actors so
+-- its state machine can drive them directly.
+local params_for_input = {
+	SongWheel    = SongWheel,
+	GroupWheel   = GroupWheel,
+	SortMenu     = nil,   -- filled from InitCommand
+	GroupJumper  = nil,   -- filled from InitCommand
+	OptionsWheel = OptionsWheel,
+	OptionRows   = OptionRows,
+	setup        = setup,
+}
+local Input = LoadActor("./Input.lua", params_for_input)
 
----------------------------------------------------------------------------
--- load the InputHandler and pass it the table of params
-local Input = LoadActor( "./Input.lua", params_for_input )
-
--- metatables
-local group_mt = LoadActor("./GroupMT.lua", {GroupWheel,SongWheel,TransitionTime,steps_type,row,col,Input,setup.PruneSongsFromGroup})
-local song_mt = LoadActor("./SongMT.lua", {SongWheel,TransitionTime,row,col})
-local optionrow_mt = LoadActor("./OptionRowMT.lua")
+local optionrow_mt      = LoadActor("./OptionRowMT.lua")
 local optionrow_item_mt = LoadActor("./OptionRowItemMT.lua")
 
 ---------------------------------------------------------------------------
+local TransitionTime = 0.35
 
-local t = Def.ActorFrame {
-	InitCommand=function(self)
-		GroupWheel:set_info_set(Groups, group_index)
-		self:GetChild("GroupWheel"):SetDrawByZPosition(true)
-
+local t = Def.ActorFrame{
+	InitCommand = function(self)
+		params_for_input.SortMenu    = self:GetChild("SortMenu")
+		params_for_input.GroupJumper = self:GetChild("GroupJumper")
 		self:queuecommand("Capture")
 	end,
-	OnCommand=function(self)
+
+	OnCommand = function(self)
 		if PREFSMAN:GetPreference("MenuTimer") then self:queuecommand("Listen") end
 	end,
-	ListenCommand=function(self)
+
+	ListenCommand = function(self)
 		local topscreen = SCREENMAN:GetTopScreen()
-		local seconds = topscreen:GetChild("Timer"):GetSeconds()
+		local timer = topscreen:GetChild("Timer")
+		local seconds = timer and timer:GetSeconds() or 999
 
-		-- if necessary, force the players into Gameplay because the MenuTimer has run out
 		if not Input.AllPlayersAreAtLastRow() and seconds <= 0 then
-
-			-- if we we're not currently in the optionrows,
-			-- we'll need to initialize them for the current song, first
 			if Input.WheelWithFocus ~= OptionsWheel then
 				setup.InitOptionRowsForSingleSong()
 			end
-
 			for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-
-				for index=1, #OptionRows-1 do
-					local choice = OptionsWheel[player][index]:get_info_at_focus_pos()
-					local choices= OptionRows[index]:Choices()
-					local values = OptionRows[index].Values()
-
-					OptionRows[index]:OnSave(player, choice, choices, values)
+				for i = 1, #OptionRows - 1 do
+					local choice  = OptionsWheel[player][i]:get_info_at_focus_pos()
+					local choices = OptionRows[i]:Choices()
+					local values  = OptionRows[i].Values()
+					OptionRows[i]:OnSave(player, choice, choices, values)
 				end
 			end
 			topscreen:StartTransitioningScreen("SM_GoToNextScreen")
@@ -79,23 +110,14 @@ local t = Def.ActorFrame {
 			self:sleep(0.5):queuecommand("Listen")
 		end
 	end,
-	CaptureCommand=function(self)
 
-		-- One element of the Input table is an internal function, Handler
+	CaptureCommand = function(self)
 		SCREENMAN:GetTopScreen():AddInputCallback( Input.Handler )
-
-		-- set up initial variable states and the players' OptionRows
 		Input:Init()
-
-		-- It should be safe to enable input for players now
 		self:queuecommand("EnableInput")
 	end,
-	CodeMessageCommand=function(self, params)
-		-- I'm using Metrics-based code detection because the engine is already good at handling
-		-- simultaneous button presses (CancelSingleSong when ThreeKeyNavigation=1),
-		-- as well as long input patterns (Exit from EventMode) and I see no need to
-		-- reinvent that functionality for the Lua InputCallback that I'm using otherwise.
 
+	CodeMessageCommand = function(self, params)
 		if params.Name == "Exit" then
 			if PREFSMAN:GetPreference("EventMode") then
 				SCREENMAN:GetTopScreen():SetNextScreenName( Branch.SSMCancel() ):StartTransitioningScreen("SM_GoToNextScreen")
@@ -109,64 +131,110 @@ local t = Def.ActorFrame {
 			end
 		end
 		if params.Name == "CancelSingleSong" then
-			-- if focus is not on OptionsWheel, we don't want to do anything
 			if Input.WheelWithFocus ~= OptionsWheel then return end
-			-- otherwise, run the function to cancel this single song choice
 			Input.CancelSongChoice()
 		end
 	end,
 
-	-- a hackish solution to prevent users from button-spamming and breaking input :O
-	SwitchFocusToSongsMessageCommand=function(self)
-		self:sleep(TransitionTime):queuecommand("EnableInput")
-	end,
-	SwitchFocusToGroupsMessageCommand=function(self)
-		self:sleep(TransitionTime):queuecommand("EnableInput")
-	end,
-	SwitchFocusToSingleSongMessageCommand=function(self)
+	SwitchFocusToSongsMessageCommand      = function(self) self:sleep(TransitionTime):queuecommand("EnableInput") end,
+	SwitchFocusToGroupsMessageCommand     = function(self) self:sleep(TransitionTime):queuecommand("EnableInput") end,
+	SwitchFocusToSingleSongMessageCommand = function(self)
 		setup.InitOptionRowsForSingleSong()
-
 		self:sleep(TransitionTime):queuecommand("EnableInput")
 	end,
-	EnableInputCommand=function(self)
-		Input.Enabled = true
-	end,
+	EnableInputCommand = function(self) Input.Enabled = true end,
 
+	-------------------------------------------------------------
+	-- Base HUD
+	-------------------------------------------------------------
+	LoadActor("./Header.lua"),
 
-	LoadActor("./PlayerOptionsShared.lua", {row, col, Input}),
-	LoadActor("./SongWheelShared.lua", {row, col, songwheel_y_offset}),
+	LoadActor("./MusicWheel/default.lua", {
+		SongWheel   = SongWheel,
+		setup       = setup,
+		song_list   = song_list,
+		focus_index = focus_index,
+	}),
 
-	-- included, but unused for now
-	LoadActor("./GroupWheelShared.lua", {row, col, group_info}),
+	LoadActor("./PlayerPane/default.lua", { player = PLAYER_1 }),
+	LoadActor("./PlayerPane/default.lua", { player = PLAYER_2 }),
 
-	SongWheel:create_actors( "SongWheel", 12, song_mt, 0, songwheel_y_offset),
+	LoadActor("./FooterHelpText.lua"),
 
-	LoadActor("./Header.lua", row),
+	-- Overlays (SortMenu + GroupJumper).  Loaded here so their child
+	-- position is above the wheel/panes in draw order.  Both are
+	-- hidden until an OpenSortMenu / OpenGroupJumper broadcast fires.
+	LoadActor("./SortMenu/default.lua",    { setup = setup }),
+	LoadActor("./GroupJumper/default.lua", { setup = setup, group_wheel = GroupWheel }),
 
-	GroupWheel:create_actors( "GroupWheel", row.how_many * col.how_many, group_mt, 0, 0, true),
-
-	LoadActor("FooterHelpText.lua"),
+	LoadActor("./SoundEffects.lua"),
 }
 
-t[#t+1] = LoadActor("SoundEffects.lua")
+-- Now that params_for_input has the wheel refs, thread GroupWheel too.
+-- (SortMenu/GroupJumper actors are set in InitCommand via GetChild.)
+params_for_input.GroupWheel = GroupWheel
 
--- Add player options ActorFrames to our primary ActorFrame
-for pn in ivalues( PlayerNumber ) do
-	local x_offset = (pn==PLAYER_1 and -1) or 1
+---------------------------------------------------------------------------
+-- Modal wrapper (single AF whose diffusealpha follows SwitchFocus*)
+local modal_af = Def.ActorFrame{
+	Name = "Modal",
+	InitCommand = function(self) self:diffusealpha(0) end,
 
-	-- create an optionswheel that has enough items to handle the number of optionrows necessary
-	t[#t+1] = OptionsWheel[pn]:create_actors("OptionsWheel"..ToEnumShortString(pn), #OptionRows, optionrow_mt, _screen.cx - 100 + 140 * x_offset, _screen.cy - 30)
+	SwitchFocusToSingleSongMessageCommand = function(self)
+		self:stoptweening():sleep(0.15):linear(0.2):diffusealpha(1)
+	end,
+	SwitchFocusToSongsMessageCommand  = function(self) self:stoptweening():linear(0.15):diffusealpha(0) end,
+	SwitchFocusToGroupsMessageCommand = function(self) self:stoptweening():linear(0.15):diffusealpha(0) end,
+	SingleSongCanceledMessageCommand  = function(self) self:stoptweening():linear(0.15):diffusealpha(0) end,
 
-	for i=1,#OptionRows do
-		-- Create sub-wheels for each optionrow with 3 items each.
-		-- Regardless of how many items are actually in that row,
-		-- we only display 1 at a time.
-		t[#t+1] = OptionsWheel[pn][i]:create_actors(ToEnumShortString(pn).."OptionWheel"..i, 3, optionrow_item_mt, WideScale(30, 130) + 140 * x_offset, _screen.cy - 5 + i * 62)
+	LoadActor("./PlayerOptionsShared.lua", { row, col, Input, panel_geom }),
+}
+
+for pn in ivalues(PlayerNumber) do
+	local pn_short = ToEnumShortString(pn)
+	local panel_cx = (pn == PLAYER_1) and panel_geom.p1_cx or panel_geom.p2_cx
+
+	local player_af = Def.ActorFrame{
+		Name = "ModalPlayer_" .. pn_short,
+		InitCommand = function(self)
+			self:visible( GAMESTATE:IsHumanPlayer(pn) )
+		end,
+		PlayerJoinedMessageCommand = function(self, params)
+			if params.Player == pn then self:visible(true) end
+		end,
+		PlayerUnjoinedMessageCommand = function(self, params)
+			if params.Player == pn then self:visible(false) end
+		end,
+
+		OptionsWheel[pn]:create_actors(
+			"OptionsWheel" .. pn_short,
+			#OptionRows,
+			optionrow_mt,
+			panel_cx,
+			PANEL_CY
+		),
+	}
+
+	for i = 1, #OptionRows do
+		local item_y = ITEM_ROW_Y[i]
+		if item_y then
+			local item_wheel_af = OptionsWheel[pn][i]:create_actors(
+				pn_short .. "OptionWheel" .. i,
+				3,
+				optionrow_item_mt,
+				panel_cx,
+				item_y
+			)
+			OptionsWheel[pn][i].focus_pos = 2
+			player_af[#player_af+1] = item_wheel_af
+		end
 	end
+
+	modal_af[#modal_af+1] = player_af
 end
 
--- FIXME: This is dumb.  Add the player option StartButton visual last so it
---  draws over everything else and we can hide cursors behind it when needed...
-t[#t+1] = LoadActor("./StartButton.lua")
+modal_af[#modal_af+1] = LoadActor("./StartButton.lua", { panel_geom = panel_geom })
+
+t[#t+1] = modal_af
 
 return t
