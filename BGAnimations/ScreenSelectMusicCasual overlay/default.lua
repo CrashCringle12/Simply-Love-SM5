@@ -16,8 +16,10 @@
 --     all wrapped in a single fade-controlled ActorFrame.
 --
 -- Wheels owned here (all sick_wheel_mt instances) and passed via args:
---   SongWheel   -> MusicWheel + Input
---   GroupWheel  -> GroupJumper + Input
+--   SongWheel    -> MusicWheel + Input
+--   GroupWheel   -> GroupJumper + Input
+--   LetterWheel  -> LetterJumper + Input
+--   MeterWheel   -> MeterJumper + Input
 --   OptionsWheel[pn] and OptionsWheel[pn][i] come from Setup.lua
 ---------------------------------------------------------------------------
 local setup = LoadActor("./Setup.lua")
@@ -29,6 +31,8 @@ end
 ---------------------------------------------------------------------------
 local SongWheel    = setmetatable({}, sick_wheel_mt)
 local GroupWheel   = setmetatable({}, sick_wheel_mt)
+local LetterWheel  = setmetatable({}, sick_wheel_mt)
+local MeterWheel   = setmetatable({}, sick_wheel_mt)
 local OptionsWheel = setup.OptionsWheel
 local OptionRows   = setup.OptionRows
 
@@ -43,6 +47,10 @@ local PANEL_W        = WideScale(300, 400)
 local PANEL_H        = 340
 local PANEL_MARGIN_X = 16
 local PANEL_CY       = _screen.cy + 10
+local DEMO_MASK_W    = PANEL_W - 30
+local DEMO_MASK_H    = 130
+local DEMO_OFFSET_Y  = 88
+local MASK_PAD       = 1000
 
 local panel_geom = {
 	w     = PANEL_W,
@@ -61,13 +69,17 @@ local ITEM_ROW_Y = {
 -- Input handler.  Receives references to all wheels + overlay actors so
 -- its state machine can drive them directly.
 local params_for_input = {
-	SongWheel    = SongWheel,
-	GroupWheel   = GroupWheel,
-	SortMenu     = nil,   -- filled from InitCommand
-	GroupJumper  = nil,   -- filled from InitCommand
-	OptionsWheel = OptionsWheel,
-	OptionRows   = OptionRows,
-	setup        = setup,
+	SongWheel     = SongWheel,
+	GroupWheel    = GroupWheel,
+	LetterWheel   = LetterWheel,
+	MeterWheel    = MeterWheel,
+	SortMenu      = nil,   -- filled from InitCommand
+	GroupJumper   = nil,   -- filled from InitCommand
+	LetterJumper  = nil,   -- filled from InitCommand
+	MeterJumper   = nil,   -- filled from InitCommand
+	OptionsWheel  = OptionsWheel,
+	OptionRows    = OptionRows,
+	setup         = setup,
 }
 local Input = LoadActor("./Input.lua", params_for_input)
 
@@ -79,8 +91,10 @@ local TransitionTime = 0.35
 
 local t = Def.ActorFrame{
 	InitCommand = function(self)
-		params_for_input.SortMenu    = self:GetChild("SortMenu")
-		params_for_input.GroupJumper = self:GetChild("GroupJumper")
+		params_for_input.SortMenu     = self:GetChild("SortMenu")
+		params_for_input.GroupJumper  = self:GetChild("GroupJumper")
+		params_for_input.LetterJumper = self:GetChild("LetterJumper")
+		params_for_input.MeterJumper  = self:GetChild("MeterJumper")
 		self:queuecommand("Capture")
 	end,
 
@@ -161,18 +175,22 @@ local t = Def.ActorFrame{
 
 	LoadActor("./FooterHelpText.lua"),
 
-	-- Overlays (SortMenu + GroupJumper).  Loaded here so their child
-	-- position is above the wheel/panes in draw order.  Both are
-	-- hidden until an OpenSortMenu / OpenGroupJumper broadcast fires.
-	LoadActor("./SortMenu/default.lua",    { setup = setup }),
-	LoadActor("./GroupJumper/default.lua", { setup = setup, group_wheel = GroupWheel }),
+	-- Overlays.  Loaded here so their child position is above the
+	-- wheel/panes in draw order.  All are hidden until their Open*
+	-- broadcast fires.
+	LoadActor("./SortMenu/default.lua",     { setup = setup }),
+	LoadActor("./GroupJumper/default.lua",  { setup = setup, group_wheel  = GroupWheel  }),
+	LoadActor("./LetterJumper/default.lua", { setup = setup, letter_wheel = LetterWheel }),
+	LoadActor("./MeterJumper/default.lua",  { setup = setup, meter_wheel  = MeterWheel  }),
 
 	LoadActor("./SoundEffects.lua"),
 }
 
--- Now that params_for_input has the wheel refs, thread GroupWheel too.
--- (SortMenu/GroupJumper actors are set in InitCommand via GetChild.)
-params_for_input.GroupWheel = GroupWheel
+-- Now that params_for_input has the wheel refs, thread all shared
+-- wheels too. (Overlay actor refs are set in InitCommand via GetChild.)
+params_for_input.GroupWheel  = GroupWheel
+params_for_input.LetterWheel = LetterWheel
+params_for_input.MeterWheel  = MeterWheel
 
 ---------------------------------------------------------------------------
 -- Modal wrapper (single AF whose diffusealpha follows SwitchFocus*)
@@ -229,6 +247,43 @@ for pn in ivalues(PlayerNumber) do
 			player_af[#player_af+1] = item_wheel_af
 		end
 	end
+	player_af[#player_af+1] = Def.ActorFrame{
+		Name = "ModalDemo_" .. pn_short,
+		InitCommand = function(self)
+			self:xy(panel_cx, PANEL_CY + DEMO_OFFSET_Y)
+		end,
+
+		Def.Quad{
+			InitCommand = function(self)
+				self:zoomto(DEMO_MASK_W + MASK_PAD*2, MASK_PAD*2)
+					:y(-(DEMO_MASK_H/2 + MASK_PAD))
+					:diffuse(1, 1, 1, 1):MaskSource()
+			end,
+		},
+		Def.Quad{
+			InitCommand = function(self)
+				self:zoomto(DEMO_MASK_W + MASK_PAD*2, MASK_PAD*2)
+					:y(DEMO_MASK_H/2 + MASK_PAD)
+					:diffuse(1, 1, 1, 1):MaskSource()
+			end,
+		},
+		Def.Quad{
+			InitCommand = function(self)
+				self:zoomto(MASK_PAD*2, DEMO_MASK_H)
+					:x(-(DEMO_MASK_W/2 + MASK_PAD))
+					:diffuse(1, 1, 1, 1):MaskSource()
+			end,
+		},
+	
+
+		LoadActor("./GameplayDemo.lua", {
+			modal = true,
+			player = pn,
+			x = 0,
+			y = 0,
+			zoom = (GAMESTATE:GetCurrentGame():GetName() == "techno") and 0.62 or 0.7,
+		}),
+	}
 
 	modal_af[#modal_af+1] = player_af
 end

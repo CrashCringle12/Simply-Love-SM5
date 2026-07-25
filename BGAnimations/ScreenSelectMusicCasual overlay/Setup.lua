@@ -230,7 +230,7 @@ local GetPlayCountSource = function()
 	return nil
 end
 
-local Compare_MostPlayed = function(a, b)
+local Compare_Popular = function(a, b)
 	local profile = GetPlayCountSource()
 	local ap = profile and profile:GetSongNumTimesPlayed(a) or 0
 	local bp = profile and profile:GetSongNumTimesPlayed(b) or 0
@@ -257,7 +257,7 @@ local GetSongLastPlayedTimestamp = function(profile, song)
 	return best
 end
 
-local Compare_RecentlyPlayed = function(a, b)
+local Compare_Recent = function(a, b)
 	local profile = GetPlayCountSource()
 	local at = GetSongLastPlayedTimestamp(profile, a)
 	local bt = GetSongLastPlayedTimestamp(profile, b)
@@ -265,12 +265,36 @@ local Compare_RecentlyPlayed = function(a, b)
 	return at > bt
 end
 
+-- Lowest allowed-chart meter for a song (its "entry point").  Used for
+-- the Meter sort ordering and for the Meter jumper's lookup.  pcall'd
+-- for engine compat.
+local GetSongMinMeter = function(song)
+	if not song then return math.huge end
+	local max_m = ThemePrefs.Get("CasualMaxMeter")
+	local best  = math.huge
+	local ok, list = pcall(song.GetStepsByStepsType, song, steps_type)
+	if not ok or type(list) ~= "table" then return math.huge end
+	for chart in ivalues(list) do
+		local m = chart:GetMeter()
+		if m <= max_m and m < best then best = m end
+	end
+	return best
+end
+
+local Compare_Meter = function(a, b)
+	local am = GetSongMinMeter(a)
+	local bm = GetSongMinMeter(b)
+	if am == bm then return Compare_Title(a, b) end
+	return am < bm
+end
+
 local SortModes = {
 	{ Name="Group",          Scope="group" },
 	{ Name="Title",          Scope="all", SortFn=function(list) table.sort(list, Compare_Title) end },
 	{ Name="Artist",         Scope="all", SortFn=function(list) table.sort(list, Compare_Artist) end },
-	{ Name="MostPlayed",     Scope="all", SortFn=function(list) table.sort(list, Compare_MostPlayed) end },
-	{ Name="RecentlyPlayed", Scope="all", SortFn=function(list) table.sort(list, Compare_RecentlyPlayed) end },
+	{ Name="Meter",          Scope="all", SortFn=function(list) table.sort(list, Compare_Meter) end },
+	{ Name="Popular",     Scope="all", SortFn=function(list) table.sort(list, Compare_Popular) end },
+	{ Name="Recent", Scope="all", SortFn=function(list) table.sort(list, Compare_Recent) end },
 }
 
 local SortModesByName = {}
@@ -280,9 +304,15 @@ for m in ivalues(SortModes) do SortModesByName[m.Name] = m end
 -- GetSongList(sort_mode_name, group_name)
 --
 -- Returns:
---   list         : array of Song objects the wheel should render, in order
---   focus_index  : 1-based index of the currently-selected song within `list`
---                  (or 1 if the current song isn't present)
+--   list         : array of items the wheel should render, in order.
+--                  Entries are Song objects, EXCEPT the final entry is
+--                  the special "Sorts folder" marker table (identified
+--                  via IsSortsFolder below) so players always have an
+--                  in-wheel entry point to the SortMenu overlay.
+--   focus_index  : 1-based index of the currently-selected song within
+--                  `list`, or 1 if the current song isn't present.
+local SORTS_FOLDER_MARKER = { is_sorts_folder = true }
+
 local GetSongList = function(sort_mode_name, group_name)
 	local mode = SortModesByName[sort_mode_name] or SortModesByName["Group"]
 	local list = {}
@@ -304,6 +334,11 @@ local GetSongList = function(sort_mode_name, group_name)
 			if song == cur then focus_index = i; break end
 		end
 	end
+
+	-- Always append the Sorts folder as the final wheel item so players
+	-- have a discoverable way to change sort without needing Select.
+	list[#list+1] = SORTS_FOLDER_MARKER
+
 	return list, focus_index
 end
 
@@ -318,12 +353,14 @@ return {
 
 	-- initial state
 	InitialGroup                 = initial_group,
-	InitialSortMode              = "Group",
+	InitialSortMode              = "Meter",
 
 	-- sort machinery
 	SortModes                    = SortModes,
 	SortModesByName              = SortModesByName,
 	GetSongList                  = GetSongList,
+	GetSongMinMeter              = GetSongMinMeter,
+	IsSortsFolder                = function(item) return type(item) == "table" and item.is_sorts_folder == true end,
 
 	-- modal plumbing preserved for now
 	OptionsWheel                 = OptionsWheel,

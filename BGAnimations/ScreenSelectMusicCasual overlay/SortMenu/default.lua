@@ -22,11 +22,12 @@ local setup = args.setup
 
 -- Must stay in sync with `sort_options` in Input.lua.  Duplicated only
 -- for the localization key lookups; the mode names come from Input.
-local option_keys = { "ChangeGroup", "Title", "Artist", "MostPlayed", "RecentlyPlayed" }
+local option_keys = { "ChangeGroup", "Title", "Artist", "Meter", "Popular", "Recent" }
 local NUM = #option_keys
 
--- Layout
-local CARD_W    = 132
+-- Layout.  Six cards is a lot for one row, so cards are slightly
+-- narrower than the previous 5-card layout.
+local CARD_W    = 118
 local CARD_H    = 60
 local CARD_GAP  = 12
 local ROW_Y     = _screen.cy + 10
@@ -75,8 +76,9 @@ local build_card = function(index, key)
 					ChangeGroup    = color("#ffe14a"),
 					Title          = color("#7cd3ff"),
 					Artist         = color("#c199ff"),
-					MostPlayed     = color("#ff9d5b"),
-					RecentlyPlayed = color("#5bffa0"),
+					Meter          = color("#ff5b9d"),
+					Popular     = color("#ff9d5b"),
+					Recent = color("#5bffa0"),
 				}
 				self:zoomto(4, CARD_H):x(-CARD_W/2 + 2)
 					:diffuse( role_colors[key] or Color.White )

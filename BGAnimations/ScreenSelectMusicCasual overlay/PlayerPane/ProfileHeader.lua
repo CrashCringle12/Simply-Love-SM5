@@ -51,4 +51,5 @@ return Def.ActorFrame{
 		PlayerProfileSetMessageCommand = function(self, p) if p.Player == player then self:playcommand("Refresh") end end,
 		RefreshCommand = function(self) self:settext( GetProfileName() ) end,
 	},
+	LoadActor("./ProfileAvatar", {player, pane_w/2 - 20})
 }

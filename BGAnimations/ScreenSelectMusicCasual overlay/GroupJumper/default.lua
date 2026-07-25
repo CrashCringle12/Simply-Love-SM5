@@ -64,9 +64,17 @@ local group_item_mt = {
 					Name = "Banner",
 					InitCommand = function(subself)
 						self.banner = subself
-						subself:setsize(CARD_W - 20, 32):y(-14):visible(false)
+						subself:setsize(CARD_W - 20, 32):y(-8):visible(false)
 					end,
 				},
+                Def.Quad{
+                    Name = "BannerBackdrop",
+                    InitCommand = function(subself)
+                        self.banner_backdrop = subself
+						subself:zoom(0.85):diffuse(Color.Black):shadowlength(0.75):diffusealpha(0.3)
+							:y(12):zoomto(CARD_W, 20)
+                    end,
+                },
 				LoadFont("Common Normal")..{
 					Name = "GroupName",
 					InitCommand = function(subself)
@@ -80,7 +88,7 @@ local group_item_mt = {
 					InitCommand = function(subself)
 						self.count_bmt = subself
 						subself:zoom(0.65):diffuse(color("#8b95a0")):shadowlength(0.5)
-							:y(30):maxwidth(CARD_W - 16)
+							:y(32):maxwidth(CARD_W - 16)
 					end,
 				},
 			}
@@ -117,7 +125,7 @@ local group_item_mt = {
 			if self.banner and SONGMAN.GetSongGroupBannerPath then
 				local ok, path = pcall(SONGMAN.GetSongGroupBannerPath, SONGMAN, group_name)
 				if ok and type(path) == "string" and path ~= "" then
-					self.banner:visible(true):Load(path):scaletoclipped(CARD_W - 20, 32)
+					self.banner:visible(true):Load(path):scaletoclipped(CARD_W - 5, 58)
 				else
 					self.banner:visible(false)
 				end

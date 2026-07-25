@@ -15,11 +15,11 @@ local panel_geom = args and args.panel_geom or nil
 -- Positioned at bottom center between the two panels.  Falls back to
 -- _screen coordinates if panel geometry isn't threaded through.
 local BUTTON_CX = panel_geom and _screen.cx or _screen.cx
-local BUTTON_CY = panel_geom and (panel_geom.cy + panel_geom.h/2 - 32)
+local BUTTON_CY = panel_geom and (panel_geom.cy + panel_geom.h/2 + 28)
                               or (_screen.h - 60)
 
 local W, H = 160, 44
-
+local onePlayerIsAtLastRow = false
 return Def.ActorFrame{
 	Name = "StartButton",
 	InitCommand = function(self)
@@ -45,18 +45,34 @@ return Def.ActorFrame{
 		if text then text:finishtweening():decelerate(0.15):zoom(1.05):accelerate(0.15):zoom(1.0) end
 	end,
 	CancelBothPlayersAreReadyMessageCommand = function(self)
+        if not onePlayerIsAtLastRow then
+           return
+        end
+        onePlayerIsAtLastRow = false
 		self:linear(0.15):diffusealpha(0.55)
+        local text = self:GetChild("Text")
+        if text then text:finishtweening():decelerate(0.1):accelerate(0.15):zoom(0.5) end
 	end,
 
 	-- Soft outer glow (pulses when active)
 	LoadActor("./img/start_glow.png")..{
 		Name = "Glow",
 		InitCommand = function(self)
-			self:zoom( (W / self:GetWidth()) * 1.3 )
+			self:zoomto(W*1.2, H*1.47)
 		end,
 		OnCommand = function(self)
 			self:diffuseshift():effectcolor1(color("#55CC5500")):effectcolor2(color("#55CC55FF")):effectperiod(1.6)
 		end,
+        OnePlayerIsAtLastRowMessageCommand = function(self, params)
+            if onePlayerIsAtLastRow then
+                return
+            end
+            self:diffuseshift():effectcolor1(color("#55CC55FF")):effectcolor2(PlayerColor(params.player)):effectperiod(1.1)
+            onePlayerIsAtLastRow = true
+        end,
+        CancelBothPlayersAreReadyMessageCommand = function(self)
+            self:diffuseshift():effectcolor1(color("#55CC5500")):effectcolor2(color("#55CC55FF")):effectperiod(1.6)
+        end,
 	},
 
 	-- Pill body

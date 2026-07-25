@@ -17,7 +17,7 @@ end
 return LoadFont("Common Normal")..{
 	Name = "FooterHelpText",
 	InitCommand = function(self)
-		self:xy(_screen.cx, _screen.h - 140)
+		self:xy(_screen.cx, _screen.h - 170)
 			:zoom(0.7):diffuse(color("#cfd6dc")):shadowlength(0.5)
 			:settext( get("FooterTextSongs") )
 	end,

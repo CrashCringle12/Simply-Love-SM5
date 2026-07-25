@@ -100,6 +100,9 @@ local BroadcastFocus = function(self)
 	last_broadcast_pos = pos
 
 	local song = info[pos]
+    if type(song) == "table" then
+        return
+    end
 	if song and GAMESTATE:GetCurrentSong() ~= song then
 		GAMESTATE:SetCurrentSong(song)
 		MESSAGEMAN:Broadcast("CurrentSongChanged", {song = song})

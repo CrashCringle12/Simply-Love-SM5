@@ -34,7 +34,7 @@ local NameForMeter = function(m)
 	elseif m == 7 then return "Hard"
 	elseif m == 8 then return "Hard+"
 	elseif m == 9 then return "Expert"
-	elseif m and m >= 10 then return "Insane"
+	elseif m and m >= 10 then return "🔥Insane"
 	end
 	return ""
 end

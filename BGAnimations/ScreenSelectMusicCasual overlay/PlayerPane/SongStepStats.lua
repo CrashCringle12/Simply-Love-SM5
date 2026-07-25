@@ -1,27 +1,33 @@
 -- PlayerPane/SongStepStats.lua
 --
--- Per-player chart statistics row.  Shows the note counts that are most
--- useful to a casual player at a glance:  Notes / Jumps / Holds / Mines.
+-- Per-player chart statistics row.  Shows counts most useful to a casual
+-- player at a glance:  Notes / Jumps / Holds / Mines / Crossovers.
 --
--- Uses SM5's RadarValues interface (Steps:GetRadarValues(player)) so
--- routine-style asymmetric charts count correctly per side.  Zeroes are
--- rendered so the row always has the same visual weight (the actual
--- number changes rather than the field disappearing).
+-- Data sources:
+--   * Notes / Jumps / Holds / Mines come from SM5's RadarValues API
+--     (Steps:GetRadarValues(player)) so routine-style asymmetric charts
+--     count correctly per side.
+--   * Crossovers come from the newer TechCounts API
+--     (Steps:GetTechCounts(player)), which isn't present on every fork.
+--     We pcall around the call so a missing API degrades to "0" cleanly.
 ---------------------------------------------------------------------------
 local params = ...
 local player = params.player
 local pane_w = params.pane_w
 local pane_h = params.pane_h
 
--- Which radar values we render, and the localized label under each.
--- Keeping this table-driven makes it easy to add / reorder later.
+-- Column definitions.  Each entry says how to fetch its value from a
+-- Steps object:
+--   source = "radar" -> uses steps:GetRadarValues(player):GetValue("RadarCategory_"..key)
+--   source = "tech"  -> uses steps:GetTechCounts(player):GetValue("TechCountsCategory_"..key)
 local STATS = {
-	{ key = "Notes", label = "NOTES" },
-	{ key = "Jumps", label = "JUMPS" },
-	{ key = "Holds", label = "HOLDS" },
-	{ key = "Mines", label = "MINES" },
+	{ key = "Notes",      label = "NOTES",  source = "radar" },
+	{ key = "Jumps",      label = "JUMPS",  source = "radar" },
+	{ key = "Holds",      label = "HOLDS",  source = "radar" },
+	{ key = "Mines",      label = "MINES",  source = "radar" },
+	{ key = "Crossovers", label = "CROSSOVERS", source = "tech"  },
 }
-local COL_W = (pane_w - 24) / #STATS  -- equal-width columns
+local COL_W = (pane_w - 24) / #STATS
 
 local build_cell = function(i, def)
 	local x = -pane_w/2 + 12 + (i - 0.5) * COL_W
@@ -30,20 +36,18 @@ local build_cell = function(i, def)
 		Name = "Stat_" .. def.key,
 		InitCommand = function(self) self:x(x) end,
 
-		-- Numeric value (larger, white)
 		LoadFont("Wendy/_wendy small")..{
 			Name = "Value",
 			InitCommand = function(self)
-				self:zoom(0.4):diffuse(Color.White):shadowlength(0.5)
-					:settext("0")
+				self:zoom(0.36):diffuse(Color.White):shadowlength(0.5)
+					:settext("0"):maxwidth(COL_W - 4)
 			end,
 		},
-		-- Label under the value
 		LoadFont("Common Normal")..{
 			Name = "Label",
 			InitCommand = function(self)
-				self:zoom(0.55):y(15):diffuse(color("#8b95a0")):shadowlength(0.5)
-					:settext( def.label )
+				self:zoom(0.5):y(15):diffuse(color("#8b95a0")):shadowlength(0.5)
+					:settext( def.label ):maxwidth(COL_W + 4)
 			end,
 		},
 
@@ -51,6 +55,26 @@ local build_cell = function(i, def)
 			self:GetChild("Value"):settext( tostring(p.value or 0) )
 		end,
 	}
+end
+
+-- Fetch a value from a Steps object for the given stat definition.
+-- Returns 0 on any error (missing API, nil steps, etc.).
+local FetchValue = function(steps, def, player)
+	if not steps then return 0 end
+	if def.source == "tech" then
+		if not steps.GetTechCounts then return 0 end
+		local ok, tc = pcall(steps.GetTechCounts, steps, player)
+		if not ok or not tc then return 0 end
+		local ok2, v = pcall(tc.GetValue, tc, "TechCountsCategory_" .. def.key)
+		if not ok2 or type(v) ~= "number" then return 0 end
+		return v
+	end
+	-- default: radar
+	local ok, rv = pcall(steps.GetRadarValues, steps, player)
+	if not ok or not rv then return 0 end
+	local ok2, v = pcall(rv.GetValue, rv, "RadarCategory_" .. def.key)
+	if not ok2 or type(v) ~= "number" then return 0 end
+	return v
 end
 
 local af = Def.ActorFrame{
@@ -66,17 +90,8 @@ local af = Def.ActorFrame{
 
 	RefreshCommand = function(self)
 		local steps = GAMESTATE:GetCurrentSteps(player)
-		if not steps then
-			for _, def in ipairs(STATS) do
-				self:GetChild("Stat_" .. def.key):playcommand("SetValue", { value = 0 })
-			end
-			return
-		end
-		local rv = steps:GetRadarValues(player)
 		for _, def in ipairs(STATS) do
-			local v = rv and rv:GetValue("RadarCategory_" .. def.key) or 0
-			-- Guard against negative sentinel values that some engines
-			-- return when the chart doesn't measure a category.
+			local v = FetchValue(steps, def, player)
 			if v < 0 then v = 0 end
 			self:GetChild("Stat_" .. def.key):playcommand("SetValue", { value = math.floor(v) })
 		end

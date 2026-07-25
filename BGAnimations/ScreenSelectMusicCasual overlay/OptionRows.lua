@@ -31,7 +31,7 @@ local NameForMeter = function(m)
 	elseif m == 7 then return "Hard"
 	elseif m == 8 then return "Hard+"
 	elseif m == 9 then return "Expert"
-	elseif m and m >= 10 then return "Insane"
+	elseif m and m >= 10 then return "🔥Insane"
 	end
 	return ""
 end
@@ -96,11 +96,35 @@ local OptionRows = {
 		Name     = "Speed",
 		HelpText = THEME:GetString("ScreenSelectMusicCasual", "SelectSpeedMod"),
 
-		Values = function() return {210, 300, 125} end,
+		Values = function() return {"auto", "more", "less"} end,
+
+		AutoCModForMeter = function(_, meter)
+			meter = tonumber(meter) or 1
+			if meter <= 3 then return 200 end
+			if meter == 4 then return 250 end
+			if meter == 5 then return 300 end
+			if meter <= 7 then return 350 end
+			if meter == 8 then return 400 end
+			return 450
+		end,
+
+		ResolveCModForChoice = function(self, pn, choice)
+			if not choice or not choice.index then return 300 end
+
+			local meter = 5
+			local cur_steps = GAMESTATE:GetCurrentSteps(pn)
+			if cur_steps then meter = cur_steps:GetMeter() end
+			local auto = self:AutoCModForMeter(meter)
+
+			if choice.index == 1 then return auto end
+			if choice.index == 2 then return auto + 150 end
+			if choice.index == 3 then return math.max(50, auto - 150) end
+			return auto
+		end,
 
 		Choices = function()
 			return {
-				{ role="speed", index=1, text = THEME:GetString("ScreenSelectMusicCasual", "Normal")    },
+                { role="speed", index=1, text = THEME:GetString("ScreenSelectMusicCasual", "Auto")    },
 				{ role="speed", index=2, text = THEME:GetString("ScreenSelectMusicCasual", "MoreSpace") },
 				{ role="speed", index=3, text = THEME:GetString("ScreenSelectMusicCasual", "LessSpace") },
 			}
@@ -109,21 +133,34 @@ local OptionRows = {
 		OnLoad = function(actor, pn, choices, values)
 			local start = 1
 			local cmod = GAMESTATE:GetPlayerState(pn):GetPlayerOptions("ModsLevel_Preferred"):CMod()
+			local meter = 5
+			local cur_steps = GAMESTATE:GetCurrentSteps(pn)
+			if cur_steps then meter = cur_steps:GetMeter() end
+			local auto = 300
+			if meter <= 3 then auto = 200
+			elseif meter == 4 then auto = 250
+			elseif meter == 5 then auto = 300
+			elseif meter <= 7 then auto = 350
+			elseif meter == 8 then auto = 400
+			else auto = 450 end
 			if cmod then
-				for i, v in ipairs(values) do
-					if v == cmod then start = i; break end
+				if cmod == auto + 150 then
+					start = 2
+				elseif cmod == math.max(50, auto - 150) then
+					start = 3
 				end
 			end
 			actor:set_info_set(choices, start)
 		end,
 
 		OnSave = function(self, pn, choice)
-			if not choice or not choice.index then return end
-			local values = self:Values()
-			local v = values[choice.index]
-			if v then
-				GAMESTATE:GetPlayerState(pn):GetPlayerOptions("ModsLevel_Preferred"):CMod(v)
-			end
+			local cmod = self:ResolveCModForChoice(pn, choice)
+			GAMESTATE:GetPlayerState(pn):GetPlayerOptions("ModsLevel_Preferred"):CMod(cmod)
+			MESSAGEMAN:Broadcast("GameplayDemoSpeedChanged", {
+				Player = pn,
+				CMod = cmod,
+				Source = "SpeedRowSave"
+			})
 		end,
 	},
 }

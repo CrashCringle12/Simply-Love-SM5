@@ -15,7 +15,8 @@
 --   row 2 header  y = -32    Speed
 --   row 3 header  y =  76    Exit  (blank; StartButton handles visuals)
 ---------------------------------------------------------------------------
-local ROW_HEADER_Y = { [1] = -132, [2] = -32, [3] = 76 }
+local ROW_HEADER_Y = { [1] = -152, [2] = -32, [3] = 76 }
+local GlobalOffsetSeconds = PREFSMAN:GetPreference("GlobalOffsetSeconds")
 
 local optionrow_mt = {
 	__index = {
@@ -36,11 +37,11 @@ local optionrow_mt = {
 
 				GainFocusCommand = function(subself)
 					local h = subself:GetChild("Header")
-					if h then h:stoptweening():linear(0.1):diffusealpha(1.0) end
+					if h then h:stoptweening():linear(0.1):diffusealpha(1.0):diffuse(GetCurrentColor()) end
 				end,
 				LoseFocusCommand = function(subself)
 					local h = subself:GetChild("Header")
-					if h then h:stoptweening():linear(0.1):diffusealpha(0.45) end
+					if h then h:stoptweening():linear(0.1):diffuse(Color.White):diffusealpha(0.45) end
 				end,
 
 				-- Row header label
@@ -52,6 +53,18 @@ local optionrow_mt = {
 							:shadowlength(0.75)
 					end,
 				},
+                Def.Sprite {
+                    Texture = "arrow.png",
+                    InitCommand = function(subself)
+                        self.arrow = subself
+                        subself:zoom(0.5):diffuse(Color.White):diffusealpha(0.45)
+                            :shadowlength(0.75)
+                            :x(-85)
+                        	subself:bounce():effectclock("beatnooffset")
+                            subself:effectmagnitude(-3,0,0)
+                            subself:effectperiod(1):effectoffset( -10 * GlobalOffsetSeconds)
+                    end,
+                }
 			}
 		end,
 
@@ -62,8 +75,12 @@ local optionrow_mt = {
 			self.container:finishtweening()
 			if has_focus then
 				self.container:playcommand("GainFocus")
+                if self.index < 3 then
+                    self.arrow:stoptweening():visible(true)
+                end
 			else
 				self.container:playcommand("LoseFocus")
+                self.arrow:stoptweening():visible(false)
 			end
 		end,
 

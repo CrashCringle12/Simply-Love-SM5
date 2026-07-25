@@ -45,8 +45,8 @@ return Def.ActorFrame{
 	LoadFont("Common Normal")..{
 		Name = "Percent",
 		InitCommand = function(self)
-			self:zoom(0.9):diffuse(color("#e8e8e8")):shadowlength(0.5)
-				:halign(1):x(pane_w/2 - 14)
+			self:zoom(0.85):diffuse(color("#e8e8e8")):shadowlength(0.5)
+				:halign(1):x(pane_w/2 - 14):y(2)
 		end,
 	},
 
@@ -70,7 +70,7 @@ return Def.ActorFrame{
 		local noscoreBmt = self:GetChild("NoScore")
 
 		if grade_str then
-			gradeBmt:visible(true):settext( (grade_str:gsub("_", " ")):gsub("Grade ", "") )
+			gradeBmt:visible(true):settext( THEME:GetString("Grade", grade_str) )
 			percentBmt:visible(true):settext( ("%.2f%%"):format(percent) )
 			noscoreBmt:visible(false)
 		else

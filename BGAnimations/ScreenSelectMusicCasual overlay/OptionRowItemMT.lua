@@ -65,7 +65,7 @@ local optionrow_item_mt = {
 					InitCommand = function(subself)
 						self.primary = subself
 						subself:zoom(0.5):diffuse(Color.White):shadowlength(0.75)
-							:y(-8):maxwidth(CARD_W - 12)
+							:y(-8):maxwidth(CARD_W - 2)
 					end,
 				},
 				-- Secondary label (name under meter for chart cards)
@@ -128,7 +128,7 @@ local optionrow_item_mt = {
 					:diffuse(Color.Black):zoom(0.75):y(16)
 			else
 				self.primary:settext( info.text or "" )
-					:diffuse(Color.White):zoom(0.55):y(0)
+					:diffuse(Color.White):zoom(0.65):y(0)
 				self.secondary:settext("")
 			end
 		end,
