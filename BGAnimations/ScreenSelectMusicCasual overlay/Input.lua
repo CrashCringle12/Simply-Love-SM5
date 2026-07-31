@@ -321,7 +321,7 @@ t.Handler = function(event)
 			MESSAGEMAN:Broadcast("ScrolledLeft")
 			MESSAGEMAN:Broadcast("PlaySFX", {Action="ChangeSong", Player=event.PlayerNumber})
 
-		elseif event.GameButton == "MenuDown" then
+		elseif event.GameButton == "MenuDown" or event.GameButton == "Right" then
 			-- Difficulty controls only make sense when we're focused on
 			-- an actual song (not the Sorts folder marker).
 			local focused = SongWheel:get_info_at_focus_pos()
@@ -331,7 +331,7 @@ t.Handler = function(event)
 				end
 			end
 
-		elseif event.GameButton == "MenuUp" then
+		elseif event.GameButton == "MenuUp" or event.GameButton == "Left" then
 			local focused = SongWheel:get_info_at_focus_pos()
 			if not setup.IsSortsFolder(focused) then
 				if CyclePlayerDifficulty(event.PlayerNumber, 1) then
@@ -549,7 +549,7 @@ t.Handler = function(event)
 				MESSAGEMAN:Broadcast("BothPlayersAreReady")
 			end
 
-		elseif event.GameButton == "MenuUp" then
+		elseif event.GameButton == "MenuUp" or (event.GameButton == "Select" and index > 1) then
 			if index > 1 then
 				index = index - 1
 				ActiveOptionRow[event.PlayerNumber] = index
