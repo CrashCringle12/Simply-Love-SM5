@@ -1,5 +1,5 @@
 local StepchartOptRowIndex = nil
-
+local autoStyle = ThemePrefs.Get("PreferredStyle") == "auto"
 -- get all the LinesNames as a single string from Metrics.ini, split on commas,
 local LineNames = split(",", THEME:GetMetric("ScreenPlayerOptions", "LineNames"))
 -- and loop through until we find one that matches "Stepchart" (or, we don't).
@@ -7,7 +7,6 @@ for i, name in ipairs(LineNames) do
 	if name == "Stepchart" then StepchartOptRowIndex = i-1; break end
 end
 -- -----------------------------------------------------------------------
-
 return Def.ActorFrame{
 	Name="OptionsUnderlineMiddle",
 
@@ -26,7 +25,7 @@ return Def.ActorFrame{
 			-- OptionRow amidst myriad unnamed children belonging to the topscreen
 			-- each and every time.
 			local optrow = SCREENMAN:GetTopScreen():GetChild("Container"):GetChild("")[StepchartOptRowIndex+1]
-			if not optrow then return end
+			if not optrow or not autoStyle then return end
 
 			local underline_af = optrow:GetChild("")
 			if not underline_af then return end
