@@ -228,9 +228,11 @@ local function AddSorts()
 		{ {"SortBy", "Genre"} },
 		{ {"SortBy", "BPM"} },
 		{ {"SortBy", "Length"} },
+		{ {"SortBy", "Year"} },
 		{ {"SortBy", "Meter"} },
 		{ {"SortBy", "Popularity"} },
 		{ {"SortBy", "Recent"} },
+		{ {"SortBy", "Newest"} },
 		{ {"SortBy", "TopGrades"} },
 	}
 end
