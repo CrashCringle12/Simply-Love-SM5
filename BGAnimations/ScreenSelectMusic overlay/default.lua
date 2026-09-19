@@ -69,6 +69,9 @@ local af = Def.ActorFrame{
 	-- Apply player modifiers from profile
 	LoadActor("./PlayerModifiers.lua"),
 
+	-- Experimental local recommendation model + debug output.
+	LoadActor("./RecommendationsDebug.lua"),
+
 	-- allow stepcharts from multiple styles (single, double, routine) to coexist
 	-- in the same music wheel
 	LoadActor("./AutoSetStyle.lua"),
