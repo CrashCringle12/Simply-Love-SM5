@@ -8,7 +8,7 @@
 -- exposes HighScoreList:GetNumTimesPlayed() and :GetLastPlayed().
 
 SLRecommendations = SLRecommendations or {}
-SLRecommendations.Version = "26"
+SLRecommendations.Version = "27"
 
 -- The curriculum is kept in a separate editable file.  Normally Simply Love
 -- loads Scripts automatically, but load it explicitly if necessary so this
@@ -160,6 +160,11 @@ SLRecommendations.Config = {
     ColdStartDefaultMeter = 6,
     ColdStartDifficultySigma = 3.0,
     PersonalConfidenceFullPassedCharts = 25,
+    -- If the engine profile says the player has substantial lifetime play,
+    -- but zero local passed charts can be matched, do not assume they are a
+    -- brand-new player.  This commonly indicates local SongID/path mismatch
+    -- or unavailable HighScoreList play-count bindings.
+    ExperiencedProfilePlayCountGuard = 20,
     ScoreWellMinBenchmarkCharts = 8,
     MachineRecentActivityDays = 120,
     CommunityScoreFloor = 0.75,
@@ -215,7 +220,7 @@ SLRecommendations.Modes = {
     },
 
     ScoreWell = {
-        section = "Try for Score",
+        section = "Score Well",
         difficultyGateFloor = 0.20,
         weights = {
             difficulty = 0.20,
@@ -696,10 +701,68 @@ local function getHSL(profile, song, steps)
     return profile:GetHighScoreListIfExists(song, steps)
 end
 
-local function getPlayCount(profile, song, steps)
+local function getHistoryEvidence(profile, song, steps)
     local hsl = getHSL(profile, song, steps)
-    if not hsl or not hsl.GetNumTimesPlayed then return 0 end
-    return hsl:GetNumTimesPlayed() or 0
+
+    if not hsl then
+        return {
+            hsl = nil,
+            reportedPlays = 0,
+            scoreCount = 0,
+            usablePlays = 0,
+            playCountBindingAvailable = false,
+            usedScoreFallback = false,
+        }
+    end
+
+    local scores =
+        hsl.GetHighScores
+        and (hsl:GetHighScores() or {})
+        or {}
+
+    local scoreCount =
+        #scores
+
+    local playCountBindingAvailable =
+        hsl.GetNumTimesPlayed ~= nil
+
+    local reportedPlays = 0
+
+    if playCountBindingAvailable then
+        reportedPlays =
+            tonumber(
+                hsl:GetNumTimesPlayed()
+            ) or 0
+    end
+
+    -- Skill/history recognition must not disappear merely because the optional
+    -- play-count binding is missing or unexpectedly reports zero.  A stored
+    -- HighScore is itself direct evidence that this chart has history.
+    local usablePlays =
+        math.max(
+            reportedPlays,
+            scoreCount
+        )
+
+    return {
+        hsl = hsl,
+        reportedPlays = reportedPlays,
+        scoreCount = scoreCount,
+        usablePlays = usablePlays,
+        playCountBindingAvailable =
+            playCountBindingAvailable,
+        usedScoreFallback =
+            scoreCount > reportedPlays,
+    }
+end
+
+local function getPlayCount(profile, song, steps)
+    return
+        getHistoryEvidence(
+            profile,
+            song,
+            steps
+        ).usablePlays
 end
 
 local function getBestPercentDP(profile, song, steps)
@@ -887,6 +950,18 @@ local function collectChartGroups(pn, stepsType, personalProfile)
     local fallbackIdentity = 0
     local totalEntries = 0
 
+    -- Personal-history diagnostics.  These make it possible to distinguish:
+    --   1. profile not loaded/persistent,
+    --   2. HSL play-count binding unavailable,
+    --   3. local Song/Steps IDs not matching history stored in the profile.
+    local personalHSLMatches = 0
+    local personalHSLWithScores = 0
+    local personalUsablePlayEntries = 0
+    local personalReportedPlayEntries = 0
+    local personalScoreFallbackEntries = 0
+    local personalPlayCountBindingObserved = false
+    local personalPlayCountBindingMissingOnMatchedHSL = false
+
     for song in ivalues(SONGMAN:GetAllSongs()) do
         local favorite = personalProfile and isFavorited(pn, song) or false
 
@@ -920,11 +995,56 @@ local function collectChartGroups(pn, stepsType, personalProfile)
                 groups[#groups + 1] = group
             end
 
+            local personalEvidence =
+                personalProfile
+                and getHistoryEvidence(
+                    personalProfile,
+                    song,
+                    steps
+                )
+                or nil
+
+            if personalEvidence
+                and personalEvidence.hsl
+            then
+                personalHSLMatches =
+                    personalHSLMatches + 1
+
+                if personalEvidence.scoreCount > 0 then
+                    personalHSLWithScores =
+                        personalHSLWithScores + 1
+                end
+
+                if personalEvidence.reportedPlays > 0 then
+                    personalReportedPlayEntries =
+                        personalReportedPlayEntries + 1
+                end
+
+                if personalEvidence.usablePlays > 0 then
+                    personalUsablePlayEntries =
+                        personalUsablePlayEntries + 1
+                end
+
+                if personalEvidence.usedScoreFallback then
+                    personalScoreFallbackEntries =
+                        personalScoreFallbackEntries + 1
+                end
+
+                if personalEvidence.playCountBindingAvailable then
+                    personalPlayCountBindingObserved = true
+                else
+                    personalPlayCountBindingMissingOnMatchedHSL = true
+                end
+            end
+
             local entry = {
                 song = song,
                 steps = steps,
                 favorite = favorite,
-                playerPlays = getPlayCount(personalProfile, song, steps),
+                playerPlays =
+                    personalEvidence
+                    and personalEvidence.usablePlays
+                    or 0,
                 machinePlays = getPlayCount(machine, song, steps),
                 grooveStatsHash = hash,
                 grooveStatsHashVersion = hashVersion,
@@ -954,6 +1074,27 @@ local function collectChartGroups(pn, stepsType, personalProfile)
         uniqueIdentities = #groups,
         duplicateHashGroups = duplicateHashGroups,
         duplicateChartCopiesCollapsed = duplicateChartCopiesCollapsed,
+
+        personalHSLMatches =
+            personalHSLMatches,
+
+        personalHSLWithScores =
+            personalHSLWithScores,
+
+        personalUsablePlayEntries =
+            personalUsablePlayEntries,
+
+        personalReportedPlayEntries =
+            personalReportedPlayEntries,
+
+        personalScoreFallbackEntries =
+            personalScoreFallbackEntries,
+
+        personalPlayCountBindingObserved =
+            personalPlayCountBindingObserved,
+
+        personalPlayCountBindingMissingOnMatchedHSL =
+            personalPlayCountBindingMissingOnMatchedHSL,
     }
 end
 
@@ -3590,18 +3731,65 @@ local function finalizeSkillAndTechProfile(model)
     local skillCfg = cfg.Skill or DEFAULT_CURRICULUM.Skill
     local jokeMax = cfg.JokeMeterMax or 30
 
-    if not model.usePersonalData or model.passedHistoryCharts <= 0 then
+    if not model.usePersonalData then
         model.personalConfidence = 0
-        model.playerMaturity = model.profileIsGuest and "guest" or "cold"
+        model.playerMaturity =
+            model.profileIsGuest
+            and "guest"
+            or "cold"
 
-        -- Brand-new onboarding: show 1s/2s/3s together. Guest/no-data players
-        -- get this too because it is a useful "where do I start?" section.
+        -- Guest/nonpersistent onboarding.
         model.introProgression = true
         model.levelUpMeter = 3
         model.skillFocusLevel = 3
         model.targetMeter = 2
         model.difficultySigma = 1.25
+        model.scoreWellReady = false
+        return
+    end
 
+    if model.passedHistoryCharts <= 0 then
+        model.personalConfidence = 0
+
+        local lifetimePlays =
+            tonumber(
+                model.profileReportedTotalSongsPlayed
+            ) or 0
+
+        local experiencedGuard =
+            tonumber(
+                SLRecommendations.Config.ExperiencedProfilePlayCountGuard
+            ) or 20
+
+        if lifetimePlays >= experiencedGuard then
+            -- The profile itself clearly isn't new, but the currently loaded
+            -- cabinet could not turn its local Song/Steps objects into passed
+            -- historical charts.  Do NOT call this player a beginner.
+            --
+            -- This can happen when a shared profile moves between cabinets
+            -- whose Group/Song paths differ; ITGmania's current profile Lua
+            -- lookup is keyed through SongID/StepsID built from the local
+            -- Song/Steps objects.
+            model.playerMaturity = "history-unmatched"
+            model.historyMismatchSuspected = true
+            model.introProgression = false
+            model.levelUpMeter = nil
+            model.skillFocusLevel = nil
+            model.targetMeter = nil
+            model.difficultySigma =
+                SLRecommendations.Config.DifficultyMinSigma
+            model.scoreWellReady = false
+            return
+        end
+
+        model.playerMaturity = "cold"
+
+        -- Genuine low/no-data onboarding.
+        model.introProgression = true
+        model.levelUpMeter = 3
+        model.skillFocusLevel = 3
+        model.targetMeter = 2
+        model.difficultySigma = 1.25
         model.scoreWellReady = false
         return
     end
@@ -4236,6 +4424,42 @@ local function buildModel(pn, stepsType)
         difficultyScaleCounts = {},
         playedHistoryCharts = 0,
         favoriteSongs = 0,
+
+        -- Profile/history sanity diagnostics.
+        profileReportedTotalSongsPlayed =
+            (
+                usePersonalData
+                and profile
+                and profile.GetTotalNumSongsPlayed
+                and profile:GetTotalNumSongsPlayed()
+            ) or 0,
+
+        localHistoryHSLMatches =
+            groupStats.personalHSLMatches or 0,
+
+        localHistoryHSLWithScores =
+            groupStats.personalHSLWithScores or 0,
+
+        localHistoryUsablePlayEntries =
+            groupStats.personalUsablePlayEntries or 0,
+
+        localHistoryReportedPlayEntries =
+            groupStats.personalReportedPlayEntries or 0,
+
+        localHistoryScoreFallbackEntries =
+            groupStats.personalScoreFallbackEntries or 0,
+
+        highScoreListPlayCountBindingObserved =
+            groupStats.personalPlayCountBindingObserved
+            and true
+            or false,
+
+        highScoreListPlayCountBindingMissingOnMatchedHSL =
+            groupStats.personalPlayCountBindingMissingOnMatchedHSL
+            and true
+            or false,
+
+        historyMismatchSuspected = false,
 
         -- Local peer-relative scoring model.  v10 records this signal for
         -- validation but does not let it alter ranking yet.
@@ -8140,6 +8364,70 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
     lines[#lines + 1] = "Personal data enabled: " .. tostring(model.usePersonalData)
     lines[#lines + 1] = "Personal-data confidence: " .. fmt(model.personalConfidence or 0, 3)
     lines[#lines + 1] = "Passed history charts: " .. tostring(model.passedHistoryCharts or 0)
+    lines[#lines + 1] =
+        "Profile total songs played (engine): " ..
+        tostring(
+            model.profileReportedTotalSongsPlayed
+            or 0
+        )
+
+    lines[#lines + 1] =
+        "Local chart entries matching profile HSL: " ..
+        tostring(
+            model.localHistoryHSLMatches
+            or 0
+        ) ..
+        " / " ..
+        tostring(
+            model.totalChartEntries
+            or 0
+        )
+
+    lines[#lines + 1] =
+        "Matched HSLs containing stored scores: " ..
+        tostring(
+            model.localHistoryHSLWithScores
+            or 0
+        )
+
+    lines[#lines + 1] =
+        "Matched chart entries with reported play count > 0: " ..
+        tostring(
+            model.localHistoryReportedPlayEntries
+            or 0
+        )
+
+    lines[#lines + 1] =
+        "Matched chart entries with usable history evidence: " ..
+        tostring(
+            model.localHistoryUsablePlayEntries
+            or 0
+        )
+
+    lines[#lines + 1] =
+        "Charts using stored-score fallback for play evidence: " ..
+        tostring(
+            model.localHistoryScoreFallbackEntries
+            or 0
+        )
+
+    lines[#lines + 1] =
+        "HighScoreList:GetNumTimesPlayed binding observed: " ..
+        tostring(
+            model.highScoreListPlayCountBindingObserved
+        )
+
+    lines[#lines + 1] =
+        "Matched HSL missing GetNumTimesPlayed binding: " ..
+        tostring(
+            model.highScoreListPlayCountBindingMissingOnMatchedHSL
+        )
+
+    lines[#lines + 1] =
+        "History mismatch suspected: " ..
+        tostring(
+            model.historyMismatchSuspected
+        )
     lines[#lines + 1] = "Working / reliable / mastered meter: " ..
         tostring(model.workingMeter or "-") .. " / " ..
         tostring(model.reliableMeter or "-") .. " / " ..

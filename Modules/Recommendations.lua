@@ -1,5 +1,5 @@
 -- ITGmania / Simply Love Recommendations module
--- v26.1
+-- v27
 --
 -- Target:
 --   ITGmania beta
@@ -14,7 +14,7 @@
 --   modules such as bpm_change_indicator.lua.
 
 local t = {}
-local MODULE_VERSION = "26.1"
+local MODULE_VERSION = "27"
 
 local TARGET_SCREEN = "ScreenSelectMusic"
 
@@ -1466,9 +1466,9 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 78)
-                    :zoom(0.32)
+                    :zoom(0.55)
                     :wrapwidthpixels(
-                        (PANEL.width - 18) / 0.32
+                        (PANEL.width - 18) / 0.55
                     )
                     :vertspacing(0)
                     :diffuse(
@@ -1488,9 +1488,9 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 121)
-                    :zoom(0.32)
+                    :zoom(0.55)
                     :wrapwidthpixels(
-                        (PANEL.width - 18) / 0.32
+                        (PANEL.width - 18) / 0.55
                     )
                     :vertspacing(0)
                     :diffuse(
@@ -1510,9 +1510,9 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 164)
-                    :zoom(0.32)
+                    :zoom(0.55)
                     :wrapwidthpixels(
-                        (PANEL.width - 18) / 0.32
+                        (PANEL.width - 18) / 0.55
                     )
                     :vertspacing(0)
                     :diffuse(

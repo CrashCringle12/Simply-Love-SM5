@@ -3,7 +3,7 @@
 -- POLICY lives here.  The scorer reads this table dynamically.
 
 SLRecommendationCurriculum = {
-    Version = 11,
+    Version = 12,
 
     JokeMeterMax = 30,
 
@@ -296,8 +296,8 @@ SLRecommendationCurriculum = {
     -- it only comes back when the player's recent history shows actual interest.
     Quirkiness = {
         automaticLevel = 10,
-        section = "Gimmicky Recs",
-        interestSection = "Gimmicky Recs",
+        section = "Quirky Recs",
+        interestSection = "More Quirky Charts",
         candidateMin = 0.42,
         maxResults = 20,
         interestMaxResults = 16,
