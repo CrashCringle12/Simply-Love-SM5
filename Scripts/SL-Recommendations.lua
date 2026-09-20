@@ -8,7 +8,7 @@
 -- exposes HighScoreList:GetNumTimesPlayed() and :GetLastPlayed().
 
 SLRecommendations = SLRecommendations or {}
-SLRecommendations.Version = "24.5"
+SLRecommendations.Version = "26"
 
 -- The curriculum is kept in a separate editable file.  Normally Simply Love
 -- loads Scripts automatically, but load it explicitly if necessary so this
@@ -67,7 +67,17 @@ SLRecommendations.Config = {
     -- another cabinet stores it under a different pack/group.
     DailyRecommendationsEnabled = true,
     DailyRecommendationCacheFilename = "recommendations-daily.json",
-    DailyRecommendationCacheFormatVersion = 1,
+    DailyRecommendationCacheFormatVersion = 2,
+
+    -- Cabinet-global hash -> local chart cache.  This lives in MachineProfile,
+    -- so every player on the same cabinet teaches/reuses the same mappings.
+    MachineChartIndexFilename = "Recommendations-ChartIndex.json",
+    MachineChartIndexFormatVersion = 1,
+
+    -- Native preferred-sort cache written per profile + cabinet + StepsType.
+    -- This lets repeat ScreenSelectMusic visits hand ITGmania a tiny resolved
+    -- sort file instead of rebuilding preferred sections from the full library.
+    MachinePreferredSortPrefix = "Recommendations",
 
     -- Deterministic daily variance for For You only.  This is intentionally
     -- small: close candidates can trade places, but weak matches cannot jump
@@ -205,7 +215,7 @@ SLRecommendations.Modes = {
     },
 
     ScoreWell = {
-        section = "Score Well",
+        section = "Try for Score",
         difficultyGateFloor = 0.20,
         weights = {
             difficulty = 0.20,
@@ -5995,10 +6005,28 @@ end
 -- DAILY RECOMMENDATION CACHE
 -- =========================================================================
 --
--- A shared profile may be mounted by multiple cabinets with different song
--- libraries.  The profile owns one daily hash-based recommendation set.  Each
--- cabinet resolves those hashes locally and may save a cabinet-specific filled
--- version when some shared charts are missing.
+-- v25 uses three cache layers:
+--
+--   1. Profile daily cache (portable):
+--        recommendations-daily.json
+--        Hash/ChartKey identities; shared across cabinets.
+--
+--   2. Machine chart index (cabinet-global):
+--        MachineProfile/Recommendations-ChartIndex.json
+--        GrooveStats hash -> local Group/SongFolder + ChartKey.
+--        Every player's recommendations teach the same cabinet-wide lookup.
+--
+--   3. Native preferred-sort cache (profile + cabinet + StepsType):
+--        Recommendations-{MachineGuid}-{StepsType}.txt
+--        Already-resolved local song paths for ITGmania's native preferred sort.
+--
+-- The important performance property is that a normal same-cab daily cache hit
+-- never needs to iterate every installed chart.  It resolves directly through
+-- local song paths / the machine index and checks only the handful of Steps on
+-- each recommended song.
+
+local machineChartIndexMemory = nil
+local machineChartIndexDirty = false
 
 local function dailyDateKey()
     return string.format(
@@ -6052,6 +6080,13 @@ local function dailyStyleKey(stepsType)
         or nil
 end
 
+local function sanitizeFilenamePart(value)
+    local s = tostring(value or "")
+    s = s:gsub("[^%w%-%._]", "_")
+    if s == "" then s = "unknown" end
+    return s
+end
+
 local function dailyCachePath(pn)
     if PROFILEMAN:IsPersistentProfile(pn) then
         return PROFILEMAN:GetProfileDir(profileSlotForPlayer(pn)) ..
@@ -6065,253 +6100,1220 @@ local function dailyCachePath(pn)
         "recommendations-guest-daily.json"
 end
 
-local function readDailyCache(pn)
-    local path = dailyCachePath(pn)
-    if not FILEMAN:DoesFileExist(path) then return nil end
+local function machineChartIndexPath()
+    return PROFILEMAN:GetProfileDir("ProfileSlot_Machine") ..
+        tostring(
+            SLRecommendations.Config.MachineChartIndexFilename
+            or "Recommendations-ChartIndex.json"
+        )
+end
+
+local function preferredSortCachePath(pn, stepsType)
+    local baseDir
+
+    if PROFILEMAN:IsPersistentProfile(pn) then
+        baseDir =
+            PROFILEMAN:GetProfileDir(
+                profileSlotForPlayer(pn)
+            )
+    else
+        baseDir =
+            PROFILEMAN:GetProfileDir(
+                "ProfileSlot_Machine"
+            )
+    end
+
+    local prefix =
+        tostring(
+            SLRecommendations.Config.MachinePreferredSortPrefix
+            or "Recommendations"
+        )
+
+    return
+        baseDir ..
+        prefix ..
+        "-" ..
+        sanitizeFilenamePart(dailyMachineIdentity()) ..
+        "-" ..
+        sanitizeFilenamePart(dailyStyleKey(stepsType)) ..
+        ".txt"
+end
+
+local function readJsonFile(path)
+    if not path
+        or not FILEMAN:DoesFileExist(path)
+    then
+        return nil
+    end
 
     local raw = lua.ReadFile(path)
-    if type(raw) ~= "string" or raw == "" then return nil end
+    if type(raw) ~= "string" or raw == "" then
+        return nil
+    end
 
-    local ok, decoded = pcall(JsonDecode, raw)
-    if not ok or type(decoded) ~= "table" then return nil end
+    local ok, decoded =
+        pcall(
+            JsonDecode,
+            raw
+        )
+
+    if not ok or type(decoded) ~= "table" then
+        return nil
+    end
 
     return decoded
 end
 
-local function writeDailyCache(pn, cache)
-    local ok, encoded = pcall(JsonEncode, cache, false)
-    if not ok or type(encoded) ~= "string" then return false end
-
-    local file = RageFileUtil.CreateRageFile()
-    local path = dailyCachePath(pn)
+local function writeTextFile(path, contents)
+    local file =
+        RageFileUtil.CreateRageFile()
 
     if not file:Open(path, 2) then
         file:destroy()
         return false
     end
 
-    file:Write(encoded)
+    file:Write(contents or "")
     file:Close()
     file:destroy()
+
     return true
 end
 
+local function writeJsonFile(path, value)
+    local ok, encoded =
+        pcall(
+            JsonEncode,
+            value,
+            false
+        )
+
+    if not ok
+        or type(encoded) ~= "string"
+    then
+        return false
+    end
+
+    return writeTextFile(path, encoded)
+end
+
+local function readDailyCache(pn)
+    return readJsonFile(dailyCachePath(pn))
+end
+
+local function writeDailyCache(pn, cache)
+    return writeJsonFile(dailyCachePath(pn), cache)
+end
+
 local function chartKeyForSteps(steps)
-    if not steps or not steps.GetChartKey then return nil end
+    if not steps or not steps.GetChartKey then
+        return nil
+    end
+
     local key = trim(steps:GetChartKey() or "")
     return key ~= "" and key or nil
 end
 
 local function copyStringArray(values)
     local out = {}
+
     for _, value in ipairs(values or {}) do
-        if type(value) == "string" then out[#out + 1] = value end
+        if type(value) == "string" then
+            out[#out + 1] = value
+        end
     end
+
     return out
 end
 
-local function buildInstalledChartIdentityIndex(stepsType)
-    local byHash = {}
-    local byChartKey = {}
+local function songReference(song)
+    if not song then return nil end
 
-    for song in ivalues(SONGMAN:GetAllSongs() or {}) do
-        for steps in ivalues(song:GetStepsByStepsType(stepsType) or {}) do
-            local hash = select(1, getGrooveStatsIdentity(steps))
-            if hash and hash ~= "" and not byHash[hash] then
-                byHash[hash] = { song = song, steps = steps }
-            end
+    local group =
+        trim(
+            song:GetGroupName()
+            or ""
+        )
 
-            local chartKey = chartKeyForSteps(steps)
-            if chartKey and not byChartKey[chartKey] then
-                byChartKey[chartKey] = { song = song, steps = steps }
-            end
+    local dir =
+        tostring(
+            song:GetSongDir()
+            or ""
+        )
+
+    dir = dir:gsub("\\", "/")
+    dir = dir:gsub("/+$", "")
+
+    local folder =
+        dir:match("([^/]+)$")
+
+    if group == ""
+        or not folder
+        or folder == ""
+    then
+        return nil
+    end
+
+    return group .. "/" .. folder
+end
+
+local function loadMachineChartIndex()
+    if machineChartIndexMemory then
+        return machineChartIndexMemory
+    end
+
+    local formatVersion =
+        tonumber(
+            SLRecommendations.Config.MachineChartIndexFormatVersion
+        ) or 1
+
+    local loaded =
+        readJsonFile(
+            machineChartIndexPath()
+        )
+
+    if type(loaded) ~= "table"
+        or tonumber(loaded.formatVersion) ~= formatVersion
+    then
+        loaded = {
+            formatVersion = formatVersion,
+            machineGuid = dailyMachineIdentity(),
+            styles = {},
+        }
+
+        machineChartIndexDirty = true
+    end
+
+    loaded.styles =
+        type(loaded.styles) == "table"
+        and loaded.styles
+        or {}
+
+    machineChartIndexMemory = loaded
+    return machineChartIndexMemory
+end
+
+local function flushMachineChartIndex()
+    if not machineChartIndexDirty then
+        return true
+    end
+
+    local index =
+        loadMachineChartIndex()
+
+    index.machineGuid =
+        dailyMachineIdentity()
+
+    index.updated =
+        dailyDateKey()
+
+    local ok =
+        writeJsonFile(
+            machineChartIndexPath(),
+            index
+        )
+
+    if ok then
+        machineChartIndexDirty = false
+    end
+
+    return ok
+end
+
+local function getMachineStyleIndex(stepsType)
+    local root =
+        loadMachineChartIndex()
+
+    local styleKey =
+        dailyStyleKey(stepsType)
+
+    local style =
+        root.styles[styleKey]
+
+    if type(style) ~= "table" then
+        style = {
+            complete = false,
+            songCount = 0,
+            byHash = {},
+            byChartKey = {},
+        }
+
+        root.styles[styleKey] = style
+        machineChartIndexDirty = true
+    end
+
+    style.byHash =
+        type(style.byHash) == "table"
+        and style.byHash
+        or {}
+
+    style.byChartKey =
+        type(style.byChartKey) == "table"
+        and style.byChartKey
+        or {}
+
+    local currentSongCount =
+        tonumber(
+            SONGMAN:GetNumSongs()
+        ) or 0
+
+    if style.complete
+        and tonumber(style.songCount) ~= currentSongCount
+    then
+        -- Packs were added/removed since this index was completed.  Existing
+        -- mappings remain useful, but an unknown hash may require one rescan.
+        style.complete = false
+        machineChartIndexDirty = true
+    end
+
+    return style
+end
+
+local function learnMachineChartLocation(
+    song,
+    steps,
+    stepsType,
+    styleIndex
+)
+    if not song or not steps then
+        return
+    end
+
+    styleIndex =
+        styleIndex
+        or getMachineStyleIndex(stepsType)
+
+    local ref =
+        songReference(song)
+
+    if not ref then return end
+
+    local hash, hashVersion =
+        getGrooveStatsIdentity(steps)
+
+    local chartKey =
+        chartKeyForSteps(steps)
+
+    if hash and hash ~= "" then
+        local previous =
+            styleIndex.byHash[hash]
+
+        if type(previous) ~= "table"
+            or previous.songRef ~= ref
+            or previous.chartKey ~= (chartKey or "")
+        then
+            styleIndex.byHash[hash] = {
+                songRef = ref,
+                chartKey = chartKey or "",
+                hashVersion =
+                    hashVersion
+                    and tostring(hashVersion)
+                    or "",
+            }
+
+            machineChartIndexDirty = true
         end
     end
 
-    return { byHash = byHash, byChartKey = byChartKey }
+    if chartKey then
+        local previous =
+            styleIndex.byChartKey[chartKey]
+
+        if type(previous) ~= "table"
+            or previous.songRef ~= ref
+            or previous.hash ~= (hash or "")
+        then
+            styleIndex.byChartKey[chartKey] = {
+                songRef = ref,
+                hash = hash or "",
+            }
+
+            machineChartIndexDirty = true
+        end
+    end
+end
+
+local function findMatchingStepsOnSong(
+    song,
+    item,
+    stepsType,
+    styleIndex
+)
+    if not song then return nil end
+
+    for steps in ivalues(
+        song:GetStepsByStepsType(stepsType)
+        or {}
+    ) do
+        local matched = false
+
+        if item.hash
+            and item.hash ~= ""
+        then
+            local hash =
+                select(
+                    1,
+                    getGrooveStatsIdentity(steps)
+                )
+
+            matched =
+                hash == item.hash
+        end
+
+        if not matched
+            and item.chartKey
+            and item.chartKey ~= ""
+        then
+            matched =
+                chartKeyForSteps(steps)
+                == item.chartKey
+        end
+
+        if matched then
+            learnMachineChartLocation(
+                song,
+                steps,
+                stepsType,
+                styleIndex
+            )
+
+            return steps
+        end
+    end
+
+    return nil
+end
+
+local function resolveSerializedItemFast(
+    item,
+    stepsType,
+    styleIndex
+)
+    if type(item) ~= "table" then
+        return nil
+    end
+
+    styleIndex =
+        styleIndex
+        or getMachineStyleIndex(stepsType)
+
+    local tried = {}
+
+    local function trySongRef(ref)
+        if not ref
+            or ref == ""
+            or tried[ref]
+        then
+            return nil
+        end
+
+        tried[ref] = true
+
+        local song =
+            SONGMAN:FindSong(ref)
+
+        if not song then
+            return nil
+        end
+
+        local steps =
+            findMatchingStepsOnSong(
+                song,
+                item,
+                stepsType,
+                styleIndex
+            )
+
+        if steps then
+            return {
+                song = song,
+                steps = steps,
+            }
+        end
+
+        return nil
+    end
+
+    -- The serialized local path is the cheapest path on the cabinet that
+    -- created the entry.  It is safe to try on another cabinet because the
+    -- chart hash/ChartKey is always verified before accepting it.
+    local direct =
+        trySongRef(
+            item.songRef
+        )
+
+    if direct then return direct end
+
+    if item.hash
+        and item.hash ~= ""
+    then
+        local entry =
+            styleIndex.byHash[
+                item.hash
+            ]
+
+        if type(entry) == "table" then
+            local resolved =
+                trySongRef(
+                    entry.songRef
+                )
+
+            if resolved then
+                return resolved
+            end
+
+            -- Stale mapping; keep the rest of the machine index intact.
+            styleIndex.byHash[item.hash] = nil
+            machineChartIndexDirty = true
+        end
+    end
+
+    if item.chartKey
+        and item.chartKey ~= ""
+    then
+        local entry =
+            styleIndex.byChartKey[
+                item.chartKey
+            ]
+
+        if type(entry) == "table" then
+            local resolved =
+                trySongRef(
+                    entry.songRef
+                )
+
+            if resolved then
+                return resolved
+            end
+
+            styleIndex.byChartKey[item.chartKey] = nil
+            machineChartIndexDirty = true
+        end
+    end
+
+    return nil
+end
+
+local function rebuildMachineChartIndex(stepsType)
+    local root =
+        loadMachineChartIndex()
+
+    local styleKey =
+        dailyStyleKey(stepsType)
+
+    local style = {
+        complete = false,
+        songCount =
+            tonumber(
+                SONGMAN:GetNumSongs()
+            ) or 0,
+        byHash = {},
+        byChartKey = {},
+    }
+
+    root.styles[styleKey] = style
+    machineChartIndexDirty = true
+
+    for song in ivalues(
+        SONGMAN:GetAllSongs()
+        or {}
+    ) do
+        for steps in ivalues(
+            song:GetStepsByStepsType(stepsType)
+            or {}
+        ) do
+            learnMachineChartLocation(
+                song,
+                steps,
+                stepsType,
+                style
+            )
+        end
+    end
+
+    style.complete = true
+    style.songCount =
+        tonumber(
+            SONGMAN:GetNumSongs()
+        ) or 0
+
+    machineChartIndexDirty = true
+    flushMachineChartIndex()
+
+    return style
 end
 
 local function serializeRecommendationResult(result)
-    if not result or not result.song or not result.steps then return nil end
+    if not result
+        or not result.song
+        or not result.steps
+    then
+        return nil
+    end
 
-    local hash, hashVersion = getGrooveStatsIdentity(result.steps)
+    local hash, hashVersion =
+        getGrooveStatsIdentity(
+            result.steps
+        )
 
     return {
         hash = hash or "",
-        hashVersion = hashVersion and tostring(hashVersion) or "",
-        chartKey = chartKeyForSteps(result.steps) or "",
+        hashVersion =
+            hashVersion
+            and tostring(hashVersion)
+            or "",
+        chartKey =
+            chartKeyForSteps(result.steps)
+            or "",
+
+        -- Local path is only an acceleration hint.  Hash/ChartKey remain the
+        -- authoritative identity, so this is safe in the portable shared file.
+        songRef =
+            songReference(result.song)
+            or "",
+
         modeKey = result.modeKey or "",
         score = tonumber(result.score) or 0,
-        dailyVarianceFactor = tonumber(result.dailyVarianceFactor) or 1,
-        reasons = copyStringArray(result.reasons),
+        dailyVarianceFactor =
+            tonumber(result.dailyVarianceFactor)
+            or 1,
+        reasons =
+            copyStringArray(
+                result.reasons
+            ),
 
-        -- Human-readable diagnostics/fallback metadata only.  Resolution does
-        -- not depend on pack/group path.
-        title = result.song:GetDisplayFullTitle() or "",
-        artist = result.song:GetDisplayArtist() or "",
-        group = result.song:GetGroupName() or "",
-        meter = tonumber(result.steps:GetMeter()) or 0,
-        difficulty = tostring(result.steps:GetDifficulty() or ""),
-        credit = result.steps:GetAuthorCredit() or "",
+        title =
+            result.song:GetDisplayFullTitle()
+            or "",
+        artist =
+            result.song:GetDisplayArtist()
+            or "",
+        group =
+            result.song:GetGroupName()
+            or "",
+        meter =
+            tonumber(
+                result.steps:GetMeter()
+            ) or 0,
+        difficulty =
+            tostring(
+                result.steps:GetDifficulty()
+                or ""
+            ),
+        credit =
+            result.steps:GetAuthorCredit()
+            or "",
     }
 end
 
-local function serializeRecommendationSections(resultsBySection, model)
-    local sections = {}
+local function orderedRecommendationSections(
+    resultsBySection,
+    model
+)
+    local out = {}
     local seen = {}
 
-    local function append(section)
-        if not section or section == "" or seen[section] then return end
+    local function add(section)
+        if not section
+            or section == ""
+            or seen[section]
+        then
+            return
+        end
 
-        local results = resultsBySection and resultsBySection[section]
-        if type(results) ~= "table" or #results <= 0 then return end
+        local results =
+            resultsBySection
+            and resultsBySection[section]
+
+        if type(results) ~= "table"
+            or #results <= 0
+        then
+            return
+        end
 
         seen[section] = true
-        local entry = { name = section, items = {} }
+        out[#out + 1] = section
+    end
 
-        for _, result in ipairs(results) do
-            local item = serializeRecommendationResult(result)
-            if item and (item.hash ~= "" or item.chartKey ~= "") then
-                entry.items[#entry.items + 1] = item
+    if model
+        and model.modeOrder
+    then
+        for _, modeKey in ipairs(
+            model.modeOrder
+        ) do
+            add(
+                getModeSection(
+                    model,
+                    modeKey
+                )
+            )
+        end
+    end
+
+    for section in pairs(
+        resultsBySection
+        or {}
+    ) do
+        add(section)
+    end
+
+    return out
+end
+
+local function serializeRecommendationSections(
+    resultsBySection,
+    model
+)
+    local sections = {}
+
+    for _, section in ipairs(
+        orderedRecommendationSections(
+            resultsBySection,
+            model
+        )
+    ) do
+        local entry = {
+            name = section,
+            items = {},
+        }
+
+        for _, result in ipairs(
+            resultsBySection[section]
+            or {}
+        ) do
+            local item =
+                serializeRecommendationResult(
+                    result
+                )
+
+            if item
+                and (
+                    item.hash ~= ""
+                    or item.chartKey ~= ""
+                )
+            then
+                entry.items[
+                    #entry.items + 1
+                ] = item
             end
         end
 
-        if #entry.items > 0 then sections[#sections + 1] = entry end
-    end
-
-    if model and model.modeOrder then
-        for _, modeKey in ipairs(model.modeOrder) do
-            append(getModeSection(model, modeKey))
+        if #entry.items > 0 then
+            sections[#sections + 1] = entry
         end
     end
 
-    for section in pairs(resultsBySection or {}) do append(section) end
     return sections
+end
+
+local function learnResultsIntoMachineIndex(
+    resultsBySection,
+    stepsType
+)
+    local styleIndex =
+        getMachineStyleIndex(
+            stepsType
+        )
+
+    for _, results in pairs(
+        resultsBySection
+        or {}
+    ) do
+        for _, result in ipairs(
+            results
+            or {}
+        ) do
+            if result.song
+                and result.steps
+            then
+                learnMachineChartLocation(
+                    result.song,
+                    result.steps,
+                    stepsType,
+                    styleIndex
+                )
+            end
+        end
+    end
+
+    flushMachineChartIndex()
+end
+
+local function writePreferredSortCache(
+    pn,
+    resultsBySection,
+    model,
+    stepsType
+)
+    local path =
+        preferredSortCachePath(
+            pn,
+            stepsType
+        )
+
+    local lines = {}
+
+    for _, section in ipairs(
+        orderedRecommendationSections(
+            resultsBySection,
+            model
+        )
+    ) do
+        local sectionLines = {}
+
+        for _, result in ipairs(
+            resultsBySection[section]
+            or {}
+        ) do
+            local ref =
+                songReference(
+                    result.song
+                )
+
+            if ref then
+                sectionLines[
+                    #sectionLines + 1
+                ] = ref
+            end
+        end
+
+        if #sectionLines > 0 then
+            lines[#lines + 1] =
+                "---" .. section
+
+            for _, ref in ipairs(
+                sectionLines
+            ) do
+                lines[#lines + 1] = ref
+            end
+
+            lines[#lines + 1] = ""
+        end
+    end
+
+    if #lines <= 0 then
+        return nil
+    end
+
+    if not writeTextFile(
+        path,
+        table.concat(lines, "\n")
+    ) then
+        return nil
+    end
+
+    return path
+end
+
+local function ensureMachineFastCaches(
+    pn,
+    resultsBySection,
+    model,
+    stepsType,
+    rewritePreferred
+)
+    learnResultsIntoMachineIndex(
+        resultsBySection,
+        stepsType
+    )
+
+    local path =
+        preferredSortCachePath(
+            pn,
+            stepsType
+        )
+
+    if rewritePreferred
+        or not FILEMAN:DoesFileExist(path)
+    then
+        path =
+            writePreferredSortCache(
+                pn,
+                resultsBySection,
+                model,
+                stepsType
+            )
+    end
+
+    if model then
+        model.preferredSortPath =
+            path
+    end
+
+    return path
+end
+
+local function resultFromSerializedItem(
+    section,
+    item,
+    localChart
+)
+    local song =
+        localChart.song
+
+    local steps =
+        localChart.steps
+
+    return {
+        song = song,
+        steps = steps,
+        section = section,
+        modeKey = item.modeKey or "",
+        score = tonumber(item.score) or 0,
+        dailyVarianceFactor =
+            tonumber(
+                item.dailyVarianceFactor
+            ) or 1,
+        reasons =
+            copyStringArray(
+                item.reasons
+            ),
+        meter =
+            steps:GetMeter(),
+        artist =
+            song:GetDisplayArtist(),
+        genre =
+            song:GetGenre(),
+        credit =
+            steps:GetAuthorCredit(),
+        grooveStatsHash =
+            item.hash
+            or "",
+        grooveStatsHashVersion =
+            item.hashVersion
+            or "",
+        components = {},
+    }
+end
+
+local function resolveSerializedSections(
+    serialized,
+    stepsType
+)
+    if type(serialized) ~= "table" then
+        return {}, {}
+    end
+
+    local styleIndex =
+        getMachineStyleIndex(
+            stepsType
+        )
+
+    local targetCounts = {}
+    local sectionSlots = {}
+    local unresolved = {}
+
+    for _, sectionEntry in ipairs(
+        serialized
+    ) do
+        local section =
+            tostring(
+                sectionEntry.name
+                or ""
+            )
+
+        if section ~= ""
+            and type(sectionEntry.items) == "table"
+        then
+            targetCounts[section] =
+                #sectionEntry.items
+
+            local slots = {}
+            sectionSlots[section] = slots
+
+            for index, item in ipairs(
+                sectionEntry.items
+            ) do
+                local localChart =
+                    resolveSerializedItemFast(
+                        item,
+                        stepsType,
+                        styleIndex
+                    )
+
+                if localChart then
+                    slots[index] =
+                        resultFromSerializedItem(
+                            section,
+                            item,
+                            localChart
+                        )
+                else
+                    unresolved[
+                        #unresolved + 1
+                    ] = {
+                        section = section,
+                        index = index,
+                        item = item,
+                    }
+                end
+            end
+        end
+    end
+
+    -- A sparse machine index is allowed while we learn recommendation hashes
+    -- organically.  The first genuinely unknown hash triggers ONE full scan for
+    -- this StepsType; afterwards "complete=true" means absent hashes are known
+    -- to be absent and future profiles do not rescan the library.
+    if #unresolved > 0
+        and not styleIndex.complete
+    then
+        styleIndex =
+            rebuildMachineChartIndex(
+                stepsType
+            )
+
+        for _, pending in ipairs(
+            unresolved
+        ) do
+            local localChart =
+                resolveSerializedItemFast(
+                    pending.item,
+                    stepsType,
+                    styleIndex
+                )
+
+            if localChart then
+                local slots =
+                    sectionSlots[
+                        pending.section
+                    ]
+
+                slots[pending.index] =
+                    resultFromSerializedItem(
+                        pending.section,
+                        pending.item,
+                        localChart
+                    )
+            end
+        end
+    end
+
+    local resultsBySection = {}
+
+    -- Flatten in the original serialized order so partial cache resolution can
+    -- never change recommendation rank order.
+    for section, slots in pairs(
+        sectionSlots
+    ) do
+        local results = {}
+        local target =
+            tonumber(
+                targetCounts[section]
+            ) or 0
+
+        for index = 1, target do
+            local result =
+                slots[index]
+
+            if result then
+                results[
+                    #results + 1
+                ] = result
+            end
+        end
+
+        if #results > 0 then
+            resultsBySection[section] =
+                results
+        end
+    end
+
+    flushMachineChartIndex()
+
+    return
+        resultsBySection,
+        targetCounts
 end
 
 local function recommendationIdentity(result)
     if not result then return nil end
 
     local hash = result.grooveStatsHash
-    if (not hash or hash == "") and result.steps then
-        hash = select(1, getGrooveStatsIdentity(result.steps))
-    end
-    if hash and hash ~= "" then return "h:" .. hash end
 
-    local chartKey = result.steps and chartKeyForSteps(result.steps) or nil
-    if chartKey then return "c:" .. chartKey end
+    if (not hash or hash == "")
+        and result.steps
+    then
+        hash =
+            select(
+                1,
+                getGrooveStatsIdentity(
+                    result.steps
+                )
+            )
+    end
+
+    if hash and hash ~= "" then
+        return "h:" .. hash
+    end
+
+    local chartKey =
+        result.steps
+        and chartKeyForSteps(
+            result.steps
+        )
+        or nil
+
+    if chartKey then
+        return "c:" .. chartKey
+    end
+
     return nil
 end
 
-local function resolveSerializedSections(serialized, stepsType)
-    if type(serialized) ~= "table" then return {}, {} end
-
-    local index = buildInstalledChartIdentityIndex(stepsType)
-    local resultsBySection = {}
-    local targetCounts = {}
-
-    for _, sectionEntry in ipairs(serialized) do
-        local section = tostring(sectionEntry.name or "")
-        if section ~= "" and type(sectionEntry.items) == "table" then
-            targetCounts[section] = #sectionEntry.items
-            local results = {}
-
-            for _, item in ipairs(sectionEntry.items) do
-                local localChart = nil
-
-                if item.hash and item.hash ~= "" then
-                    localChart = index.byHash[item.hash]
-                end
-
-                if not localChart and item.chartKey and item.chartKey ~= "" then
-                    localChart = index.byChartKey[item.chartKey]
-                end
-
-                if localChart then
-                    local song = localChart.song
-                    local steps = localChart.steps
-
-                    results[#results + 1] = {
-                        song = song,
-                        steps = steps,
-                        section = section,
-                        modeKey = item.modeKey or "",
-                        score = tonumber(item.score) or 0,
-                        dailyVarianceFactor = tonumber(item.dailyVarianceFactor) or 1,
-                        reasons = copyStringArray(item.reasons),
-                        meter = steps:GetMeter(),
-                        artist = song:GetDisplayArtist(),
-                        genre = song:GetGenre(),
-                        credit = steps:GetAuthorCredit(),
-                        grooveStatsHash = item.hash or "",
-                        grooveStatsHashVersion = item.hashVersion or "",
-                        components = {},
-                    }
-                end
-            end
-
-            if #results > 0 then resultsBySection[section] = results end
-        end
-    end
-
-    return resultsBySection, targetCounts
-end
-
-local function mergeResolvedWithLocal(resolved, localResults, targetCounts)
+local function mergeResolvedWithLocal(
+    resolved,
+    localResults,
+    targetCounts
+)
     local merged = {}
     local sections = {}
 
-    for section in pairs(targetCounts or {}) do sections[section] = true end
-    for section in pairs(resolved or {}) do sections[section] = true end
-    for section in pairs(localResults or {}) do sections[section] = true end
+    for section in pairs(
+        targetCounts
+        or {}
+    ) do
+        sections[section] = true
+    end
+
+    for section in pairs(
+        resolved
+        or {}
+    ) do
+        sections[section] = true
+    end
+
+    for section in pairs(
+        localResults
+        or {}
+    ) do
+        sections[section] = true
+    end
 
     for section in pairs(sections) do
         local out = {}
         local seen = {}
-        local target = tonumber(targetCounts and targetCounts[section]) or 0
+
+        local target =
+            tonumber(
+                targetCounts
+                and targetCounts[section]
+            ) or 0
+
         if target <= 0 then
-            target = #(localResults and localResults[section] or {})
+            target =
+                #(
+                    localResults
+                    and localResults[section]
+                    or {}
+                )
         end
 
         local function add(result)
-            if #out >= target and target > 0 then return end
-            local identity = recommendationIdentity(result)
-            if identity and not seen[identity] then
+            if #out >= target
+                and target > 0
+            then
+                return
+            end
+
+            local identity =
+                recommendationIdentity(
+                    result
+                )
+
+            if identity
+                and not seen[identity]
+            then
                 seen[identity] = true
                 out[#out + 1] = result
             end
         end
 
-        for _, result in ipairs(resolved and resolved[section] or {}) do add(result) end
-        for _, result in ipairs(localResults and localResults[section] or {}) do add(result) end
+        for _, result in ipairs(
+            resolved
+            and resolved[section]
+            or {}
+        ) do
+            add(result)
+        end
 
-        if #out > 0 then merged[section] = out end
+        for _, result in ipairs(
+            localResults
+            and localResults[section]
+            or {}
+        ) do
+            add(result)
+        end
+
+        if #out > 0 then
+            merged[section] = out
+        end
     end
 
     return merged
 end
 
-local function dailySeedFor(pn, dateKey, generation)
+local function dailySeedFor(
+    pn,
+    dateKey,
+    generation
+)
     return stableStringHash(
-        table.concat({
-            tostring(dateKey),
-            dailyProfileIdentity(pn),
-            tostring(generation or 0),
-        }, "|"),
+        table.concat(
+            {
+                tostring(dateKey),
+                dailyProfileIdentity(pn),
+                tostring(generation or 0),
+            },
+            "|"
+        ),
         8675309
     )
 end
 
-local function cachedModelFromEntry(entry)
+local function cachedModelFromEntry(
+    entry,
+    stepsType
+)
     return {
         fromDailyCache = true,
         modeOrder = entry.modeOrder or {},
-        introProgression = entry.introProgression and true or false,
-        levelUpMeter = entry.levelUpMeter,
-        skillFocusLevel = entry.skillFocusLevel,
-        stepsType = entry.stepsType,
-        dailyRecommendationSeed = entry.seed,
-        dailyRecommendationGeneration = tonumber(entry.generation) or 0,
+        introProgression =
+            entry.introProgression
+            and true
+            or false,
+        levelUpMeter =
+            entry.levelUpMeter,
+        skillFocusLevel =
+            entry.skillFocusLevel,
+        stepsType =
+            stepsType,
+        dailyRecommendationSeed =
+            entry.seed,
+        dailyRecommendationGeneration =
+            tonumber(
+                entry.generation
+            ) or 0,
+    }
+end
+
+local function saveMachineEntry(
+    styleCache,
+    machineKey,
+    generation,
+    resultsBySection,
+    model
+)
+    styleCache.machines[
+        machineKey
+    ] = {
+        generation =
+            generation,
+        sections =
+            serializeRecommendationSections(
+                resultsBySection,
+                model
+            ),
     }
 end
 
@@ -6319,12 +7321,236 @@ function SLRecommendations.GetDailyRecommendationCachePath(pn)
     return dailyCachePath(pn)
 end
 
-function SLRecommendations.EnsureDailyRecommendations(pn, options)
+function SLRecommendations.GetMachineChartIndexPath()
+    return machineChartIndexPath()
+end
+
+function SLRecommendations.GetMachinePreferredSortPath(
+    pn,
+    stepsType
+)
+    return preferredSortCachePath(
+        pn,
+        stepsType
+    )
+end
+
+
+local DAILY_MONTH_NAMES = {
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+}
+
+local function dailyDisplayDate()
+    return string.format(
+        "%s %d, %d",
+        DAILY_MONTH_NAMES[
+            MonthOfYear() + 1
+        ] or "Unknown",
+        DayOfMonth(),
+        Year()
+    )
+end
+
+-- Cheap preflight used by the ScreenSelectMusic module before it decides
+-- whether to show the "Building Daily Recommendations..." message.
+--
+-- IMPORTANT: this intentionally does NOT resolve any stored hashes, inspect
+-- every chart, rebuild the machine chart index, or generate recommendation
+-- features.  It only reads today's small profile cache and checks whether the
+-- shared daily set already exists.
+function SLRecommendations.GetDailyRecommendationStatus(
+    pn,
+    options
+)
+    options = options or {}
+
+    local stepsType =
+        options.stepsType
+
+    if not stepsType then
+        local style =
+            GAMESTATE
+            and GAMESTATE:GetCurrentStyle()
+            or nil
+
+        if not style then
+            return {
+                available = false,
+                needsBuild = false,
+                reason = "style-unavailable",
+                date = dailyDateKey(),
+                displayDate = dailyDisplayDate(),
+            }
+        end
+
+        stepsType =
+            style:GetStepsType()
+    end
+
+    if not stepsType then
+        return {
+            available = false,
+            needsBuild = false,
+            reason = "steps-type-unavailable",
+            date = dailyDateKey(),
+            displayDate = dailyDisplayDate(),
+        }
+    end
+
+    local styleKey =
+        dailyStyleKey(
+            stepsType
+        )
+
+    if not styleKey then
+        return {
+            available = false,
+            needsBuild = false,
+            reason = "style-unavailable",
+            date = dailyDateKey(),
+            displayDate = dailyDisplayDate(),
+        }
+    end
+
+    local today =
+        dailyDateKey()
+
+    local formatVersion =
+        tonumber(
+            SLRecommendations.Config.DailyRecommendationCacheFormatVersion
+        ) or 2
+
+    local cache =
+        readDailyCache(pn)
+
+    local cacheUsable =
+        type(cache) == "table"
+        and cache.date == today
+        and tostring(
+            cache.scriptVersion
+            or ""
+        ) == tostring(
+            SLRecommendations.Version
+        )
+        and tonumber(
+            cache.formatVersion
+        ) == formatVersion
+
+    local styleCache = nil
+
+    if cacheUsable
+        and type(cache.styles) == "table"
+    then
+        styleCache =
+            cache.styles[
+                styleKey
+            ]
+    end
+
+    local shared =
+        type(styleCache) == "table"
+        and styleCache.shared
+        or nil
+
+    local generation =
+        type(styleCache) == "table"
+        and tonumber(
+            styleCache.generation
+        )
+        or 0
+
+    if type(shared) == "table"
+        and tonumber(
+            shared.generation
+        ) ~= nil
+    then
+        generation =
+            tonumber(
+                shared.generation
+            )
+    end
+
+    local machineEntry = nil
+
+    if type(styleCache) == "table"
+        and type(styleCache.machines) == "table"
+    then
+        machineEntry =
+            styleCache.machines[
+                dailyMachineIdentity()
+            ]
+    end
+
+    local force =
+        options.forceRefresh
+        and true
+        or false
+
+    return {
+        available = true,
+        date = today,
+        displayDate = dailyDisplayDate(),
+        stepsType = stepsType,
+        styleKey = styleKey,
+        cacheUsable = cacheUsable,
+        hasShared =
+            type(shared) == "table",
+        hasMachineEntry =
+            type(machineEntry) == "table",
+        generation =
+            generation,
+        needsBuild =
+            force
+            or type(shared) ~= "table",
+        forceRefresh =
+            force,
+        preferredSortPath =
+            preferredSortCachePath(
+                pn,
+                stepsType
+            ),
+    }
+end
+
+function SLRecommendations.EnsureDailyRecommendations(
+    pn,
+    options
+)
     options = options or {}
 
     if not SLRecommendations.Config.DailyRecommendationsEnabled then
-        local results, model, err = SLRecommendations.GenerateModes(pn, options)
-        return results, model, err, "generated-no-cache"
+        local results, model, err =
+            SLRecommendations.GenerateModes(
+                pn,
+                options
+            )
+
+        if not err and model then
+            ensureMachineFastCaches(
+                pn,
+                results,
+                model,
+                model.stepsType,
+                true
+            )
+        end
+
+        return
+            results,
+            model,
+            err,
+            "generated-no-cache"
     end
 
     local stepsType =
@@ -6357,7 +7583,9 @@ function SLRecommendations.EnsureDailyRecommendations(pn, options)
     end
 
     local styleKey =
-        dailyStyleKey(stepsType)
+        dailyStyleKey(
+            stepsType
+        )
 
     if not styleKey then
         return
@@ -6367,85 +7595,225 @@ function SLRecommendations.EnsureDailyRecommendations(pn, options)
             "style-unavailable"
     end
 
-    local machineKey = dailyMachineIdentity()
-    local today = dailyDateKey()
-    local formatVersion = tonumber(SLRecommendations.Config.DailyRecommendationCacheFormatVersion) or 1
-    local cache = readDailyCache(pn)
+    local machineKey =
+        dailyMachineIdentity()
+
+    local today =
+        dailyDateKey()
+
+    local formatVersion =
+        tonumber(
+            SLRecommendations.Config.DailyRecommendationCacheFormatVersion
+        ) or 2
+
+    local cache =
+        readDailyCache(pn)
 
     local cacheUsable =
         type(cache) == "table"
         and cache.date == today
-        and tostring(cache.scriptVersion or "") == tostring(SLRecommendations.Version)
-        and tonumber(cache.formatVersion) == formatVersion
+        and tostring(
+            cache.scriptVersion
+            or ""
+        ) == tostring(
+            SLRecommendations.Version
+        )
+        and tonumber(
+            cache.formatVersion
+        ) == formatVersion
 
     if not cacheUsable then
         cache = {
-            formatVersion = formatVersion,
-            scriptVersion = tostring(SLRecommendations.Version),
-            date = today,
-            profileGuid = dailyProfileIdentity(pn),
+            formatVersion =
+                formatVersion,
+            scriptVersion =
+                tostring(
+                    SLRecommendations.Version
+                ),
+            date =
+                today,
+            profileGuid =
+                dailyProfileIdentity(pn),
             styles = {},
         }
     end
 
-    cache.styles = type(cache.styles) == "table" and cache.styles or {}
-    local styleCache = cache.styles[styleKey]
-    if type(styleCache) ~= "table" then
-        styleCache = { machines = {} }
-        cache.styles[styleKey] = styleCache
-    end
-    styleCache.machines = type(styleCache.machines) == "table" and styleCache.machines or {}
+    cache.styles =
+        type(cache.styles) == "table"
+        and cache.styles
+        or {}
 
-    local force = options.forceRefresh and true or false
-    local generation = tonumber(styleCache.generation) or 0
+    local styleCache =
+        cache.styles[
+            styleKey
+        ]
+
+    if type(styleCache) ~= "table" then
+        styleCache = {
+            machines = {},
+        }
+
+        cache.styles[
+            styleKey
+        ] = styleCache
+    end
+
+    styleCache.machines =
+        type(styleCache.machines) == "table"
+        and styleCache.machines
+        or {}
+
+    local force =
+        options.forceRefresh
+        and true
+        or false
+
+    local generation =
+        tonumber(
+            styleCache.generation
+        ) or 0
 
     if force then
-        generation = generation + 1
+        generation =
+            generation + 1
     end
 
-    -- Manual refresh establishes a brand-new shared daily set and invalidates
-    -- cabinet-specific filled versions.
-    if force or type(styleCache.shared) ~= "table" then
-        local seed = dailySeedFor(pn, today, generation)
+    -- First generation of the day, or manual refresh.  The generating cabinet
+    -- already has exact Song/Steps objects, so immediately save BOTH the shared
+    -- portable set and this cabinet's resolved machine entry.  v24.5 only saved
+    -- the shared set, causing needless resolution work on the second visit.
+    if force
+        or type(styleCache.shared) ~= "table"
+    then
+        local seed =
+            dailySeedFor(
+                pn,
+                today,
+                generation
+            )
+
         local generatedOptions = {}
-        for key, value in pairs(options) do generatedOptions[key] = value end
+
+        for key, value in pairs(options) do
+            generatedOptions[key] = value
+        end
+
         generatedOptions.forceRefresh = nil
         generatedOptions.dailySeed = seed
-        generatedOptions.dailyGeneration = generation
+        generatedOptions.dailyGeneration =
+            generation
 
-        local generated, model, err = SLRecommendations.GenerateModes(pn, generatedOptions)
-        if err then return generated, model, err, "generation-error" end
+        local generated, model, err =
+            SLRecommendations.GenerateModes(
+                pn,
+                generatedOptions
+            )
 
-        styleCache.generation = generation
-        styleCache.seed = seed
+        if err then
+            return
+                generated,
+                model,
+                err,
+                "generation-error"
+        end
+
+        styleCache.generation =
+            generation
+
+        styleCache.seed =
+            seed
+
         styleCache.shared = {
-            generation = generation,
-            seed = seed,
-            stepsType = styleKey,
-            modeOrder = model.modeOrder or {},
-            introProgression = model.introProgression and true or false,
-            levelUpMeter = model.levelUpMeter,
-            skillFocusLevel = model.skillFocusLevel,
-            sections = serializeRecommendationSections(generated, model),
+            generation =
+                generation,
+            seed =
+                seed,
+            stepsType =
+                styleKey,
+            modeOrder =
+                model.modeOrder
+                or {},
+            introProgression =
+                model.introProgression
+                and true
+                or false,
+            levelUpMeter =
+                model.levelUpMeter,
+            skillFocusLevel =
+                model.skillFocusLevel,
+            sections =
+                serializeRecommendationSections(
+                    generated,
+                    model
+                ),
         }
-        styleCache.machines = {}
-        writeDailyCache(pn, cache)
 
-        return generated, model, nil, force and "refreshed" or "generated-daily"
+        styleCache.machines = {}
+
+        saveMachineEntry(
+            styleCache,
+            machineKey,
+            generation,
+            generated,
+            model
+        )
+
+        writeDailyCache(
+            pn,
+            cache
+        )
+
+        ensureMachineFastCaches(
+            pn,
+            generated,
+            model,
+            stepsType,
+            true
+        )
+
+        return
+            generated,
+            model,
+            nil,
+            force
+            and "refreshed"
+            or "generated-daily"
     end
 
-    generation = tonumber(styleCache.shared.generation) or generation
-    local machineEntry = styleCache.machines[machineKey]
+    generation =
+        tonumber(
+            styleCache.shared.generation
+        ) or generation
 
+    local machineEntry =
+        styleCache.machines[
+            machineKey
+        ]
+
+    -- Fastest path: this exact profile/cabinet/generation was already resolved.
+    -- resolveSerializedSections() first tries the stored local songRef and the
+    -- cabinet-global hash index, so it does NOT scan the whole library here.
     if type(machineEntry) == "table"
-        and tonumber(machineEntry.generation) == generation
+        and tonumber(
+            machineEntry.generation
+        ) == generation
     then
         local resolved, machineTargets =
-            resolveSerializedSections(machineEntry.sections, stepsType)
+            resolveSerializedSections(
+                machineEntry.sections,
+                stepsType
+            )
 
         local machineComplete = true
-        for section, target in pairs(machineTargets) do
-            if #(resolved[section] or {}) < target then
+
+        for section, target in pairs(
+            machineTargets
+        ) do
+            if #(
+                resolved[section]
+                or {}
+            ) < target
+            then
                 machineComplete = false
                 break
             end
@@ -6455,45 +7823,159 @@ function SLRecommendations.EnsureDailyRecommendations(pn, options)
             and resolved["For You"]
             and #resolved["For You"] > 0
         then
-            local model = cachedModelFromEntry(styleCache.shared)
-            return resolved, model, nil, "daily-cache-machine"
+            local model =
+                cachedModelFromEntry(
+                    styleCache.shared,
+                    stepsType
+                )
+
+            ensureMachineFastCaches(
+                pn,
+                resolved,
+                model,
+                stepsType,
+                false
+            )
+
+            return
+                resolved,
+                model,
+                nil,
+                "daily-cache-machine-fast"
         end
     end
 
+    -- This is a new cabinet for today's shared profile set (or the previous
+    -- machine entry became stale).  Resolve portable hashes using:
+    --
+    --   direct shared songRef, if identical on this cab
+    --   -> cabinet-global hash index learned from ANY player
+    --   -> one full StepsType scan only if the machine index is still sparse
+    --
     local sharedResolved, targetCounts =
-        resolveSerializedSections(styleCache.shared.sections, stepsType)
+        resolveSerializedSections(
+            styleCache.shared.sections,
+            stepsType
+        )
 
     local needsFill = false
-    for section, target in pairs(targetCounts) do
-        local have = #(sharedResolved[section] or {})
-        if have < target then needsFill = true break end
+
+    for section, target in pairs(
+        targetCounts
+    ) do
+        local have =
+            #(
+                sharedResolved[section]
+                or {}
+            )
+
+        if have < target then
+            needsFill = true
+            break
+        end
     end
 
-    if not needsFill and sharedResolved["For You"] and #sharedResolved["For You"] > 0 then
-        return sharedResolved, cachedModelFromEntry(styleCache.shared), nil, "daily-cache-shared"
+    if not needsFill
+        and sharedResolved["For You"]
+        and #sharedResolved["For You"] > 0
+    then
+        local model =
+            cachedModelFromEntry(
+                styleCache.shared,
+                stepsType
+            )
+
+        saveMachineEntry(
+            styleCache,
+            machineKey,
+            generation,
+            sharedResolved,
+            model
+        )
+
+        writeDailyCache(
+            pn,
+            cache
+        )
+
+        ensureMachineFastCaches(
+            pn,
+            sharedResolved,
+            model,
+            stepsType,
+            true
+        )
+
+        return
+            sharedResolved,
+            model,
+            nil,
+            "daily-cache-shared-resolved"
     end
 
-    -- This cabinet is missing some shared charts.  Generate once locally using
-    -- the SAME daily seed, keep every shared chart that exists here, and fill
-    -- only the gaps from local candidates.
+    -- This cabinet genuinely lacks some shared charts.  Generate once locally
+    -- using the SAME daily seed, preserve every shared chart that exists here,
+    -- and fill only the gaps.  The merged result then becomes this profile's
+    -- cabinet-local machine entry + native preferred-sort file.
     local localOptions = {}
-    for key, value in pairs(options) do localOptions[key] = value end
+
+    for key, value in pairs(options) do
+        localOptions[key] = value
+    end
+
     localOptions.forceRefresh = nil
-    localOptions.dailySeed = styleCache.shared.seed
-    localOptions.dailyGeneration = generation
+    localOptions.dailySeed =
+        styleCache.shared.seed
+    localOptions.dailyGeneration =
+        generation
 
-    local localResults, localModel, err = SLRecommendations.GenerateModes(pn, localOptions)
-    if err then return localResults, localModel, err, "local-fill-error" end
+    local localResults, localModel, err =
+        SLRecommendations.GenerateModes(
+            pn,
+            localOptions
+        )
 
-    local merged = mergeResolvedWithLocal(sharedResolved, localResults, targetCounts)
+    if err then
+        return
+            localResults,
+            localModel,
+            err,
+            "local-fill-error"
+    end
 
-    styleCache.machines[machineKey] = {
-        generation = generation,
-        sections = serializeRecommendationSections(merged, localModel),
-    }
-    writeDailyCache(pn, cache)
+    local merged =
+        mergeResolvedWithLocal(
+            sharedResolved,
+            localResults,
+            targetCounts
+        )
 
-    return merged, localModel, nil, "daily-cache-filled"
+    saveMachineEntry(
+        styleCache,
+        machineKey,
+        generation,
+        merged,
+        localModel
+    )
+
+    writeDailyCache(
+        pn,
+        cache
+    )
+
+    ensureMachineFastCaches(
+        pn,
+        merged,
+        localModel,
+        stepsType,
+        true
+    )
+
+    return
+        merged,
+        localModel,
+        nil,
+        "daily-cache-filled"
 end
 
 function SLRecommendations.ResolveRecommendationForSong(

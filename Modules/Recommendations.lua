@@ -1,5 +1,5 @@
 -- ITGmania / Simply Love Recommendations module
--- v24.5
+-- v26.1
 --
 -- Target:
 --   ITGmania beta
@@ -7,18 +7,25 @@
 --
 -- Module lifecycle:
 --   The root ScreenSelectMusic actor is initialized from ModuleCommand.
+--   SortMenu integration is installed immediately, but recommendation data is
+--   intentionally NOT loaded/generated until the player selects "For You" or
+--   "Refresh Recommendations".
 --   Visual child actors use normal InitCommand, matching existing Simply Love
 --   modules such as bpm_change_indicator.lua.
 
 local t = {}
-local MODULE_VERSION = "24.5"
+local MODULE_VERSION = "26.1"
 
 local TARGET_SCREEN = "ScreenSelectMusic"
 
 local installAttempts = 0
-local dailyInitAttempts = 0
 local activePlayer = nil
 local dailyPreparationInProgress = false
+
+-- Recommendations are intentionally lazy in v26.  Merely entering
+-- ScreenSelectMusic must not read/resolve/generate recommendation data.
+local moduleActor = nil
+local pendingRecommendationRequest = nil
 
 local function isRecommendationScreen()
     local screen =
@@ -685,9 +692,32 @@ local function prepareRecommendations(forceRefresh, switchToRecommendedSort)
     SLRecommendations.SetActive(pn, resultsBySection, model)
     activePlayer = pn
 
-    SONGMAN:SetPreferredSongsFromTable(
-        preferredSectionsFromResults(resultsBySection)
-    )
+    local preferredSortPath =
+        model
+        and model.preferredSortPath
+        or nil
+
+    if preferredSortPath
+        and FILEMAN:DoesFileExist(
+            preferredSortPath
+        )
+    then
+        SONGMAN:SetPreferredSongs(
+            preferredSortPath,
+            true
+        )
+
+        dbg(
+            "Loaded native recommendation preferred sort: " ..
+            tostring(preferredSortPath)
+        )
+    else
+        SONGMAN:SetPreferredSongsFromTable(
+            preferredSectionsFromResults(
+                resultsBySection
+            )
+        )
+    end
 
     -- Cache hits intentionally skip the full debug rewrite because rebuilding
     -- the expensive model solely for diagnostics defeats the daily cache.
@@ -733,20 +763,139 @@ local function prepareRecommendations(forceRefresh, switchToRecommendedSort)
     dbg(
         "Prepared recommendations P=" .. tostring(pn) ..
         " source=" .. tostring(source) ..
-        " ForYouCount=" .. tostring(#forYou)
+        " ForYouCount=" .. tostring(#forYou) ..
+        " preferredSort=" ..
+        tostring(
+            model
+            and model.preferredSortPath
+            or "-"
+        )
     )
 
     return true
 end
 
+local function requestRecommendations(
+    forceRefresh
+)
+    if not isRecommendationScreen() then
+        return false
+    end
+
+    if dailyPreparationInProgress
+        or pendingRecommendationRequest
+    then
+        dbg(
+            "Recommendation request ignored; preparation already pending/in progress."
+        )
+        return false
+    end
+
+    if not SLRecommendations then
+        SM(
+            "Recommendation engine is not loaded."
+        )
+        return false
+    end
+
+    local pn =
+        GAMESTATE:GetMasterPlayerNumber()
+
+    if not pn then
+        SM(
+            "No active player is available for recommendations."
+        )
+        return false
+    end
+
+    local status = nil
+
+    if SLRecommendations.GetDailyRecommendationStatus then
+        local ok, result =
+            pcall(
+                SLRecommendations.GetDailyRecommendationStatus,
+                pn,
+                {
+                    forceRefresh =
+                        forceRefresh
+                        and true
+                        or false,
+                }
+            )
+
+        if ok then
+            status = result
+        else
+            dbg(
+                "GetDailyRecommendationStatus runtime error: " ..
+                tostring(result)
+            )
+        end
+    end
+
+    local needsBuild =
+        status
+        and status.needsBuild
+        or forceRefresh
+        or false
+
+    if needsBuild then
+        local displayDate =
+            status
+            and status.displayDate
+            or string.format(
+                "%04d-%02d-%02d",
+                Year(),
+                MonthOfYear() + 1,
+                DayOfMonth()
+            )
+
+        -- Simply Love's SM(text, duration) supports an explicit duration.
+        -- Queue the expensive build for the next frame so the message actually
+        -- renders before synchronous recommendation generation begins.
+        SM(
+            "Building Daily Recommendations for " ..
+            tostring(displayDate) ..
+            "...please wait",
+            5
+        )
+
+        pendingRecommendationRequest = {
+            forceRefresh =
+                forceRefresh
+                and true
+                or false,
+            switchToRecommendedSort = true,
+        }
+
+        if moduleActor then
+            moduleActor
+                :sleep(0.05)
+                :queuecommand(
+                    "RunPendingRecommendationRequest"
+                )
+
+            return true
+        end
+
+        pendingRecommendationRequest = nil
+    end
+
+    return
+        prepareRecommendations(
+            forceRefresh,
+            true
+        )
+end
+
 local function activateRecommendations()
     dbg("activateRecommendations ENTER")
-    return prepareRecommendations(false, true)
+    return requestRecommendations(false)
 end
 
 local function refreshRecommendations()
     dbg("refreshRecommendations ENTER")
-    return prepareRecommendations(true, true)
+    return requestRecommendations(true)
 end
 
 local function registerCustomFunction()
@@ -859,6 +1008,29 @@ local function recommendationPanelLines(result, localSteps)
     return sectionLine, stepLine, reasons
 end
 
+local function isSortMenuVisible()
+    if not isRecommendationScreen() then
+        return false
+    end
+
+    local screen =
+        SCREENMAN:GetTopScreen()
+
+    local overlay =
+        screen
+        and screen:GetChild("Overlay")
+        or nil
+
+    local sortMenu =
+        overlay
+        and overlay:GetChild("SortMenu")
+        or nil
+
+    return
+        sortMenu ~= nil
+        and sortMenu:GetVisible()
+end
+
 local function hideRecommendationUI(self)
     local panel = self:GetChild("RecommendationPanel")
     local marker = self:GetChild("RecommendedDifficultyMarker")
@@ -936,7 +1108,10 @@ local function refreshRecommendationUI(self)
         panel:visible(false)
     end
 
-    if marker and cfg("ShowRecommendationDifficultyMarker", true) then
+    if marker
+        and cfg("ShowRecommendationDifficultyMarker", true)
+        and not isSortMenuVisible()
+    then
         local row = recommendedDifficultyGridRow(localSteps)
 
         if row then
@@ -945,12 +1120,6 @@ local function refreshRecommendationUI(self)
                 _screen.cx - 26,
                 _screen.cy + 67 + (row - 3) * 30
             )
-
-            local label = marker:GetChild("Label")
-            if label then
-                local isP2 = activePlayer == PLAYER_2
-                label:xy(isP2 and 9 or -9, -24)
-            end
         else
             marker:visible(false)
         end
@@ -984,8 +1153,8 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
 
             activePlayer = nil
             installAttempts = 0
-            dailyInitAttempts = 0
             dailyPreparationInProgress = false
+            pendingRecommendationRequest = nil
         end
     end,
 
@@ -1005,9 +1174,10 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
             )
         )
 
+        moduleActor = self
         activePlayer = nil
         installAttempts = 0
-        dailyInitAttempts = 0
+        pendingRecommendationRequest = nil
         self:queuecommand("TryInit")
     end,
 
@@ -1034,60 +1204,12 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
 
         if registered and injected then
             ctx.sortmenu:playcommand("AssessAvailableChoices")
-            dbg("Sort integration initialized.")
-
-            self:sleep(0.05)
-                :queuecommand("EnsureDailyRecommendations")
+            dbg(
+                "Sort integration initialized; recommendations remain lazy until selected."
+            )
         else
             self:sleep(0.1):queuecommand("TryInit")
         end
-    end,
-
-    EnsureDailyRecommendationsCommand=function(self)
-        if not isRecommendationScreen() then
-            self:stoptweening()
-            return
-        end
-
-        local style =
-            GAMESTATE
-            and GAMESTATE:GetCurrentStyle()
-            or nil
-
-        if not style then
-            dailyInitAttempts =
-                dailyInitAttempts + 1
-
-            if dailyInitAttempts <= 40 then
-                dbg(
-                    "CurrentStyle unavailable; retrying daily recommendations (" ..
-                    tostring(dailyInitAttempts) ..
-                    "/40)."
-                )
-
-                self:sleep(0.10)
-                    :queuecommand(
-                        "EnsureDailyRecommendations"
-                    )
-            else
-                dbg(
-                    "Daily recommendations skipped: CurrentStyle never became available."
-                )
-            end
-
-            return
-        end
-
-        dailyInitAttempts = 0
-
-        prepareRecommendations(
-            false,
-            false
-        )
-
-        self:queuecommand(
-            "RefreshRecommendationUI"
-        )
     end,
 
     PlayerProfileSetMessageCommand=function(self)
@@ -1095,13 +1217,32 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
             return
         end
 
+        -- Do not prepare recommendations merely because a profile was loaded.
+        -- The player must explicitly choose For You / Refresh Recommendations.
         activePlayer = nil
-        dailyInitAttempts = 0
+        pendingRecommendationRequest = nil
+        hideRecommendationUI(self)
+    end,
 
-        self:sleep(0.10)
-            :queuecommand(
-                "EnsureDailyRecommendations"
-            )
+    RunPendingRecommendationRequestCommand=function(self)
+        if not isRecommendationScreen() then
+            pendingRecommendationRequest = nil
+            return
+        end
+
+        local request =
+            pendingRecommendationRequest
+
+        pendingRecommendationRequest = nil
+
+        if not request then
+            return
+        end
+
+        prepareRecommendations(
+            request.forceRefresh,
+            request.switchToRecommendedSort
+        )
     end,
 
     RecommendationsPreparedMessageCommand=function(self)
@@ -1325,7 +1466,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 78)
-                    :zoom(0.54)
+                    :zoom(0.32)
                     :wrapwidthpixels(
                         (PANEL.width - 18) / 0.32
                     )
@@ -1347,7 +1488,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 121)
-                    :zoom(0.54)
+                    :zoom(0.32)
                     :wrapwidthpixels(
                         (PANEL.width - 18) / 0.32
                     )
@@ -1369,7 +1510,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 164)
-                    :zoom(0.54)
+                    :zoom(0.32)
                     :wrapwidthpixels(
                         (PANEL.width - 18) / 0.32
                     )
@@ -1430,6 +1571,16 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
         InitCommand=function(self)
             self:draworder(10030)
                 :visible(false)
+
+            self:SetUpdateFunction(
+                function(actor)
+                    actor:diffusealpha(
+                        isSortMenuVisible()
+                        and 0
+                        or 1
+                    )
+                end
+            )
         end,
 
         Def.Quad {
@@ -1481,6 +1632,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                     :zoom(0.22)
                     :diffuse(recommendationAccentColor())
                     :strokecolor(Color.Black)
+                    :visible(false)
             end,
         },
     },

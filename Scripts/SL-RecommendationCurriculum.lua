@@ -1,9 +1,9 @@
--- Editable recommendation curriculum for SL-Recommendations v24.5+.
+-- Editable recommendation curriculum for SL-Recommendations v25+.
 --
 -- POLICY lives here.  The scorer reads this table dynamically.
 
 SLRecommendationCurriculum = {
-    Version = 9,
+    Version = 11,
 
     JokeMeterMax = 30,
 
@@ -296,8 +296,8 @@ SLRecommendationCurriculum = {
     -- it only comes back when the player's recent history shows actual interest.
     Quirkiness = {
         automaticLevel = 10,
-        section = "Quirky Recs",
-        interestSection = "More Quirky Charts",
+        section = "Gimmicky Recs",
+        interestSection = "Gimmicky Recs",
         candidateMin = 0.42,
         maxResults = 20,
         interestMaxResults = 16,
