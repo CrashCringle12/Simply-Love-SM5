@@ -1325,7 +1325,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 78)
-                    :zoom(0.32)
+                    :zoom(0.54)
                     :wrapwidthpixels(
                         (PANEL.width - 18) / 0.32
                     )
@@ -1347,7 +1347,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 121)
-                    :zoom(0.32)
+                    :zoom(0.54)
                     :wrapwidthpixels(
                         (PANEL.width - 18) / 0.32
                     )
@@ -1369,7 +1369,7 @@ t["ScreenSelectMusic"] = Def.ActorFrame {
                 self:horizalign(left)
                     :vertalign(top)
                     :xy(10, 164)
-                    :zoom(0.32)
+                    :zoom(0.54)
                     :wrapwidthpixels(
                         (PANEL.width - 18) / 0.32
                     )
