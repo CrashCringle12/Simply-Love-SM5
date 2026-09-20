@@ -8,7 +8,7 @@
 -- exposes HighScoreList:GetNumTimesPlayed() and :GetLastPlayed().
 
 SLRecommendations = SLRecommendations or {}
-SLRecommendations.Version = "20"
+SLRecommendations.Version = "24.5"
 
 -- The curriculum is kept in a separate editable file.  Normally Simply Love
 -- loads Scripts automatically, but load it explicitly if necessary so this
@@ -50,7 +50,29 @@ SLRecommendations.Config = {
     -- These were accidentally omitted in v8, which meant the module treated
     -- them as false/nil and silently disabled chart selection + helper UI.
     AutoSelectRecommendedSteps = true,
-    ShowRecommendationHint = true,
+
+    -- Recommendation UI.  v23 replaces the old wide black helper bar with a
+    -- compact transparent left-side panel plus a marker on the exact
+    -- recommended difficulty in Simply Love's normal StepsDisplay grid.
+    ShowRecommendationHint = true, -- legacy alias; keep for older modules
+    ShowRecommendationPanel = true,
+    ShowRecommendationDifficultyMarker = true,
+    HideRecommendationPanelOnITL = true,
+    RecommendationPanelMaxReasons = 3,
+    RecommendationUIAccentColor = "#F4D35E",
+
+    -- Daily recommendation persistence.
+    -- Chart identity is stored by GrooveStats hash (ChartKey fallback), never
+    -- pack path, so shared network profiles can resolve the same chart even if
+    -- another cabinet stores it under a different pack/group.
+    DailyRecommendationsEnabled = true,
+    DailyRecommendationCacheFilename = "recommendations-daily.json",
+    DailyRecommendationCacheFormatVersion = 1,
+
+    -- Deterministic daily variance for For You only.  This is intentionally
+    -- small: close candidates can trade places, but weak matches cannot jump
+    -- over clearly stronger recommendations.
+    ForYouDailyVariance = 0.04,
 
     -- Module integration diagnostics.  Trace logging goes to Logs/Log.txt.
     -- Set RecommendationUIDebugOnScreen=true if you also want SM() popups.
@@ -201,21 +223,26 @@ SLRecommendations.Modes = {
         },
     },
 
-    PopularPicks = {
-        section = "Popular Picks",
+    HotRightNow = {
+        section = "Hot Right Now",
+        maxResults = 50,
         difficultyGateFloor = 0.35,
+
+        -- "Hot" means recently active on THIS cabinet first. Lifetime
+        -- popularity/local favorites stabilize sparse recent activity.
         weights = {
-            difficulty = 0.25,
-            popularity = 0.27,
-            machineRecentActivity = 0.17,
-            communityFavorite = 0.16,
-            communityScoreability = 0.08,
+            machineRecentActivity = 0.38,
+            popularity = 0.24,
+            communityFavorite = 0.14,
+            difficulty = 0.10,
+            communityScoreability = 0.07,
             beginnerSafety = 0.07,
         },
     },
 
     LevelUp = {
         section = "Level Up",
+        maxResults = 50,
         difficultyGateFloor = 0.45,
         weights = {},
     },
@@ -228,7 +255,92 @@ SLRecommendations.ModeOrder = {
     "LevelUp",
     "ScoreWell",
     "YouMightLike",
-    "PopularPicks",
+    "HotRightNow",
+}
+
+-- =========================================================================
+-- RECOMMENDATION SECTION GUIDE
+-- =========================================================================
+-- For You
+--   Balanced overall recommendations. Mature profiles use personal history,
+--   taste, style, difficulty, novelty, etc.; new profiles lean toward
+--   cabinet/community evidence and beginner safety.
+--
+-- Learn the 123s
+--   New-player onboarding. Shows meters 1, 2, and 3 together and favors
+--   proven, approachable charts rather than pretending we know an exact level.
+--
+-- Level Up to N
+--   Progression after onboarding. Targets the next/reliable working level.
+--   Tech grows in importance around 11+, stamina around 13+, and becomes a
+--   major consideration at 15+.
+--
+-- Score Well
+--   Appears only after enough personal scoring evidence exists. Emphasizes
+--   charts where the player tends to outperform the local field plus relative
+--   local scoring ease.
+--
+-- You Might Like
+--   Taste/style section: artist, genre, stepartist, favorites, and chart-style
+--   affinity.
+--
+-- Hot Right Now
+--   Cabinet/community discovery: recent local activity first, then lifetime
+--   cabinet popularity, local favorites, passability, and suitable difficulty.
+--
+-- <Tech> Recs
+--   Curriculum/teaching sections at configured levels.
+--
+-- More <Tech>
+--   Temporary recent-interest sections. Target-tech intensity dominates; the
+--   rest follows the player's actual difficulty range for that technique plus
+--   a small amount of near-ceiling progression.
+--
+-- Quirky Recs
+--   Level-10 exposure to gimmicks/mods/FGChanges/unusual timing/rhythm/
+--   high-Chaos/etc.
+--
+-- More Quirky Charts
+--   Temporary interest section for players actively choosing quirky content.
+-- =========================================================================
+
+SLRecommendations.SectionGuide = {
+    ForYou = {
+        title = "For You",
+        description = "Balanced overall recommendations.",
+    },
+    IntroLevelUp = {
+        title = "Learn the 123s",
+        description = "Beginner onboarding across meters 1, 2, and 3.",
+    },
+    LevelUp = {
+        title = "Level Up",
+        description = "Progression toward the player's next working level.",
+    },
+    ScoreWell = {
+        title = "Score Well",
+        description = "Charts the player is comparatively likely to score well on.",
+    },
+    YouMightLike = {
+        title = "You Might Like",
+        description = "Taste, artist, genre, stepartist, and style affinity.",
+    },
+    HotRightNow = {
+        title = "Hot Right Now",
+        description = "Recently active and popular cabinet/community charts.",
+    },
+    CurriculumTech = {
+        title = "<Tech> Recs",
+        description = "Level-based teaching recommendations for a specific technique.",
+    },
+    InterestTech = {
+        title = "More <Tech>",
+        description = "Recent-interest recommendations for a technique the player is choosing often.",
+    },
+    Quirky = {
+        title = "Quirky Recs",
+        description = "Gimmick, mod, FGChanges, unusual timing, rhythm/Chaos, and other quirky charts.",
+    },
 }
 
 local TECH_CATEGORIES = {
@@ -247,6 +359,42 @@ local TECH_CATEGORIES = {
 
 local DEFAULT_CURRICULUM = {
     JokeMeterMax = 30,
+
+    -- Difficulty scales used only for recommendation reasoning.  The chart's
+    -- displayed Meter is never changed.
+    DifficultyScales = {
+        default = "ITG",
+        rules = {
+            {
+                scale = "DDR",
+                prefixes = {
+                    "DDR",
+                    "Cafe Cursed",
+                    "Zenius",
+                    "Dance Dance",
+                    "DanceDance",
+                    "2014 Billboard",
+                    "Triple Cross",
+                },
+                exactGroups = {},
+            },
+        },
+        conversions = {
+            DDR = {
+                [1]=1.0, [2]=1.5, [3]=2.0, [4]=3.0, [5]=3.5,
+                [6]=4.0, [7]=5.0, [8]=5.5, [9]=6.0, [10]=7.0,
+                [11]=7.5, [12]=8.0, [13]=8.5, [14]=9.5, [15]=10.0,
+                [16]=11.0, [17]=11.5, [18]=12.0, [19]=13.0, [20]=13.5,
+            },
+        },
+    },
+
+    IntroProgression = {
+        maxPeakNps = 2.75,
+        maxQuirkiness = 0.20,
+        fullNpsSafetyAtOrBelow = 1.50,
+    },
+
     Skill = {
         decentDP = 0.80,
         strongDP = 0.90,
@@ -281,7 +429,7 @@ local DEFAULT_CURRICULUM = {
         editDifficultyPoints = 0.10,
     },
     Rhythms = {
-        section = "More Rhythms",
+        -- Internal quirk/beginner-safety evidence only.
         notation = {"RH", "SKT", "RHYTHM", "RHYTHMS", "SKITTLE", "SKITTLES"},
         streamNotation = {"STR", "STREAM", "STREAMS"},
         chaosThreshold = 1.20,
@@ -363,6 +511,64 @@ local function normalizeCredit(s)
     end
 
     return normalizeMetadata(s)
+end
+
+local function normalizedGroupName(song)
+    if not song or not song.GetGroupName then return "" end
+    return trim(tostring(song:GetGroupName() or "")):lower()
+end
+
+local function getSongDifficultyScale(song)
+    local cfg = curriculum().DifficultyScales or {}
+    local group = normalizedGroupName(song)
+
+    for _, rule in ipairs(cfg.rules or {}) do
+        local matched = false
+
+        for _, exact in ipairs(rule.exactGroups or {}) do
+            if group == trim(tostring(exact)):lower() then
+                matched = true
+                break
+            end
+        end
+
+        if not matched then
+            for _, prefix in ipairs(rule.prefixes or {}) do
+                prefix = trim(tostring(prefix)):lower()
+                if prefix ~= "" and group:sub(1, #prefix) == prefix then
+                    matched = true
+                    break
+                end
+            end
+        end
+
+        if matched then
+            return tostring(rule.scale or cfg.default or "ITG")
+        end
+    end
+
+    return tostring(cfg.default or "ITG")
+end
+
+local function getEffectiveMeter(song, steps)
+    local raw = tonumber(steps and steps:GetMeter() or 0) or 0
+    local scale = getSongDifficultyScale(song)
+    local cfg = curriculum().DifficultyScales or {}
+    local conversion = cfg.conversions and cfg.conversions[scale]
+
+    if conversion then
+        local converted = tonumber(conversion[raw])
+        if converted then
+            return converted, scale, raw
+        end
+    end
+
+    return raw, scale, raw
+end
+
+local function getProgressionMeter(song, steps)
+    local effective = getEffectiveMeter(song, steps)
+    return math.floor(effective + 0.5)
 end
 
 local function profileIsGuest(profile)
@@ -447,6 +653,22 @@ end
 local function gaussian(distance, sigma)
     sigma = math.max(0.001, sigma or 1)
     return math.exp(-0.5 * (distance / sigma) * (distance / sigma))
+end
+
+local function stableStringHash(value, seed)
+    local h = tonumber(seed) or 5381
+    h = math.floor(math.abs(h)) % 2147483647
+
+    local str = tostring(value or "")
+    for i = 1, #str do
+        h = (h * 33 + string.byte(str, i)) % 2147483647
+    end
+
+    return h
+end
+
+local function stableHashUnit(value, seed)
+    return stableStringHash(value, seed) / 2147483647
 end
 
 local function profileSlotForPlayer(pn)
@@ -1257,8 +1479,35 @@ local function getChartQuirkiness(model, steps, song, group, notation)
     local fgCount = 0
     if song.GetFGChanges then
         fgCount = safeTableCount(song:GetFGChanges())
+
         if fgCount > 0 then
-            add(2.00 + math.min(1.00, (fgCount - 1) * 0.25), "FGChanges")
+            local quirkCfg =
+                curriculum().Quirkiness or {}
+
+            local base =
+                tonumber(
+                    quirkCfg.fgChangesBasePoints
+                ) or 4.00
+
+            local extraPer =
+                tonumber(
+                    quirkCfg.fgChangesExtraPerChange
+                ) or 0.50
+
+            local extraCap =
+                tonumber(
+                    quirkCfg.fgChangesExtraCap
+                ) or 2.00
+
+            add(
+                base +
+                math.min(
+                    extraCap,
+                    math.max(0, fgCount - 1) *
+                    extraPer
+                ),
+                "FGChanges"
+            )
         end
     end
 
@@ -1338,6 +1587,47 @@ local function getChartQuirkiness(model, steps, song, group, notation)
     local hands = getRadarCount(radar, "RadarCategory_Hands")
     local lifts = getRadarCount(radar, "RadarCategory_Lifts")
     local radarFakes = getRadarCount(radar, "RadarCategory_Fakes")
+    local chaos = getRadarCount(radar, "RadarCategory_Chaos")
+
+    -- RH/SKT/Rhythms/high-Chaos are QUIRK evidence now, not a separate
+    -- recommendation family.
+    local rhythm =
+        getRhythmEvidence(
+            { radarChaos = chaos },
+            notation
+        )
+
+    local quirkCfg =
+        curriculum().Quirkiness or {}
+
+    if (rhythm.notationStrength or 0) > 0 then
+        add(
+            (
+                tonumber(
+                    quirkCfg.rhythmNotationBasePoints
+                ) or 0.60
+            ) +
+            (
+                tonumber(
+                    quirkCfg.rhythmNotationIntensityPoints
+                ) or 1.20
+            ) *
+            (rhythm.notationIntensity or 0),
+            "rhythm notation"
+        )
+    end
+
+    if (rhythm.chaosRecommendation or 0) > 0 then
+        add(
+            (
+                tonumber(
+                    quirkCfg.chaosMaxPoints
+                ) or 1.50
+            ) *
+            (rhythm.chaosRecommendation or 0),
+            "high Chaos"
+        )
+    end
 
     if mines > 0 then
         local ratio = mines / math.max(1, taps)
@@ -1382,6 +1672,11 @@ local function getChartQuirkiness(model, steps, song, group, notation)
         taps = taps,
         lifts = lifts,
         hands = hands,
+        chaos = chaos,
+        rhythmEvidence = rhythm.evidence or 0,
+        rhythmNotationToken = rhythm.notationToken,
+        rhythmNotationStrength = rhythm.notationStrength or 0,
+        rhythmChaosEvidence = rhythm.chaosRecommendation or 0,
         significantTiming = significantTiming,
         hasModsNotation = hasMods,
         hasXmodNotation = hasXmod,
@@ -2287,7 +2582,7 @@ local function predictLocalPeerPerformance(model, song, steps, group)
 
     local rawFeatures =
         localPeerRawFeatures(
-            steps:GetMeter(),
+            getEffectiveMeter(song, steps),
             shape,
             getTechVector(
                 steps,
@@ -3088,7 +3383,7 @@ local function predictLocalScoringForChart(
 
         local features =
             localPeerRawFeatures(
-                steps:GetMeter(),
+                getEffectiveMeter(song, steps),
                 shape,
                 getTechVector(
                     steps,
@@ -3288,9 +3583,15 @@ local function finalizeSkillAndTechProfile(model)
     if not model.usePersonalData or model.passedHistoryCharts <= 0 then
         model.personalConfidence = 0
         model.playerMaturity = model.profileIsGuest and "guest" or "cold"
-        model.targetMeter = SLRecommendations.Config.ColdStartDefaultMeter
-        model.difficultySigma = SLRecommendations.Config.ColdStartDifficultySigma
-        model.skillFocusLevel = nil
+
+        -- Brand-new onboarding: show 1s/2s/3s together. Guest/no-data players
+        -- get this too because it is a useful "where do I start?" section.
+        model.introProgression = true
+        model.levelUpMeter = 3
+        model.skillFocusLevel = 3
+        model.targetMeter = 2
+        model.difficultySigma = 1.25
+
         model.scoreWellReady = false
         return
     end
@@ -3343,15 +3644,42 @@ local function finalizeSkillAndTechProfile(model)
         model.difficultySigma = math.max(1.25, math.min(model.difficultySigma, 2.0))
     end
 
-    local progressionBase = highestMastered or highestReliable or highestPass
-    if progressionBase then
+    local progressionBase =
+        highestMastered
+        or highestReliable
+        or highestPass
+
+    if (highestPass or 0) <= 3
+        and (highestReliable or 0) < 3
+        and (highestMastered or 0) < 3
+    then
+        -- Still genuinely in 1/2/3 onboarding.
+        model.introProgression = true
+        model.levelUpMeter = 3
+        model.skillFocusLevel = 3
+
+    elseif progressionBase then
+        model.introProgression = false
+
         if highestMastered or highestReliable then
-            model.levelUpMeter = math.min(jokeMax, progressionBase + 1)
+            model.levelUpMeter =
+                math.min(
+                    jokeMax,
+                    progressionBase + 1
+                )
         else
-            model.levelUpMeter = math.min(jokeMax, progressionBase)
+            -- One isolated pass means establish this level first.
+            model.levelUpMeter =
+                math.min(
+                    jokeMax,
+                    progressionBase
+                )
         end
+
+        model.skillFocusLevel =
+            model.levelUpMeter
+            or model.skillComfortMeter
     end
-    model.skillFocusLevel = model.levelUpMeter or model.skillComfortMeter
 
     -- Tech mastery + recent-interest normalization.
     local maxRecent = 0
@@ -3407,49 +3735,70 @@ local function blendWeights(a, b, t)
 end
 
 local function levelUpWeights(model)
+    if model.introProgression then
+        return {
+            -- Learn the 123s: popularity inside the 1/2/3 block matters more
+            -- than all-machine popularity, and NPS gets its own strong safety
+            -- signal in addition to the hard 2.75 cap.
+            introPopularity = 0.27,
+            introNpsSafety = 0.22,
+            machineRecentActivity = 0.13,
+            communityFavorite = 0.11,
+            communityScoreability = 0.10,
+            beginnerSafety = 0.10,
+            exploration = 0.04,
+            metadata = 0.03,
+        }
+    end
+
     local level = model.levelUpMeter or 10
     if level <= 10 then
         return {
-            levelUpFit = 0.30,
-            beginnerSafety = 0.25,
-            popularity = 0.15,
-            communityFavorite = 0.10,
-            communityScoreability = 0.08,
+            levelUpFit = 0.28,
+            beginnerSafety = 0.22,
+            levelPopularity = 0.18,
+            popularity = 0.07,
+            communityFavorite = 0.08,
+            communityScoreability = 0.07,
             machineRecentActivity = 0.05,
-            exploration = 0.07,
+            exploration = 0.05,
         }
     elseif level <= 12 then
         return {
             levelUpFit = 0.25,
-            tech = 0.20,
-            stamina = 0.12,
-            localPeerPerformance = 0.10,
-            localScoringEase = 0.10,
-            popularity = 0.08,
-            communityFavorite = 0.05,
-            exploration = 0.10,
+            tech = 0.18,
+            stamina = 0.10,
+            localPeerPerformance = 0.08,
+            localScoringEase = 0.08,
+            levelPopularity = 0.10,
+            popularity = 0.04,
+            communityFavorite = 0.04,
+            communityScoreability = 0.05,
+            exploration = 0.08,
         }
     elseif level <= 14 then
         return {
             levelUpFit = 0.22,
-            stamina = 0.23,
-            tech = 0.15,
-            localPeerPerformance = 0.12,
-            localScoringEase = 0.10,
-            popularity = 0.05,
-            communityFavorite = 0.03,
-            exploration = 0.10,
+            stamina = 0.22,
+            tech = 0.14,
+            localPeerPerformance = 0.11,
+            localScoringEase = 0.09,
+            levelPopularity = 0.08,
+            popularity = 0.03,
+            communityFavorite = 0.02,
+            exploration = 0.09,
         }
     else
         return {
             levelUpFit = 0.20,
-            stamina = 0.35,
-            tech = 0.08,
-            localPeerPerformance = 0.12,
-            localScoringEase = 0.10,
-            popularity = 0.03,
+            stamina = 0.34,
+            tech = 0.07,
+            localPeerPerformance = 0.11,
+            localScoringEase = 0.09,
+            levelPopularity = 0.06,
+            popularity = 0.02,
             communityFavorite = 0.02,
-            exploration = 0.10,
+            exploration = 0.09,
         }
     end
 end
@@ -3720,92 +4069,6 @@ local function buildDynamicModes(model)
         end
     end
 
-    local rhythmCfg =
-        curriculum().Rhythms or {}
-
-    local rhythmNormallyAllowed =
-        level
-        and level >=
-            (
-                tonumber(
-                    rhythmCfg.interestMinLevel
-                )
-                or 9
-            )
-
-    local rhythmEarlyAllowed =
-        level
-        and level <
-            (
-                tonumber(
-                    rhythmCfg.interestMinLevel
-                )
-                or 9
-            )
-        and model.rhythmFamiliarity >=
-            (
-                tonumber(
-                    rhythmCfg.earlyInterestFamiliarity
-                )
-                or 0.65
-            )
-
-    if (rhythmNormallyAllowed or rhythmEarlyAllowed)
-        and model.recentRhythmCharts >=
-            (
-                tonumber(
-                    rhythmCfg.interestMinCharts
-                )
-                or 2
-            )
-        and model.recentRhythmInterest >=
-            (
-                tonumber(
-                    rhythmCfg.interestMin
-                )
-                or 0.34
-            )
-    then
-        local key = "Interest_rhythms"
-
-        model.dynamicModes[key] = {
-            section =
-                rhythmCfg.section
-                or "More Rhythms",
-
-            rhythmMode = true,
-
-            requireRhythm =
-                tonumber(
-                    rhythmCfg.candidateMin
-                )
-                or 0.42,
-
-            maxResults =
-                tonumber(
-                    rhythmCfg.maxResults
-                )
-                or 16,
-
-            weights = {
-                rhythmFeature = 0.42,
-                difficulty = 0.14,
-                stamina = 0.10,
-                metadata = 0.08,
-                personalAffinity = 0.05,
-                localPeerPerformance = 0.05,
-                localScoringEase = 0.04,
-                popularity = 0.04,
-                communityFavorite = 0.03,
-                exploration = 0.05,
-            },
-
-            difficultyGateFloor = 0.30,
-        }
-
-        order[#order + 1] = key
-    end
-
     local quirkCfg = curriculum().Quirkiness or {}
     local quirkAutomatic = level and level == (tonumber(quirkCfg.automaticLevel) or 10)
     if quirkAutomatic then
@@ -3855,7 +4118,7 @@ local function buildDynamicModes(model)
 
     if model.scoreWellReady then order[#order + 1] = "ScoreWell" end
     order[#order + 1] = "YouMightLike"
-    order[#order + 1] = "PopularPicks"
+    order[#order + 1] = "HotRightNow"
     model.modeOrder = order
 end
 
@@ -3866,9 +4129,16 @@ local function getModeConfig(model, modeKey)
 end
 
 local function getModeSection(model, modeKey)
-    if modeKey == "LevelUp" and model.levelUpMeter then
-        return "Level Up to " .. tostring(model.levelUpMeter)
+    if modeKey == "LevelUp" then
+        if model.introProgression then
+            return "Learn the 123s"
+        elseif model.levelUpMeter then
+            return
+                "Level Up to " ..
+                tostring(model.levelUpMeter)
+        end
     end
+
     return getModeConfig(model, modeKey).section
 end
 
@@ -3912,6 +4182,7 @@ local function buildModel(pn, stepsType)
         skillComfortMeter = nil,
         skillFocusLevel = nil,
         levelUpMeter = nil,
+        introProgression = false,
         scoreWellReady = false,
         techMastery = {},
         dynamicModes = {},
@@ -3949,6 +4220,10 @@ local function buildModel(pn, stepsType)
         totalHistoryWeight = 0,
         maxPlayerChartPlays = 0,
         maxMachineChartPlays = 0,
+        maxMachineChartPlaysByMeter = {},
+        maxMachineChartPlaysIntro123 = 0,
+        machineMostRecentDays = nil,
+        difficultyScaleCounts = {},
         playedHistoryCharts = 0,
         favoriteSongs = 0,
 
@@ -4004,6 +4279,9 @@ local function buildModel(pn, stepsType)
     model.localPeerDirectory =
         buildPeerDirectory(usePersonalData and profile or nil)
 
+    local machine =
+        PROFILEMAN:GetMachineProfile()
+
     -- Favorites remain song-level metadata evidence.
     for song in ivalues(SONGMAN:GetAllSongs()) do
         if usePersonalData and isFavorited(pn, song) then
@@ -4033,6 +4311,51 @@ local function buildModel(pn, stepsType)
             model.maxMachineChartPlays =
                 math.max(model.maxMachineChartPlays, machinePlays)
 
+            local effectiveMeter, difficultyScale =
+                getEffectiveMeter(rep.song, rep.steps)
+
+            model.difficultyScaleCounts[difficultyScale] =
+                (model.difficultyScaleCounts[difficultyScale] or 0) + 1
+
+            if machinePlays > 0 then
+                local meterBucket =
+                    math.max(1, math.floor(effectiveMeter + 0.5))
+
+                model.maxMachineChartPlaysByMeter[meterBucket] =
+                    math.max(
+                        model.maxMachineChartPlaysByMeter[meterBucket] or 0,
+                        machinePlays
+                    )
+
+                if effectiveMeter >= 1 and effectiveMeter <= 3 then
+                    model.maxMachineChartPlaysIntro123 =
+                        math.max(
+                            model.maxMachineChartPlaysIntro123,
+                            machinePlays
+                        )
+                end
+
+                local machineDays =
+                    getDaysSinceLastPlayed(
+                        machine,
+                        rep.song,
+                        rep.steps
+                    )
+
+                if machineDays then
+                    if model.machineMostRecentDays == nil then
+                        model.machineMostRecentDays =
+                            machineDays
+                    else
+                        model.machineMostRecentDays =
+                            math.min(
+                                model.machineMostRecentDays,
+                                machineDays
+                            )
+                    end
+                end
+            end
+
             if usePersonalData and playerPlays > 0 then
                 local historyWeight = log1p(playerPlays)
                 if group.favorite then
@@ -4045,7 +4368,11 @@ local function buildModel(pn, stepsType)
                     model.totalHistoryWeight =
                         model.totalHistoryWeight + historyWeight
 
-                    local historyMeter = rep.steps:GetMeter()
+                    local historyMeter =
+                        getEffectiveMeter(
+                            rep.song,
+                            rep.steps
+                        )
                     if historyMeter >= 1 and historyMeter <= (curriculum().JokeMeterMax or 30) then
                         meterSamples[#meterSamples + 1] = {
                             value = historyMeter,
@@ -4101,7 +4428,11 @@ local function buildModel(pn, stepsType)
                 local passedDP = select(1, getGroupBestPassedPercentDP(profile, group))
                 if passedDP then
                     model.passedHistoryCharts = model.passedHistoryCharts + 1
-                    local meter = rep.steps:GetMeter()
+                    local meter =
+                        getProgressionMeter(
+                            rep.song,
+                            rep.steps
+                        )
                     local jokeMax = curriculum().JokeMeterMax or 30
                     if meter >= 1 and meter <= jokeMax then
                         local skillCfg = curriculum().Skill or DEFAULT_CURRICULUM.Skill
@@ -4218,7 +4549,11 @@ local function buildModel(pn, stepsType)
                     -- technique.  Use meaningful historical plays, not only
                     -- recent plays and not only passes.
                     if evidence.fit >= interestMin then
-                        local meter = rep.steps:GetMeter()
+                        local meter =
+                            getEffectiveMeter(
+                                rep.song,
+                                rep.steps
+                            )
                         local jokeMax = curriculum().JokeMeterMax or 30
 
                         if meter >= 1 and meter <= jokeMax then
@@ -4287,7 +4622,11 @@ local function buildModel(pn, stepsType)
                                 steps = rep.steps,
                                 title =
                                     rep.song:GetDisplayFullTitle(),
-                                meter = rep.steps:GetMeter(),
+                                meter = getEffectiveMeter(
+                                    rep.song,
+                                    rep.steps
+                                ),
+                                rawMeter = rep.steps:GetMeter(),
                                 shape =
                                     getChartShapeFeatures(
                                         model,
@@ -4524,6 +4863,9 @@ local function recommendationReasons(candidate, weights)
         machineFreshness = "cabinet rediscovery",
         machineRecentActivity = "recently played on this machine",
         popularity = "machine popularity",
+        levelPopularity = "popular at this difficulty",
+        introPopularity = "popular beginner chart",
+        introNpsSafety = "beginner-friendly note density",
         communityFavorite = "liked by local players",
         communityScoreability = "scores well on this machine",
         beginnerSafety = "beginner-friendly patterning",
@@ -4599,6 +4941,9 @@ local function scoreCandidate(model, entry, group)
         machineFreshness = 0,
         machineRecentActivity = 0,
         popularity = 0,
+        levelPopularity = 0,
+        introPopularity = 0,
+        introNpsSafety = 0,
         communityFavorite = 0,
         communityScoreability = 0,
         beginnerSafety = 1,
@@ -4624,10 +4969,16 @@ local function scoreCandidate(model, entry, group)
         localScoringEase = 0,
     }
 
+    local effectiveMeter, difficultyScale, rawMeter =
+        getEffectiveMeter(song, steps)
+
     local difficultyFit = nil
     if model.targetMeter then
         difficultyFit =
-            gaussian(steps:GetMeter() - model.targetMeter, model.difficultySigma)
+            gaussian(
+                effectiveMeter - model.targetMeter,
+                model.difficultySigma
+            )
         components.difficulty = difficultyFit
     end
 
@@ -4638,6 +4989,30 @@ local function scoreCandidate(model, entry, group)
             song,
             group
         )
+
+    do
+        local introCfg = curriculum().IntroProgression or {}
+        local maxNps = tonumber(introCfg.maxPeakNps) or 2.75
+        local fullAt =
+            math.min(
+                maxNps,
+                tonumber(introCfg.fullNpsSafetyAtOrBelow) or 1.50
+            )
+
+        local peak = tonumber(chartShape.peakNps) or 0
+        if peak <= fullAt then
+            components.introNpsSafety = 1
+        elseif peak >= maxNps then
+            components.introNpsSafety = 0
+        else
+            components.introNpsSafety =
+                clamp(
+                    1 - (peak - fullAt) / math.max(0.01, maxNps - fullAt),
+                    0,
+                    1
+                )
+        end
+    end
 
     local candidateTech, candidateTechRaw =
         getTechVector(
@@ -4763,9 +5138,23 @@ local function scoreCandidate(model, entry, group)
             0,
             1
         )
-        components.machineRecentActivity = math.exp(
-            -machineDays / SLRecommendations.Config.MachineRecentActivityDays
-        )
+        -- Relative recency keeps Hot Right Now meaningful even on copied or
+        -- stale machine-profile data where every absolute date is old.
+        local relativeDays =
+            math.max(
+                0,
+                machineDays -
+                (
+                    model.machineMostRecentDays
+                    or machineDays
+                )
+            )
+
+        components.machineRecentActivity =
+            math.exp(
+                -relativeDays /
+                SLRecommendations.Config.MachineRecentActivityDays
+            )
     end
 
     if model.maxMachineChartPlays > 0 and machinePlays > 0 then
@@ -4774,6 +5163,36 @@ local function scoreCandidate(model, entry, group)
             0,
             1
         )
+    end
+
+    if machinePlays > 0 then
+        local meterBucket =
+            math.max(1, math.floor(effectiveMeter + 0.5))
+
+        local meterMax =
+            model.maxMachineChartPlaysByMeter[meterBucket] or 0
+
+        if meterMax > 0 then
+            components.levelPopularity =
+                clamp(
+                    log1p(machinePlays) / log1p(meterMax),
+                    0,
+                    1
+                )
+        end
+
+        if effectiveMeter >= 1
+            and effectiveMeter <= 3
+            and model.maxMachineChartPlaysIntro123 > 0
+        then
+            components.introPopularity =
+                clamp(
+                    log1p(machinePlays) /
+                    log1p(model.maxMachineChartPlaysIntro123),
+                    0,
+                    1
+                )
+        end
     end
 
     local communityKey = songCommunityKey(song)
@@ -4788,7 +5207,7 @@ local function scoreCandidate(model, entry, group)
 
     if model.levelUpMeter then
         components.levelUpFit = gaussian(
-            steps:GetMeter() - model.levelUpMeter,
+            effectiveMeter - model.levelUpMeter,
             SLRecommendations.Config.LevelUpSigma
         )
     end
@@ -4866,7 +5285,9 @@ local function scoreCandidate(model, entry, group)
         bestPercentDP = bestDP,
         personalDaysSince = personalDays,
         machineDaysSince = machineDays,
-        meter = steps:GetMeter(),
+        meter = rawMeter,
+        effectiveMeter = effectiveMeter,
+        difficultyScale = difficultyScale,
         artist = song:GetDisplayArtist(),
         genre = song:GetGenre(),
         credit = steps:GetAuthorCredit(),
@@ -4934,7 +5355,7 @@ local function techModeLevelFit(candidate, mode)
     end
 
     return gaussian(
-        candidate.meter - mode.techTargetMeter,
+        (candidate.effectiveMeter or candidate.meter) - mode.techTargetMeter,
         math.max(
             0.50,
             tonumber(mode.techLevelSigma)
@@ -4950,7 +5371,40 @@ local function weightedCandidateTotal(candidate, weights, mode)
     for name, weight in pairs(weights or {}) do
         if weight and weight > 0 then
             local value = candidate.components[name] or 0
-            if name == "techFeature"
+
+            if name == "levelPopularity"
+                and candidate._model
+                and candidate._model.levelUpMeter
+            then
+                -- Level Up should care about popularity inside the TARGET
+                -- difficulty block.  This prevents the globally most-played
+                -- meter from dominating progression recommendations.
+                local targetBucket =
+                    math.max(
+                        1,
+                        math.floor(
+                            candidate._model.levelUpMeter + 0.5
+                        )
+                    )
+
+                local targetMax =
+                    candidate._model.maxMachineChartPlaysByMeter[
+                        targetBucket
+                    ] or 0
+
+                if targetMax > 0
+                    and (candidate.machinePlays or 0) > 0
+                then
+                    value =
+                        clamp(
+                            log1p(candidate.machinePlays) /
+                            log1p(targetMax),
+                            0,
+                            1
+                        )
+                end
+
+            elseif name == "techFeature"
                 and mode
                 and mode.techFeature
             then
@@ -4987,17 +5441,11 @@ local function weightedCandidateTotal(candidate, weights, mode)
                     techHistoryMeterFit(
                         candidate._model,
                         mode.techFeature,
-                        candidate.meter
+                        candidate.effectiveMeter or candidate.meter
                     )
 
             elseif name == "quirkFeature" and mode and mode.quirkMode then
                 value = candidate.components.quirkiness or 0
-
-            elseif name == "rhythmFeature" and mode and mode.rhythmMode then
-                value =
-                    candidate.components.rhythmIntensity
-                    or candidate.components.rhythmEvidence
-                    or 0
 
             elseif name == "beginnerSafety" and mode and mode.techFeature then
                 value = beginnerSafetyForTech(
@@ -5030,7 +5478,12 @@ local function scoreForMode(model, baseCandidate, modeKey)
 
     local fit
     if modeKey == "LevelUp" then
-        fit = baseCandidate.components.levelUpFit
+        if model.introProgression then
+            fit = 1
+        else
+            fit =
+                baseCandidate.components.levelUpFit
+        end
     elseif mode.techFeature then
         if mode.isInterestTech then
             -- A membership quota supplies progression coverage.  Do not
@@ -5052,7 +5505,33 @@ local function scoreForMode(model, baseCandidate, modeKey)
         gate = floor + (1 - floor) * fit
     end
 
-    return raw, gate, raw * gate
+    local score = raw * gate
+    local varianceFactor = 1
+
+    if modeKey == "ForYou" and model.dailyRecommendationSeed then
+        local amount = clamp(
+            tonumber(SLRecommendations.Config.ForYouDailyVariance) or 0,
+            0,
+            0.20
+        )
+
+        if amount > 0 then
+            local identity = baseCandidate.grooveStatsHash
+            if not identity or identity == "" then
+                identity = table.concat({
+                    tostring(baseCandidate.song and baseCandidate.song:GetDisplayFullTitle() or ""),
+                    tostring(baseCandidate.song and baseCandidate.song:GetDisplayArtist() or ""),
+                    tostring(baseCandidate.effectiveMeter or baseCandidate.meter or 0),
+                }, "|")
+            end
+
+            local unit = stableHashUnit(identity, model.dailyRecommendationSeed)
+            varianceFactor = 1 + (((unit * 2) - 1) * amount)
+            score = score * varianceFactor
+        end
+    end
+
+    return raw, gate, score, varianceFactor
 end
 
 local function rankedItemBetter(a, b)
@@ -5085,6 +5564,7 @@ local function materializeModeCandidate(model, item, modeKey)
     candidate.rawScore = item.rawScore
     candidate.difficultyGate = item.gate
     candidate.score = item.score
+    candidate.dailyVarianceFactor = item.varianceFactor or 1
 
     local reasonComponents = shallowCopy(candidate.components)
     if mode.techFeature then
@@ -5108,7 +5588,7 @@ local function materializeModeCandidate(model, item, modeKey)
             techHistoryMeterFit(
                 model,
                 mode.techFeature,
-                candidate.meter
+                candidate.effectiveMeter or candidate.meter
             )
     end
     local original = candidate.components
@@ -5125,7 +5605,34 @@ local function collapseModeToSongs(model, baseCandidates, modeKey, count)
 
     for _, baseCandidate in ipairs(baseCandidates) do
         local allowed = true
-        if mode.techFeature then
+
+        if modeKey == "LevelUp"
+            and model.introProgression
+        then
+            local introCfg =
+                curriculum().IntroProgression or {}
+
+            local effectiveMeter =
+                baseCandidate.effectiveMeter
+                or baseCandidate.meter
+
+            local maxPeakNps =
+                tonumber(introCfg.maxPeakNps)
+                or 2.75
+
+            local maxQuirkiness =
+                tonumber(introCfg.maxQuirkiness)
+                or 0.20
+
+            allowed =
+                effectiveMeter >= 1
+                and effectiveMeter <= 3
+                and (baseCandidate.peakNps or 0) <= maxPeakNps
+                and (baseCandidate.components.quirkiness or 0) <=
+                    maxQuirkiness
+        end
+
+        if allowed and mode.techFeature then
             local presence =
                 baseCandidate.techFeatureFits[
                     mode.techFeature
@@ -5148,24 +5655,29 @@ local function collapseModeToSongs(model, baseCandidates, modeKey, count)
             if allowed
                 and mode.isInterestTech
                 and mode.techCeilingMeter
-                and baseCandidate.meter > mode.techCeilingMeter
+                and (baseCandidate.effectiveMeter or baseCandidate.meter) >
+                    mode.techCeilingMeter
             then
                 allowed = false
             end
 
-        elseif mode.quirkMode then
+        elseif allowed and mode.quirkMode then
             allowed = (baseCandidate.components.quirkiness or 0)
                 >= (mode.requireQuirkiness or 0.42)
 
-        elseif mode.rhythmMode then
-            allowed =
-                (baseCandidate.components.rhythmEvidence or 0)
-                >= (mode.requireRhythm or 0.42)
         end
 
         if allowed then
-            local rawScore, gate, score = scoreForMode(model, baseCandidate, modeKey)
-            local item = {base = baseCandidate, rawScore = rawScore, gate = gate, score = score}
+            local rawScore, gate, score, varianceFactor =
+                scoreForMode(model, baseCandidate, modeKey)
+
+            local item = {
+                base = baseCandidate,
+                rawScore = rawScore,
+                gate = gate,
+                score = score,
+                varianceFactor = varianceFactor or 1,
+            }
             local songKey = baseCandidate.song:GetSongDir()
             if not songKey or songKey == "" then
                 songKey = baseCandidate.song:GetDisplayFullTitle() .. "\\0" .. baseCandidate.song:GetDisplayArtist()
@@ -5209,7 +5721,9 @@ local function collapseModeToSongs(model, baseCandidates, modeKey, count)
         for _, item in pairs(bestBySong) do
             insertTopK(overall, item, resultLimit)
 
-            local meter = item.base.meter
+            local meter =
+                item.base.effectiveMeter
+                or item.base.meter
             if meter <= mode.techCeilingMeter
                 and meter >= (mode.techCeilingMeter - band)
             then
@@ -5271,6 +5785,10 @@ function SLRecommendations.GenerateModes(pn, options)
     local modelStart = totalStart
     local model, err = buildModel(pn, stepsType)
     if not model then return {}, nil, err end
+
+    model.dailyRecommendationSeed = options.dailySeed
+    model.dailyRecommendationGeneration =
+        tonumber(options.dailyGeneration) or 0
 
     local afterModel =
         GetTimeSinceStart and GetTimeSinceStart() or modelStart
@@ -5435,10 +5953,547 @@ function SLRecommendations.SetActive(pn, resultsBySection, model)
     }
 end
 
+function SLRecommendations.GetSectionGuide(modeKey, model)
+    if modeKey == "LevelUp" then
+        if model and model.introProgression then
+            return SLRecommendations.SectionGuide.IntroLevelUp
+        end
+
+        return SLRecommendations.SectionGuide.LevelUp
+    end
+
+    if modeKey
+        and tostring(modeKey):find("^Curriculum_")
+    then
+        if modeKey == "Curriculum_quirky" then
+            return SLRecommendations.SectionGuide.Quirky
+        end
+
+        return SLRecommendations.SectionGuide.CurriculumTech
+    end
+
+    if modeKey
+        and tostring(modeKey):find("^Interest_")
+    then
+        if modeKey == "Interest_quirky" then
+            return SLRecommendations.SectionGuide.Quirky
+        end
+
+        return SLRecommendations.SectionGuide.InterestTech
+    end
+
+    return SLRecommendations.SectionGuide[modeKey]
+end
+
 function SLRecommendations.GetActive(pn)
     return SLRecommendations.Active[
         ToEnumShortString(pn)
     ]
+end
+
+-- =========================================================================
+-- DAILY RECOMMENDATION CACHE
+-- =========================================================================
+--
+-- A shared profile may be mounted by multiple cabinets with different song
+-- libraries.  The profile owns one daily hash-based recommendation set.  Each
+-- cabinet resolves those hashes locally and may save a cabinet-specific filled
+-- version when some shared charts are missing.
+
+local function dailyDateKey()
+    return string.format(
+        "%04d-%02d-%02d",
+        Year(),
+        MonthOfYear() + 1,
+        DayOfMonth()
+    )
+end
+
+local function dailyProfileIdentity(pn)
+    local profile = getPlayerProfile(pn)
+    if profile and profile.GetGUID then
+        local guid = trim(profile:GetGUID() or "")
+        if guid ~= "" then return guid end
+    end
+
+    return "guest:" .. tostring(ToEnumShortString(pn))
+end
+
+local function dailyMachineIdentity()
+    local machine = PROFILEMAN:GetMachineProfile()
+    if machine and machine.GetGUID then
+        local guid = trim(machine:GetGUID() or "")
+        if guid ~= "" then return guid end
+    end
+
+    return "machine"
+end
+
+local function dailyStyleKey(stepsType)
+    if stepsType then
+        return tostring(stepsType)
+    end
+
+    local style =
+        GAMESTATE
+        and GAMESTATE:GetCurrentStyle()
+        or nil
+
+    if not style then
+        return nil
+    end
+
+    local currentStepsType =
+        style:GetStepsType()
+
+    return
+        currentStepsType
+        and tostring(currentStepsType)
+        or nil
+end
+
+local function dailyCachePath(pn)
+    if PROFILEMAN:IsPersistentProfile(pn) then
+        return PROFILEMAN:GetProfileDir(profileSlotForPlayer(pn)) ..
+            tostring(
+                SLRecommendations.Config.DailyRecommendationCacheFilename
+                or "recommendations-daily.json"
+            )
+    end
+
+    return PROFILEMAN:GetProfileDir("ProfileSlot_Machine") ..
+        "recommendations-guest-daily.json"
+end
+
+local function readDailyCache(pn)
+    local path = dailyCachePath(pn)
+    if not FILEMAN:DoesFileExist(path) then return nil end
+
+    local raw = lua.ReadFile(path)
+    if type(raw) ~= "string" or raw == "" then return nil end
+
+    local ok, decoded = pcall(JsonDecode, raw)
+    if not ok or type(decoded) ~= "table" then return nil end
+
+    return decoded
+end
+
+local function writeDailyCache(pn, cache)
+    local ok, encoded = pcall(JsonEncode, cache, false)
+    if not ok or type(encoded) ~= "string" then return false end
+
+    local file = RageFileUtil.CreateRageFile()
+    local path = dailyCachePath(pn)
+
+    if not file:Open(path, 2) then
+        file:destroy()
+        return false
+    end
+
+    file:Write(encoded)
+    file:Close()
+    file:destroy()
+    return true
+end
+
+local function chartKeyForSteps(steps)
+    if not steps or not steps.GetChartKey then return nil end
+    local key = trim(steps:GetChartKey() or "")
+    return key ~= "" and key or nil
+end
+
+local function copyStringArray(values)
+    local out = {}
+    for _, value in ipairs(values or {}) do
+        if type(value) == "string" then out[#out + 1] = value end
+    end
+    return out
+end
+
+local function buildInstalledChartIdentityIndex(stepsType)
+    local byHash = {}
+    local byChartKey = {}
+
+    for song in ivalues(SONGMAN:GetAllSongs() or {}) do
+        for steps in ivalues(song:GetStepsByStepsType(stepsType) or {}) do
+            local hash = select(1, getGrooveStatsIdentity(steps))
+            if hash and hash ~= "" and not byHash[hash] then
+                byHash[hash] = { song = song, steps = steps }
+            end
+
+            local chartKey = chartKeyForSteps(steps)
+            if chartKey and not byChartKey[chartKey] then
+                byChartKey[chartKey] = { song = song, steps = steps }
+            end
+        end
+    end
+
+    return { byHash = byHash, byChartKey = byChartKey }
+end
+
+local function serializeRecommendationResult(result)
+    if not result or not result.song or not result.steps then return nil end
+
+    local hash, hashVersion = getGrooveStatsIdentity(result.steps)
+
+    return {
+        hash = hash or "",
+        hashVersion = hashVersion and tostring(hashVersion) or "",
+        chartKey = chartKeyForSteps(result.steps) or "",
+        modeKey = result.modeKey or "",
+        score = tonumber(result.score) or 0,
+        dailyVarianceFactor = tonumber(result.dailyVarianceFactor) or 1,
+        reasons = copyStringArray(result.reasons),
+
+        -- Human-readable diagnostics/fallback metadata only.  Resolution does
+        -- not depend on pack/group path.
+        title = result.song:GetDisplayFullTitle() or "",
+        artist = result.song:GetDisplayArtist() or "",
+        group = result.song:GetGroupName() or "",
+        meter = tonumber(result.steps:GetMeter()) or 0,
+        difficulty = tostring(result.steps:GetDifficulty() or ""),
+        credit = result.steps:GetAuthorCredit() or "",
+    }
+end
+
+local function serializeRecommendationSections(resultsBySection, model)
+    local sections = {}
+    local seen = {}
+
+    local function append(section)
+        if not section or section == "" or seen[section] then return end
+
+        local results = resultsBySection and resultsBySection[section]
+        if type(results) ~= "table" or #results <= 0 then return end
+
+        seen[section] = true
+        local entry = { name = section, items = {} }
+
+        for _, result in ipairs(results) do
+            local item = serializeRecommendationResult(result)
+            if item and (item.hash ~= "" or item.chartKey ~= "") then
+                entry.items[#entry.items + 1] = item
+            end
+        end
+
+        if #entry.items > 0 then sections[#sections + 1] = entry end
+    end
+
+    if model and model.modeOrder then
+        for _, modeKey in ipairs(model.modeOrder) do
+            append(getModeSection(model, modeKey))
+        end
+    end
+
+    for section in pairs(resultsBySection or {}) do append(section) end
+    return sections
+end
+
+local function recommendationIdentity(result)
+    if not result then return nil end
+
+    local hash = result.grooveStatsHash
+    if (not hash or hash == "") and result.steps then
+        hash = select(1, getGrooveStatsIdentity(result.steps))
+    end
+    if hash and hash ~= "" then return "h:" .. hash end
+
+    local chartKey = result.steps and chartKeyForSteps(result.steps) or nil
+    if chartKey then return "c:" .. chartKey end
+    return nil
+end
+
+local function resolveSerializedSections(serialized, stepsType)
+    if type(serialized) ~= "table" then return {}, {} end
+
+    local index = buildInstalledChartIdentityIndex(stepsType)
+    local resultsBySection = {}
+    local targetCounts = {}
+
+    for _, sectionEntry in ipairs(serialized) do
+        local section = tostring(sectionEntry.name or "")
+        if section ~= "" and type(sectionEntry.items) == "table" then
+            targetCounts[section] = #sectionEntry.items
+            local results = {}
+
+            for _, item in ipairs(sectionEntry.items) do
+                local localChart = nil
+
+                if item.hash and item.hash ~= "" then
+                    localChart = index.byHash[item.hash]
+                end
+
+                if not localChart and item.chartKey and item.chartKey ~= "" then
+                    localChart = index.byChartKey[item.chartKey]
+                end
+
+                if localChart then
+                    local song = localChart.song
+                    local steps = localChart.steps
+
+                    results[#results + 1] = {
+                        song = song,
+                        steps = steps,
+                        section = section,
+                        modeKey = item.modeKey or "",
+                        score = tonumber(item.score) or 0,
+                        dailyVarianceFactor = tonumber(item.dailyVarianceFactor) or 1,
+                        reasons = copyStringArray(item.reasons),
+                        meter = steps:GetMeter(),
+                        artist = song:GetDisplayArtist(),
+                        genre = song:GetGenre(),
+                        credit = steps:GetAuthorCredit(),
+                        grooveStatsHash = item.hash or "",
+                        grooveStatsHashVersion = item.hashVersion or "",
+                        components = {},
+                    }
+                end
+            end
+
+            if #results > 0 then resultsBySection[section] = results end
+        end
+    end
+
+    return resultsBySection, targetCounts
+end
+
+local function mergeResolvedWithLocal(resolved, localResults, targetCounts)
+    local merged = {}
+    local sections = {}
+
+    for section in pairs(targetCounts or {}) do sections[section] = true end
+    for section in pairs(resolved or {}) do sections[section] = true end
+    for section in pairs(localResults or {}) do sections[section] = true end
+
+    for section in pairs(sections) do
+        local out = {}
+        local seen = {}
+        local target = tonumber(targetCounts and targetCounts[section]) or 0
+        if target <= 0 then
+            target = #(localResults and localResults[section] or {})
+        end
+
+        local function add(result)
+            if #out >= target and target > 0 then return end
+            local identity = recommendationIdentity(result)
+            if identity and not seen[identity] then
+                seen[identity] = true
+                out[#out + 1] = result
+            end
+        end
+
+        for _, result in ipairs(resolved and resolved[section] or {}) do add(result) end
+        for _, result in ipairs(localResults and localResults[section] or {}) do add(result) end
+
+        if #out > 0 then merged[section] = out end
+    end
+
+    return merged
+end
+
+local function dailySeedFor(pn, dateKey, generation)
+    return stableStringHash(
+        table.concat({
+            tostring(dateKey),
+            dailyProfileIdentity(pn),
+            tostring(generation or 0),
+        }, "|"),
+        8675309
+    )
+end
+
+local function cachedModelFromEntry(entry)
+    return {
+        fromDailyCache = true,
+        modeOrder = entry.modeOrder or {},
+        introProgression = entry.introProgression and true or false,
+        levelUpMeter = entry.levelUpMeter,
+        skillFocusLevel = entry.skillFocusLevel,
+        stepsType = entry.stepsType,
+        dailyRecommendationSeed = entry.seed,
+        dailyRecommendationGeneration = tonumber(entry.generation) or 0,
+    }
+end
+
+function SLRecommendations.GetDailyRecommendationCachePath(pn)
+    return dailyCachePath(pn)
+end
+
+function SLRecommendations.EnsureDailyRecommendations(pn, options)
+    options = options or {}
+
+    if not SLRecommendations.Config.DailyRecommendationsEnabled then
+        local results, model, err = SLRecommendations.GenerateModes(pn, options)
+        return results, model, err, "generated-no-cache"
+    end
+
+    local stepsType =
+        options.stepsType
+
+    if not stepsType then
+        local style =
+            GAMESTATE
+            and GAMESTATE:GetCurrentStyle()
+            or nil
+
+        if not style then
+            return
+                {},
+                nil,
+                "Current style is not available yet.",
+                "style-unavailable"
+        end
+
+        stepsType =
+            style:GetStepsType()
+    end
+
+    if not stepsType then
+        return
+            {},
+            nil,
+            "Current StepsType is not available yet.",
+            "steps-type-unavailable"
+    end
+
+    local styleKey =
+        dailyStyleKey(stepsType)
+
+    if not styleKey then
+        return
+            {},
+            nil,
+            "Current recommendation style is not available yet.",
+            "style-unavailable"
+    end
+
+    local machineKey = dailyMachineIdentity()
+    local today = dailyDateKey()
+    local formatVersion = tonumber(SLRecommendations.Config.DailyRecommendationCacheFormatVersion) or 1
+    local cache = readDailyCache(pn)
+
+    local cacheUsable =
+        type(cache) == "table"
+        and cache.date == today
+        and tostring(cache.scriptVersion or "") == tostring(SLRecommendations.Version)
+        and tonumber(cache.formatVersion) == formatVersion
+
+    if not cacheUsable then
+        cache = {
+            formatVersion = formatVersion,
+            scriptVersion = tostring(SLRecommendations.Version),
+            date = today,
+            profileGuid = dailyProfileIdentity(pn),
+            styles = {},
+        }
+    end
+
+    cache.styles = type(cache.styles) == "table" and cache.styles or {}
+    local styleCache = cache.styles[styleKey]
+    if type(styleCache) ~= "table" then
+        styleCache = { machines = {} }
+        cache.styles[styleKey] = styleCache
+    end
+    styleCache.machines = type(styleCache.machines) == "table" and styleCache.machines or {}
+
+    local force = options.forceRefresh and true or false
+    local generation = tonumber(styleCache.generation) or 0
+
+    if force then
+        generation = generation + 1
+    end
+
+    -- Manual refresh establishes a brand-new shared daily set and invalidates
+    -- cabinet-specific filled versions.
+    if force or type(styleCache.shared) ~= "table" then
+        local seed = dailySeedFor(pn, today, generation)
+        local generatedOptions = {}
+        for key, value in pairs(options) do generatedOptions[key] = value end
+        generatedOptions.forceRefresh = nil
+        generatedOptions.dailySeed = seed
+        generatedOptions.dailyGeneration = generation
+
+        local generated, model, err = SLRecommendations.GenerateModes(pn, generatedOptions)
+        if err then return generated, model, err, "generation-error" end
+
+        styleCache.generation = generation
+        styleCache.seed = seed
+        styleCache.shared = {
+            generation = generation,
+            seed = seed,
+            stepsType = styleKey,
+            modeOrder = model.modeOrder or {},
+            introProgression = model.introProgression and true or false,
+            levelUpMeter = model.levelUpMeter,
+            skillFocusLevel = model.skillFocusLevel,
+            sections = serializeRecommendationSections(generated, model),
+        }
+        styleCache.machines = {}
+        writeDailyCache(pn, cache)
+
+        return generated, model, nil, force and "refreshed" or "generated-daily"
+    end
+
+    generation = tonumber(styleCache.shared.generation) or generation
+    local machineEntry = styleCache.machines[machineKey]
+
+    if type(machineEntry) == "table"
+        and tonumber(machineEntry.generation) == generation
+    then
+        local resolved, machineTargets =
+            resolveSerializedSections(machineEntry.sections, stepsType)
+
+        local machineComplete = true
+        for section, target in pairs(machineTargets) do
+            if #(resolved[section] or {}) < target then
+                machineComplete = false
+                break
+            end
+        end
+
+        if machineComplete
+            and resolved["For You"]
+            and #resolved["For You"] > 0
+        then
+            local model = cachedModelFromEntry(styleCache.shared)
+            return resolved, model, nil, "daily-cache-machine"
+        end
+    end
+
+    local sharedResolved, targetCounts =
+        resolveSerializedSections(styleCache.shared.sections, stepsType)
+
+    local needsFill = false
+    for section, target in pairs(targetCounts) do
+        local have = #(sharedResolved[section] or {})
+        if have < target then needsFill = true break end
+    end
+
+    if not needsFill and sharedResolved["For You"] and #sharedResolved["For You"] > 0 then
+        return sharedResolved, cachedModelFromEntry(styleCache.shared), nil, "daily-cache-shared"
+    end
+
+    -- This cabinet is missing some shared charts.  Generate once locally using
+    -- the SAME daily seed, keep every shared chart that exists here, and fill
+    -- only the gaps from local candidates.
+    local localOptions = {}
+    for key, value in pairs(options) do localOptions[key] = value end
+    localOptions.forceRefresh = nil
+    localOptions.dailySeed = styleCache.shared.seed
+    localOptions.dailyGeneration = generation
+
+    local localResults, localModel, err = SLRecommendations.GenerateModes(pn, localOptions)
+    if err then return localResults, localModel, err, "local-fill-error" end
+
+    local merged = mergeResolvedWithLocal(sharedResolved, localResults, targetCounts)
+
+    styleCache.machines[machineKey] = {
+        generation = generation,
+        sections = serializeRecommendationSections(merged, localModel),
+    }
+    writeDailyCache(pn, cache)
+
+    return merged, localModel, nil, "daily-cache-filled"
 end
 
 function SLRecommendations.ResolveRecommendationForSong(
@@ -5610,6 +6665,9 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
     lines[#lines + 1] = "Skill focus / Level Up target: " ..
         tostring(model.skillFocusLevel or "-") .. " / " ..
         tostring(model.levelUpMeter or "-")
+    lines[#lines + 1] =
+        "Intro progression (Learn the 123s): " ..
+        tostring(model.introProgression)
     lines[#lines + 1] = "Score Well available: " .. tostring(model.scoreWellReady)
     lines[#lines + 1] = "Community favorite profiles: " .. tostring(model.communityFavoriteProfiles or 0)
     lines[#lines + 1] = "Played history charts: " .. tostring(model.playedHistoryCharts)
@@ -5627,7 +6685,27 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
     lines[#lines + 1] = "Difficulty sigma: " .. fmt(model.difficultySigma, 2)
     lines[#lines + 1] = "Max personal chart plays: " .. tostring(model.maxPlayerChartPlays)
     lines[#lines + 1] = "Max machine chart plays: " .. tostring(model.maxMachineChartPlays)
+    lines[#lines + 1] =
+        "Machine most-recent chart age anchor: " ..
+        tostring(model.machineMostRecentDays or "-")
     lines[#lines + 1] = "StepsType: " .. tostring(model.stepsType)
+
+    do
+        local scaleParts = {}
+        for scale, count in pairs(model.difficultyScaleCounts or {}) do
+            scaleParts[#scaleParts + 1] =
+                tostring(scale) .. "=" .. tostring(count)
+        end
+        table.sort(scaleParts)
+        lines[#lines + 1] =
+            "Difficulty scale usage: " ..
+            (#scaleParts > 0 and table.concat(scaleParts, ", ") or "-")
+    end
+    lines[#lines + 1] =
+        "Daily recommendation seed/generation: " ..
+        tostring(model.dailyRecommendationSeed or "-") .. " / " ..
+        tostring(model.dailyRecommendationGeneration or 0)
+    lines[#lines + 1] = ""
     lines[#lines + 1] = "Model build time: " ..
         fmt(model.modelBuildSeconds or 0, 3) .. "s"
     lines[#lines + 1] = "Candidate scoring time: " ..
@@ -5927,7 +7005,7 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
             )
         end
     end
-    lines[#lines + 1] = "Rhythm profile:"
+    lines[#lines + 1] = "Rhythm/Chaos familiarity (quirk + beginner safety only):"
     lines[#lines + 1] =
         "  Chaos rhythm threshold/full: " ..
         fmt(
@@ -6129,6 +7207,19 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
                     fmt(r.components.stamina, 3)
                 )
 
+                if modeKey == "LevelUp" then
+                    lines[#lines + 1] = string.format(
+                        "        levelUpEvidence: effectiveMeter=%s | scale=%s | peakNPS=%s | quirk=%s | levelPop=%s | introPop=%s | introNpsSafety=%s",
+                        fmt(r.effectiveMeter or r.meter, 1),
+                        tostring(r.difficultyScale or "ITG"),
+                        fmt(r.peakNps or 0, 2),
+                        fmt(r.components.quirkiness or 0, 3),
+                        fmt(r.components.levelPopularity or 0, 3),
+                        fmt(r.components.introPopularity or 0, 3),
+                        fmt(r.components.introNpsSafety or 0, 3)
+                    )
+                end
+
                 if previewMode.techFeature then
                     local evidence = r.techFeatureEvidence
                         and r.techFeatureEvidence[previewMode.techFeature]
@@ -6165,7 +7256,7 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
                                 techHistoryMeterFit(
                                     model,
                                     previewMode.techFeature,
-                                    r.meter
+                                    r.effectiveMeter or r.meter
                                 ),
                                 3
                             ),
@@ -6197,18 +7288,6 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
                         fmt(r.quirkiness.points, 2),
                         table.concat(r.quirkiness.reasons or {}, "; ")
                     )
-
-                elseif previewMode.rhythmMode and r.rhythm then
-                    lines[#lines + 1] = string.format(
-                        "        rhythmEvidence: fit=%s | intensity=%s | chaos=%s | chaosPresence=%s | notation=%s | notationStrength=%s | streamNotation=%s",
-                        fmt(r.rhythm.evidence or 0, 3),
-                        fmt(r.rhythm.intensity or 0, 3),
-                        fmt(r.rhythm.chaos or 0, 3),
-                        fmt(r.rhythm.chaosPresence or 0, 3),
-                        r.rhythm.notationToken or "-",
-                        fmt(r.rhythm.notationStrength or 0, 2),
-                        fmt(r.rhythm.streamNotationStrength or 0, 2)
-                    )
                 end
             end
         end
@@ -6220,11 +7299,24 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
     end
 
     for i, r in ipairs(results) do
+        local meterText = tostring(r.meter)
+        if r.effectiveMeter
+            and math.abs(r.effectiveMeter - r.meter) > 0.001
+        then
+            meterText =
+                meterText ..
+                " (effective " ..
+                fmt(r.effectiveMeter, 1) ..
+                " " ..
+                tostring(r.difficultyScale or "ITG") ..
+                ")"
+        end
+
         lines[#lines + 1] = string.format(
-            "%02d. %s | meter %d | score %.4f | raw %.4f | gate %.3f",
+            "%02d. %s | meter %s | score %.4f | raw %.4f | gate %.3f",
             i,
             r.song:GetDisplayFullTitle(),
-            r.meter,
+            meterText,
             r.score,
             r.rawScore,
             r.difficultyGate
@@ -6276,7 +7368,7 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
 
         if r.quirkiness then
             lines[#lines + 1] = string.format(
-                "    quirk: score=%s | points=%s | Edit=%s | FG=%d | BG=%d | BPM=%d | speed=%d | scroll=%d | mines=%d | lifts=%d | fakes=%d | reasons=%s",
+                "    quirk: score=%s | points=%s | Edit=%s | FG=%d | BG=%d | BPM=%d | speed=%d | scroll=%d | Chaos=%s | rhythmTag=%s | mines=%d | lifts=%d | fakes=%d | reasons=%s",
                 fmt(r.quirkiness.score, 3),
                 fmt(r.quirkiness.points, 2),
                 tostring(r.quirkiness.isEdit or false),
@@ -6285,6 +7377,8 @@ function SLRecommendations.FormatDebug(results, model, resultsBySection)
                 r.quirkiness.bpmCount or 0,
                 r.quirkiness.speedCount or 0,
                 r.quirkiness.scrollCount or 0,
+                fmt(r.quirkiness.chaos or 0, 3),
+                r.quirkiness.rhythmNotationToken or "-",
                 r.quirkiness.mines or 0,
                 r.quirkiness.lifts or 0,
                 r.quirkiness.fakeCount or 0,

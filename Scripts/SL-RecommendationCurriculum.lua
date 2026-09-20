@@ -1,11 +1,118 @@
--- Editable recommendation curriculum for SL-Recommendations v20+.
+-- Editable recommendation curriculum for SL-Recommendations v24.5+.
 --
 -- POLICY lives here.  The scorer reads this table dynamically.
 
 SLRecommendationCurriculum = {
-    Version = 5,
+    Version = 9,
 
     JokeMeterMax = 30,
+
+    -- =====================================================================
+    -- DIFFICULTY SCALE OVERRIDES
+    -- =====================================================================
+    -- Most packs use ITG-style ratings.  Rules below let specific Groups/Packs
+    -- use another scale without changing the meter shown by ITGmania.
+    --
+    -- Matching is case-insensitive. `prefixes` match the beginning of the
+    -- Group name; `exactGroups` can be used for one-off exact pack names.
+    DifficultyScales = {
+        default = "ITG",
+
+        rules = {
+            {
+                scale = "DDR",
+                prefixes = {
+                    "DDR",
+                    "Cafe Cursed",
+                    "Zenius",
+                    "Dance Dance",
+                    "DanceDance",
+                    "2014 Billboard",
+                    "Triple Cross",
+                },
+                exactGroups = {
+                    -- "My Exact DDR Pack Name",
+                },
+            },
+        },
+
+        -- Range conversions use the midpoint internally so recommendation
+        -- math remains continuous.  Example: DDR 14 -> ITG 9-10 -> 9.5.
+        conversions = {
+            DDR = {
+                [1]  = 1.0,
+                [2]  = 1.5,
+                [3]  = 2.0,
+                [4]  = 3.0,
+                [5]  = 3.5,
+                [6]  = 4.0,
+                [7]  = 5.0,
+                [8]  = 5.5,
+                [9]  = 6.0,
+                [10] = 7.0,
+                [11] = 7.5,
+                [12] = 8.0,
+                [13] = 8.5,
+                [14] = 9.5,
+                [15] = 10.0,
+                [16] = 11.0,
+                [17] = 11.5,
+                [18] = 12.0,
+                [19] = 13.0,
+                [20] = 13.5, -- DDR 20 -> ITG 13+
+            },
+        },
+    },
+
+    -- Learn the 123s has hard guard rails; these are intentionally stricter
+    -- than the general recommender because this section is onboarding.
+    IntroProgression = {
+        maxPeakNps = 2.75,
+        maxQuirkiness = 0.20,
+        fullNpsSafetyAtOrBelow = 1.50,
+    },
+
+    -- =====================================================================
+    -- SECTION GUIDE
+    -- =====================================================================
+    -- For You:
+    --   Balanced overall recommendations.
+    --
+    -- Learn the 123s:
+    --   Beginner onboarding across meters 1, 2, and 3.
+    --
+    -- Level Up to N:
+    --   Progression toward the next working difficulty after onboarding.
+    --
+    -- Score Well:
+    --   Comparative scoring section; hidden until enough personal evidence.
+    --
+    -- You Might Like:
+    --   Artist/genre/stepartist/style/taste-focused section.
+    --
+    -- Hot Right Now:
+    --   Recently active + popular cabinet/community charts.
+    --
+    -- <Tech> Recs:
+    --   Level-based teaching sections for a specific technique.
+    --
+    -- More <Tech>:
+    --   Temporary recent-interest sections for techniques the player chooses.
+    --
+    -- Quirky Recs / More Quirky Charts:
+    --   Gimmick/mod/FGChanges/unusual timing/rhythm/high-Chaos content.
+    -- =====================================================================
+    SectionGuide = {
+        ForYou = "Balanced overall recommendations.",
+        IntroLevelUp = "Beginner onboarding across meters 1, 2, and 3.",
+        LevelUp = "Progression toward the player's next working level.",
+        ScoreWell = "Charts the player is comparatively likely to score well on.",
+        YouMightLike = "Taste, artist, genre, stepartist, and style affinity.",
+        HotRightNow = "Recently active and popular cabinet/community charts.",
+        CurriculumTech = "Level-based teaching recommendations for a specific technique.",
+        InterestTech = "Recent-interest recommendations for a technique the player is choosing often.",
+        Quirky = "Gimmick, mod, FGChanges, unusual timing, rhythm/Chaos, and other quirky charts.",
+    },
 
     Skill = {
         decentDP = 0.80,
@@ -200,10 +307,22 @@ SLRecommendationCurriculum = {
         interestMin = 0.32,
 
         editDifficultyPoints = 0.10,
+
+        -- FGChanges are one of the strongest explicit signs that the chart is
+        -- intentionally doing unusual visual/modchart behavior.
+        fgChangesBasePoints = 4.00,
+        fgChangesExtraPerChange = 0.50,
+        fgChangesExtraCap = 2.00,
+
+        -- Rhythm/Skittles/very-high Chaos feed this same quirk score.
+        rhythmNotationBasePoints = 0.60,
+        rhythmNotationIntensityPoints = 1.20,
+        chaosMaxPoints = 1.50,
     },
 
     Rhythms = {
-        section = "More Rhythms",
+        -- INTERNAL QUIRK / BEGINNER-SAFETY SIGNAL ONLY.
+        -- v21 intentionally has no separate More Rhythms section.
 
         notation = {
             "RH",
@@ -221,21 +340,10 @@ SLRecommendationCurriculum = {
         },
 
         chaosThreshold = 1.20,
-        chaosFull = 2.25,
+        chaosFull = 2.40,
 
         beginnerChaosThreshold = 1.00,
         beginnerChaosFull = 2.00,
-
-        candidateMin = 0.42,
-
-        interestLookbackDays = 120,
-        interestMinCharts = 2,
-        interestMin = 0.34,
-        interestMinLevel = 9,
-
-        earlyInterestFamiliarity = 0.65,
-
-        maxResults = 16,
 
         familiarityPassedCharts = 3,
         familiarityRecentCharts = 4,
