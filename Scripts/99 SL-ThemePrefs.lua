@@ -91,8 +91,10 @@ SL_CustomPrefs.Get = function()
 				THEME:GetString("ScreenSelectMusic", "Meter"),
 				THEME:GetString("ScreenSelectMusic", "Popularity"),
 				THEME:GetString("ScreenSelectMusic", "Recent"),
+				THEME:GetString("ScreenSelectMusic", "Year"),
+				THEME:GetString("ScreenSelectMusic", "Newest"),
 			},
-			Values = { "Series", "Group", "Title", "Meter", "Popularity", "Recent"}
+			Values = { "Series", "Group", "Title", "Meter", "Popularity", "Recent", "Year", "Newest"}
 		},
 		PreferredStyle =
 		{
