@@ -196,13 +196,13 @@ SLRecommendations.Config = {
 -- Only the cheap final weighting/ranking changes between sections.
 SLRecommendations.Modes = {
     ForYou = {
-        section = "For You",
+        section = "❤️For You",
         weights = SLRecommendations.Config.Weights,
         difficultyGateFloor = SLRecommendations.Config.DifficultyGateFloor,
     },
 
     YouMightLike = {
-        section = "You Might Like",
+        section = "🎵Songs You Might Like",
         difficultyGateFloor = 0.30,
         weights = {
             difficulty = 0.15,
@@ -220,7 +220,7 @@ SLRecommendations.Modes = {
     },
 
     ScoreWell = {
-        section = "Score Well",
+        section = "🎯Scobility",
         difficultyGateFloor = 0.20,
         weights = {
             difficulty = 0.20,
@@ -239,7 +239,7 @@ SLRecommendations.Modes = {
     },
 
     HotRightNow = {
-        section = "Hot Right Now",
+        section = "🔥Hot @ The Space",
         maxResults = 50,
         difficultyGateFloor = 0.35,
 
@@ -256,7 +256,7 @@ SLRecommendations.Modes = {
     },
 
     LevelUp = {
-        section = "Level Up",
+        section = "🚀Level Up",
         maxResults = 50,
         difficultyGateFloor = 0.45,
         weights = {},

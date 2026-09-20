@@ -296,8 +296,8 @@ SLRecommendationCurriculum = {
     -- it only comes back when the player's recent history shows actual interest.
     Quirkiness = {
         automaticLevel = 10,
-        section = "Quirky Recs",
-        interestSection = "More Quirky Charts",
+        section = "Gimmicky Recs",
+        interestSection = "More Gimmicks",
         candidateMin = 0.42,
         maxResults = 20,
         interestMaxResults = 16,
