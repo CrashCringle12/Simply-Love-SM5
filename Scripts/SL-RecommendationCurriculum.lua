@@ -23,6 +23,12 @@ SLRecommendationCurriculum = {
                 scale = "DDR",
                 prefixes = {
                     "DDR",
+                    "led_light",
+                    "Rajeious",
+                    "KyokiShinsa",
+                    "KDA",
+                    "Anime Extreme",
+                    "RIME",
                     "Cafe Cursed",
                     "Zenius",
                     "Dance Dance",

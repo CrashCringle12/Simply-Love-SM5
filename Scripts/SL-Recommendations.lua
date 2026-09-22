@@ -196,7 +196,7 @@ SLRecommendations.Config = {
 -- Only the cheap final weighting/ranking changes between sections.
 SLRecommendations.Modes = {
     ForYou = {
-        section = "❤️For You",
+        section = "🤍For You",
         weights = SLRecommendations.Config.Weights,
         difficultyGateFloor = SLRecommendations.Config.DifficultyGateFloor,
     },
@@ -209,12 +209,12 @@ SLRecommendations.Modes = {
             tech = 0.17,
             stamina = 0.17,
             metadata = 0.33,
-            personalAffinity = 0.04,
+            personalAffinity = 0.05,
             personalFreshness = 0.00,
             machineFreshness = 0.00,
             popularity = 0.02,
             priorPositive = 0.00,
-            exploration = 0.12,
+            exploration = 0.35,
             localPeerPerformance = 0.00,
         },
     },
@@ -232,7 +232,7 @@ SLRecommendations.Modes = {
             machineFreshness = 0.00,
             popularity = 0.00,
             priorPositive = 0.08,
-            exploration = 0.00,
+            exploration = 0.02,
             localPeerPerformance = 0.30,
             localScoringEase = 0.13,
         },
@@ -3919,6 +3919,7 @@ local COLD_LIKE_WEIGHTS = {
     communityFavorite = 0.35,
     communityScoreability = 0.08,
     beginnerSafety = 0.10,
+    exploration = 0.30,
 }
 
 local function blendWeights(a, b, t)
