@@ -6129,6 +6129,68 @@ end
 -- ephemeral; nothing here is written into Stats.xml.
 SLRecommendations.Active = SLRecommendations.Active or {}
 
+-- Resolve recommendation sections by stable mode identity rather than by the
+-- user-facing section label.  Section labels are intentionally customizable
+-- (for example "❤️For You"), so internal cache/activation logic must never
+-- assume the literal display string "For You".
+local function resultsForMode(
+    resultsBySection,
+    modeKey
+)
+    if type(resultsBySection) ~= "table" then
+        return nil, nil
+    end
+
+    -- Prefer the stable modeKey carried by every recommendation result.
+    for section, results in pairs(
+        resultsBySection
+    ) do
+        if type(results) == "table" then
+            for _, result in ipairs(results) do
+                if result
+                    and tostring(result.modeKey or "") ==
+                        tostring(modeKey)
+                then
+                    return results, section
+                end
+            end
+        end
+    end
+
+    -- Backward-compatible fallback for old/default caches where the canonical
+    -- mode section name is still the table key.
+    local mode =
+        SLRecommendations.Modes
+        and SLRecommendations.Modes[modeKey]
+        or nil
+
+    local canonical =
+        mode
+        and mode.section
+        or nil
+
+    if canonical
+        and type(resultsBySection[canonical]) == "table"
+    then
+        return
+            resultsBySection[canonical],
+            canonical
+    end
+
+    return nil, nil
+end
+
+function SLRecommendations.GetModeResults(
+    resultsBySection,
+    modeKey
+)
+    return
+        resultsForMode(
+            resultsBySection,
+            modeKey
+        )
+end
+
 function SLRecommendations.SetActive(pn, resultsBySection, model)
     local key = ToEnumShortString(pn)
 
@@ -6137,8 +6199,14 @@ function SLRecommendations.SetActive(pn, resultsBySection, model)
     if resultsBySection
         and resultsBySection[1]
     then
+        local primarySection =
+            SLRecommendations.Modes
+            and SLRecommendations.Modes.ForYou
+            and SLRecommendations.Modes.ForYou.section
+            or "For You"
+
         resultsBySection = {
-            ["For You"] = resultsBySection,
+            [primarySection] = resultsBySection,
         }
     end
 
@@ -6177,9 +6245,19 @@ function SLRecommendations.SetActive(pn, resultsBySection, model)
         bySectionChartHash[section] = byChartHash
     end
 
+    local primaryResults,
+        primarySection =
+        resultsForMode(
+            resultsBySection,
+            "ForYou"
+        )
+
     SLRecommendations.Active[key] = {
         results =
-            resultsBySection["For You"] or {},
+            primaryResults
+            or {},
+        primarySection =
+            primarySection,
         resultsBySection = resultsBySection,
         model = model,
         bySectionSongKey = bySectionSongKey,
@@ -8043,9 +8121,18 @@ function SLRecommendations.EnsureDailyRecommendations(
             end
         end
 
+        local primaryResults =
+            select(
+                1,
+                resultsForMode(
+                    resolved,
+                    "ForYou"
+                )
+            )
+
         if machineComplete
-            and resolved["For You"]
-            and #resolved["For You"] > 0
+            and primaryResults
+            and #primaryResults > 0
         then
             local model =
                 cachedModelFromEntry(
@@ -8099,9 +8186,18 @@ function SLRecommendations.EnsureDailyRecommendations(
         end
     end
 
+    local sharedPrimaryResults =
+        select(
+            1,
+            resultsForMode(
+                sharedResolved,
+                "ForYou"
+            )
+        )
+
     if not needsFill
-        and sharedResolved["For You"]
-        and #sharedResolved["For You"] > 0
+        and sharedPrimaryResults
+        and #sharedPrimaryResults > 0
     then
         local model =
             cachedModelFromEntry(
@@ -8213,7 +8309,15 @@ function SLRecommendations.ResolveRecommendationForSong(
         return nil, nil, "no-active-or-song"
     end
 
-    section = section or "For You"
+    section =
+        section
+        or active.primarySection
+        or (
+            SLRecommendations.Modes
+            and SLRecommendations.Modes.ForYou
+            and SLRecommendations.Modes.ForYou.section
+        )
+        or "For You"
 
     local bySongKey =
         active.bySectionSongKey
