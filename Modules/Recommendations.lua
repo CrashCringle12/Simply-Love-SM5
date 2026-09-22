@@ -1,5 +1,5 @@
 -- ITGmania / Simply Love Recommendations module
--- v27
+-- v27.1
 --
 -- Target:
 --   ITGmania beta
@@ -14,7 +14,7 @@
 --   modules such as bpm_change_indicator.lua.
 
 local t = {}
-local MODULE_VERSION = "27"
+local MODULE_VERSION = "27.1"
 
 local TARGET_SCREEN = "ScreenSelectMusic"
 
@@ -671,10 +671,35 @@ local function prepareRecommendations(forceRefresh, switchToRecommendedSort)
         return false
     end
 
-    local forYou = resultsBySection and resultsBySection["For You"] or nil
+    -- Section display names are customizable (for example "❤️For You").
+    -- Resolve the primary recommendations by stable mode identity instead of
+    -- assuming the literal display label "For You".
+    local forYou = nil
+    local forYouSection = nil
+
+    if SLRecommendations.GetModeResults then
+        forYou, forYouSection =
+            SLRecommendations.GetModeResults(
+                resultsBySection,
+                "ForYou"
+            )
+    else
+        -- Backward compatibility with older recommendation scripts.
+        forYouSection =
+            SLRecommendations.Modes
+            and SLRecommendations.Modes.ForYou
+            and SLRecommendations.Modes.ForYou.section
+            or "For You"
+
+        forYou =
+            resultsBySection
+            and resultsBySection[forYouSection]
+            or nil
+    end
 
     dbg(
         "EnsureDailyRecommendations source=" .. tostring(source) ..
+        " ForYouSection=" .. tostring(forYouSection) ..
         " ForYou=" .. tostring(forYou and #forYou or "nil") ..
         " err=" .. tostring(err)
     )
