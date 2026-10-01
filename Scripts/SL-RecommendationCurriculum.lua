@@ -2,6 +2,8 @@
 --
 -- POLICY lives here.  The scorer reads this table dynamically.
 
+-- StepArtist, Artist, Song Title, Genre, Tech (XS, DS, SS, FS, BR, )
+
 SLRecommendationCurriculum = {
     Version = 12,
 
@@ -77,7 +79,6 @@ SLRecommendationCurriculum = {
         maxQuirkiness = 0.20,
         fullNpsSafetyAtOrBelow = 1.50,
     },
-
     -- =====================================================================
     -- SECTION GUIDE
     -- =====================================================================
@@ -119,7 +120,6 @@ SLRecommendationCurriculum = {
         InterestTech = "Recent-interest recommendations for a technique the player is choosing often.",
         Quirky = "Gimmick, mod, FGChanges, unusual timing, rhythm/Chaos, and other quirky charts.",
     },
-
     Skill = {
         decentDP = 0.80,
         strongDP = 0.90,
@@ -127,7 +127,6 @@ SLRecommendationCurriculum = {
         masteryMinCharts = 4,
         strongMasteryMinCharts = 3,
     },
-
     RecentInterest = {
         minLevel = 9,
         lookbackDays = 120,
@@ -242,7 +241,6 @@ SLRecommendationCurriculum = {
             interestMinLevel = 11,
             interestRequiresMastery = {"crossovers", "footswitches"},
         },
-
         jacks = {
             label = "Jack Recs",
             interestLabel = "More Jacks",
@@ -261,7 +259,6 @@ SLRecommendationCurriculum = {
             automaticMaxResults = 22,
             interestMaxResults = 16,
         },
-
         doublesteps = {
             label = "Doublestep Recs",
             interestLabel = "More Doublesteps",
@@ -282,7 +279,6 @@ SLRecommendationCurriculum = {
             interestMinLevel = 11,
         },
     },
-
     -- Parsed and retained as trusted chart-description tags even where the
     -- current recommendation model does not yet have a dedicated section.
     AdditionalNotation = {
@@ -297,7 +293,6 @@ SLRecommendationCurriculum = {
         laterals = {"AN", "SC", "AFRONOVA", "AFRONOVAS", "SCOOBY", "SCOOBIES"},
         mods = {"MODS"},
     },
-
     -- Automatic Quirky Recs are a level-10 teaching/exposure section.  At 11+
     -- it only comes back when the player's recent history shows actual interest.
     Quirkiness = {

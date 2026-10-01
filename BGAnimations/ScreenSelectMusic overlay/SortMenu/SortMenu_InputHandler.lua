@@ -133,6 +133,13 @@ local input = function(event)
 					overlay:playcommand("DirectInputToEngine")
 					SCREENMAN:SetNewScreen("ScreenViewDownloads")
 				elseif focus.new_overlay == "OnlineLobbies" then
+					SL.Global.Online = SL.Global.Online or {}
+					SL.Global.Online.target = "online"
+					overlay:queuecommand("DirectInputToEngine")
+					SCREENMAN:SetNewScreen("ScreenOnlineLobbies")
+				elseif focus.new_overlay == "LocalLobbies" then
+					SL.Global.Online = SL.Global.Online or {}
+					SL.Global.Online.target = "local"
 					overlay:queuecommand("DirectInputToEngine")
 					SCREENMAN:SetNewScreen("ScreenOnlineLobbies")
 				elseif focus.new_overlay == "SwitchProfile" then

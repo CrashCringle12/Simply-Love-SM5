@@ -49,9 +49,30 @@ local ScheduleLobbyStateUpdate = function(actor)
   actor:sleep(LOBBY_UPDATE_DELAY):queuecommand("ProcessPendingLobbyState")
 end
 
--- TESTING Variables
-local host = "syncservice.groovestats.com"
-local port = 1337
+local ONLINE_HOST = "syncservice.groovestats.com"
+local LOBBY_PORT = 1337
+
+local GetLobbyEndpoint = function()
+  local online = SL.Global.Online or {}
+  if online.target ~= "local" then
+    return ONLINE_HOST, LOBBY_PORT
+  end
+
+  local configPath = THEME:GetCurrentThemeDirectory() .. "Other/OnlineLobbies.ini"
+  local config = FILEMAN:DoesFileExist(configPath) and IniFile.ReadFile(configPath) or nil
+  local localConfig = config and config.Local or {}
+  local host = localConfig.Host
+  local port = tonumber(localConfig.Port)
+
+  if type(host) ~= "string" or host == "" then
+    host = "127.0.0.1"
+  end
+  if not port or port < 1 or port > 65535 then
+    port = LOBBY_PORT
+  end
+
+  return host, port
+end
 
 -- This input handler is used to lock input while we're waiting on the server to tell us to proceed.
 -- It does nothing, but it's necessary to prevent the player from interacting with the screen
@@ -505,6 +526,7 @@ CreateOnlineHandler = function()
       ConnectOnlineMessageCommand=function(self)
         if self.socket == nil or self.errorMsg ~= nil then
           onlineHandlerShuttingDown = false
+          local host, port = GetLobbyEndpoint()
           self.socket = NETWORK:WebSocket{
             url="ws://"..host..":"..port,
             pingInterval=15,

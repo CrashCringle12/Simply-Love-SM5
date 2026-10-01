@@ -373,7 +373,7 @@ local af = Def.ActorFrame{
 		create_lobby_password = ""
 		password_wheel:set_info_set(password_chars, 3)
 		self:playcommand("SetStatus", {
-			text="Initializing online connection...",
+			text="Initializing lobby connection...",
 			showSpinner=true
 		})
 		self:queuecommand("CheckConnect")
@@ -498,7 +498,7 @@ local af = Def.ActorFrame{
 			-- Only try once per screen load to avoid infinite loops of trying to connect.
 			if not attempted and (not onlineHandler.socket or onlineHandler.errorMsg ~= nil) then
 				self:playcommand("SetStatus", {
-					text="Connecting to online service...",
+					text="Connecting to lobby server...",
 					showSpinner=true
 				})
 				MESSAGEMAN:Broadcast("ConnectOnline")
@@ -508,7 +508,7 @@ local af = Def.ActorFrame{
 			if not onlineHandler.connected and onlineHandler.errorMsg == nil then
 				wait_time = wait_time + 1
 				self:playcommand("SetStatus", {
-					text="Connecting to online service... ("..wait_time.."s)",
+					text="Connecting to lobby server... ("..wait_time.."s)",
 					showSpinner=true
 				})
 				self:sleep(1):queuecommand("CheckConnect")
@@ -530,7 +530,7 @@ local af = Def.ActorFrame{
 				connected = true
 				has_error = false
 				self:playcommand("SetStatus", {
-					text="Connected to online service.",
+					text="Connected to lobby server.",
 					showSpinner=false,
 					showPrompt=false
 				})
