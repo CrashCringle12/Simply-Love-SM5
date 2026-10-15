@@ -326,9 +326,6 @@ local function GetChangeableStyles()
 			elseif style == "solo" then
 				table.insert(available_styles, {{"ChangeStyle", "Single"}})
 				table.insert(available_styles, {{"ChangeStyle", "Double"}})
-			-- Couple doesn't have enough content for people to be able to switch into it
-			-- However, if for some reason you end up in couples mode, you should be able to
-			-- escape
 			elseif style == "couple" then
 				table.insert(available_styles, {{"ChangeStyle", "Versus"}})
 				table.insert(available_styles, {{"ChangeStyle", "Routine"}})
