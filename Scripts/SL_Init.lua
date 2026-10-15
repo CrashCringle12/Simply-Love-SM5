@@ -100,6 +100,9 @@ local PlayerDefaults = {
 				Stats = {}
 			}
 			self.PlayerOptionsString = nil
+			self.PlayerOptionsStringDouble = nil
+			self.PlayerOptionsStringRoutine = nil
+			self.PlayerOptionsStringKey = "PlayerOptionsString"
 			self.ITLData = {
 				["pathMap"] = {},
 				["hashMap"] = {},
