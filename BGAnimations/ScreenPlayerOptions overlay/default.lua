@@ -20,33 +20,42 @@ local styleType = GAMESTATE:GetCurrentStyle():GetStyleType()
 -- In Routine (couples) mode, default players to the red and blue couples skins
 -- if they aren't already on a couples noteskin.
 if IsRoutine() then
+	local current_skins = {}
+	for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+		table.insert(current_skins, SL[ToEnumShortString(player)].ActiveModifiers.NoteSkin or "")
+	end
+
+	local only_on_couples = false
 	local couples_noteskin
 	for skin in ivalues(NOTESKIN:GetNoteSkinNames(false)) do
 		if skin:lower() == "couples" then
 			couples_noteskin = skin
-			break
 		end
-	end
-
-	if couples_noteskin then
-		local already_on_couples = true
-		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-			local current = SL[ToEnumShortString(player)].ActiveModifiers.NoteSkin or ""
-			if current:lower() ~= couples_noteskin:lower() then
-				already_on_couples = false
+		-- Take advantage of GetNoteSkinNames returning only "IsRoutineNoteSkin=true" noteskins
+		-- to check if players are using a couples noteskin.
+		local only_this_skin = true
+		for current in ivalues(current_skins) do
+			if current:lower() ~= skin:lower() then
+				only_this_skin = false
 				break
 			end
 		end
 
-		if not already_on_couples then
-			local variants = NOTESKIN:GetVariantNamesForNoteSkin(couples_noteskin) or {}
-			local defaults = { P1 = "couples_blue", P2 = "couples_red" }
-			for player in ivalues(GAMESTATE:GetHumanPlayers()) do
-				local pn = ToEnumShortString(player)
-				SL[pn].ActiveModifiers.NoteSkin = couples_noteskin
-				if defaults[pn] then
-					SL[pn].ActiveModifiers.NoteSkinVariant = defaults[pn]
-				end
+		if only_this_skin then
+			only_on_couples = true
+			-- don't need to find couples_noteskin anymore so this is okay
+			break
+		end
+	end
+
+	if not only_on_couples and couples_noteskin then
+		local variants = NOTESKIN:GetVariantNamesForNoteSkin(couples_noteskin) or {}
+		local defaults = { P1 = "couples_blue", P2 = "couples_red" }
+		for player in ivalues(GAMESTATE:GetHumanPlayers()) do
+			local pn = ToEnumShortString(player)
+			SL[pn].ActiveModifiers.NoteSkin = couples_noteskin
+			if defaults[pn] then
+				SL[pn].ActiveModifiers.NoteSkinVariant = defaults[pn]
 			end
 		end
 	end
@@ -173,7 +182,6 @@ local ChangeSpeedMod = function(pn, direction)
 	end
 end
 
-
 local ChangeVariant = function(pn, direction)
 	local ScreenOptions = SCREENMAN:GetTopScreen()
 	if direction == 0 then
@@ -181,7 +189,9 @@ local ChangeVariant = function(pn, direction)
 		if NOTESKIN:HasVariants(noteskin_name) then
 			variants_def[pn] = NOTESKIN:GetVariantNamesForNoteSkin(noteskin_name)
 			-- Put the current NoteSkin at the front of the list of variants so that it's the default selection when we refresh the OptionRow
-			table.insert(variants_def[pn], 1, noteskin_name)
+			if not IsRoutine() then
+				table.insert(variants_def[pn], 1, noteskin_name)
+			end
 		else
 			variants_def[pn] = {noteskin_name}
 		end
@@ -348,11 +358,8 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 
 			-- it's possible for the procedure above to cause the player's speedmod to exceed
 			-- the upper bound of the new Mmod or Cmod; clamp to prevent that
-			if newtype == "R" then
-				speedmod = clamp(speedmod, 100, speedmod_def[newtype].upper)
-			else
-				speedmod = clamp(speedmod, increment, speedmod_def[newtype].upper)
-			end
+			speedmod = clamp(speedmod, increment, speedmod_def[newtype].upper)
+
 			SL[pn].ActiveModifiers.SpeedMod     = speedmod
 			SL[pn].ActiveModifiers.SpeedModType = newtype
 			if styleType == "StyleType_TwoPlayersSharedSides" then
@@ -392,7 +399,6 @@ for player in ivalues(GAMESTATE:GetHumanPlayers()) do
 			local current_variant = SL[original_pn].ActiveModifiers.NoteSkinVariant or SL[original_pn].ActiveModifiers.NoteSkin
 			-- Get all text after first _ to get the variant name
 			current_variant = current_variant:match("_(.*)") or current_variant
-			
 			VariantBMTs[original_pn]:settext( current_variant )
 			self:GetParent():queuecommand("RefreshVariants")
 		end,
