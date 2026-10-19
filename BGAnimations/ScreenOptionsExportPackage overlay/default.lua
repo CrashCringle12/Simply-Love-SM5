@@ -55,7 +55,44 @@ local CATEGORY_LABELS = {
 	BGAnimations  = "BG Animations",
 }
 
-local Categories = ExportPackages.GetAvailableCategories()
+local Categories = {"Songs", "Themes", "NoteSkins", "Courses", "ThemeAssets", "Other"}
+CATEGORY_LABELS.ThemeAssets = "Theme Assets"
+CATEGORY_LABELS.Other = "Other"
+CATEGORY_LABELS.JudgmentFonts = "Judgment Fonts"
+CATEGORY_LABELS.ComboFonts = "Combo Fonts"
+CATEGORY_LABELS.VisualStyles = "Visual Styles"
+local SUBCATEGORIES = {
+	ThemeAssets = {"JudgmentFonts", "ComboFonts", "VisualStyles"},
+	Other = {"Characters", "Announcers", "BGAnimations"},
+}
+
+local function ThemeAssetItems(category)
+	local root = THEME:GetCurrentThemeDirectory()
+	local items = {}
+	local function Add(label, paths)
+		items[#items+1] = {label=label, paths=paths}
+	end
+	if category == "JudgmentFonts" then
+		local path = THEME:GetPathG('', '_judgments') .. "/"
+		for _, file in ipairs(GetJudgmentGraphics()) do
+			if file ~= "None" then Add(StripSpriteHints(file), {path .. file}) end
+		end
+	elseif category == "ComboFonts" then
+		for _, name in ipairs(GetComboFonts()) do
+			Add(name, {root .. "Fonts/_Combo Fonts/" .. name})
+		end
+	elseif category == "VisualStyles" then
+		for _, name in ipairs(FILEMAN:GetDirListing(root .. "Graphics/_VisualStyles/", true, false)) do
+			local paths = {root .. "Graphics/_VisualStyles/" .. name}
+			local banners = root .. "Graphics/_FallbackBanners/" .. name
+			if FILEMAN:DoesFileExist(banners) then paths[#paths+1] = banners end
+			local music = GetVisualStyleMusic(name)
+			if music then paths[#paths+1] = THEME:GetPathS('', '_common menu music/' .. music) end
+			Add(name, paths)
+		end
+	end
+	return items
+end
 local NUM_CATEGORY_TABS = #Categories
 local EDIT_TAB_INDEX     = NUM_CATEGORY_TABS + 1
 local CONTENTS_TAB_INDEX = NUM_CATEGORY_TABS + 2
@@ -83,6 +120,7 @@ local state = {
 	focus         = "tabs",       -- "tabs" | "list" | "edit" | "contents"
 	tab_index     = 1,            -- 1..NUM_TABS
 	drilled_group = nil,          -- when on Songs and drilled into a group
+	subcategory = nil,
 	wheel_pos     = {},           -- per-context remembered scroll position
 	edit_index    = 1,            -- 1..#EDIT_FIELDS while focus="edit"
 	contents_page = 1,            -- 1..total_pages while focus="contents"
@@ -90,7 +128,7 @@ local state = {
 
 local function CurrentCategory()
 	if state.tab_index >= 1 and state.tab_index <= NUM_CATEGORY_TABS then
-		return Categories[state.tab_index]
+		return state.subcategory or Categories[state.tab_index]
 	end
 	return nil
 end
@@ -102,7 +140,26 @@ local function BuildRows()
 	local cat = CurrentCategory()
 	local rows = {}
 	if not cat then return rows end
-	if cat == "Songs" and not state.drilled_group then
+	if SUBCATEGORIES[cat] then
+		for _, subcategory in ipairs(SUBCATEGORIES[cat]) do
+			rows[#rows+1] = {kind="category", label=CATEGORY_LABELS[subcategory], path=subcategory}
+		end
+		return rows
+	end
+	if state.subcategory then
+		rows[#rows+1] = {kind="virtual", label=".. Back to " .. CATEGORY_LABELS[Categories[state.tab_index]], path="__back_category__"}
+	end
+	if cat == "JudgmentFonts" or cat == "ComboFonts" or cat == "VisualStyles" then
+		for _, item in ipairs(ThemeAssetItems(cat)) do
+			local all, any = true, false
+			for _, path in ipairs(item.paths) do
+				local selected = ExportPackages.IsSelected(path)
+				all, any = all and selected, any or selected
+			end
+			rows[#rows+1] = {kind="asset", label=item.label, paths=item.paths,
+				selection=all and "full" or (any and "partial" or "none")}
+		end
+	elseif cat == "Songs" and not state.drilled_group then
 		for _, gpath in ipairs(ExportPackages.GetSongGroups()) do
 			local name = gpath:match("([^/]+)/?$") or gpath
 			local full    = ExportPackages.IsSongGroupFullySelected(gpath)
@@ -243,6 +300,9 @@ local wheel_item_mt = {
 			if info.kind == "virtual" then
 				self.glyph:settext("")
 				self.chev:settext("")
+			elseif info.kind == "category" then
+				self.glyph:settext("")
+				self.chev:settext(">")
 			elseif info.kind == "group" then
 				if info.selection == "full" then
 					self.glyph:settext("[x]")
@@ -255,6 +315,8 @@ local wheel_item_mt = {
 			else
 				if info.selection == "full" then
 					self.glyph:settext("[x]")
+				elseif info.selection == "partial" then
+					self.glyph:settext("[~]")
 				else
 					self.glyph:settext("[ ]")
 				end
@@ -803,6 +865,7 @@ local function EnterTab(idx)
 	if idx <= NUM_CATEGORY_TABS then
 		-- Switching to a category tab: drop any drill-in from previous Songs view.
 		state.drilled_group = nil
+		state.subcategory = nil
 		RefreshWheel()
 	end
 	RefreshTabs()
@@ -849,7 +912,17 @@ end
 local function ToggleAtFocus()
 	local info = wheel:get_info_at_focus_pos()
 	if not info then return end
-	if info.kind == "item" then
+	if info.kind == "category" then
+		RememberPos()
+		state.subcategory = info.path
+		RefreshWheel()
+	elseif info.kind == "asset" then
+		local select = info.selection ~= "full"
+		for _, path in ipairs(info.paths) do
+			if ExportPackages.IsSelected(path) ~= select then ExportPackages.ToggleSelected(path) end
+		end
+		RefreshWheel()
+	elseif info.kind == "item" then
 		ExportPackages.ToggleSelected(info.path)
 		RefreshWheel()
 	elseif info.kind == "group" then
@@ -857,7 +930,10 @@ local function ToggleAtFocus()
 		state.drilled_group = info.path
 		RefreshWheel()
 	elseif info.kind == "virtual" then
-		if info.path == ROW_BACK_TO_GROUPS then
+		if info.path == "__back_category__" then
+			state.subcategory = nil
+			RefreshWheel()
+		elseif info.path == ROW_BACK_TO_GROUPS then
 			state.drilled_group = nil
 			RefreshWheel()
 		elseif info.path == ROW_SELECT_ALL and state.drilled_group then
@@ -941,6 +1017,9 @@ local function HandleInput(event)
 		elseif gb == "Back" or gb == "Select" then
 			if state.drilled_group then
 				state.drilled_group = nil
+				RefreshWheel()
+			elseif state.subcategory then
+				state.subcategory = nil
 				RefreshWheel()
 			else
 				state.focus = "tabs"
