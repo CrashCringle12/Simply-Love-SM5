@@ -36,15 +36,6 @@ SL_CustomPrefs.Get = function()
 		end
 	end
 
-	local knownStyles = {SRPG10=true}
-	for _, value in ipairs(visualStyleValues) do knownStyles[value] = true end
-	for _, value in ipairs(FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory() .. "Graphics/_VisualStyles/", true, false)) do
-		if not knownStyles[value] then
-			visualStyleChoices[#visualStyleChoices+1] = value
-			visualStyleValues[#visualStyleValues+1] = value
-		end
-	end
-
 	return {
 		AllowFailingOutOfSet =
 		{

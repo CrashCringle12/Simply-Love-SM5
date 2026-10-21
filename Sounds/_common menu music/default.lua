@@ -1,14 +1,39 @@
+local songs = {
+	Hearts = "in_two",
+	Arrows = "halcyon farms",
+	Bears  = "vrtuous faults",
+	Ducks  = "Xuxa fami VRC6",
+	Cats   = "Beanmania IIDX",
+	Spooky = "Spooky Scary Chiptunes",
+	Gay    = "Mystical Wheelbarrow Journey",
+	Stars  = "Shooting Star - faux VRC6 remix",
+	Thonk  = "Da Box of Kardboard Too (feat Naoki vs ZigZag) - TaroNuke Remix",
+	Technique = "Quaq",
+	SRPG10  = "SRPG10",
+	PSU    = "ZombieNation.ogg",
+	Lucky  = "drunken sailor (loop).ogg",
+	GotEm  = "Ha Got Em.ogg",
+	Ice_Cream = "Space Ice Cream -Adhenoid (loop).ogg",
+	Spades = "Casino Night Remix.ogg",
+	Boba = "Bubble Tea.ogg",
+	ITL = "EasyStreet.ogg",
+	Rights = "RUSH E 8 Bit.ogg",
+	Lefts = "MrSandman 8bituniverse.ogg",
+	DBZ = "DragonBall.ogg"
+}
+
 -- retrieve the current VisualStyle from the ThemePrefs system
 local style = ThemePrefs.Get("VisualStyle")
 
--- Use the shared mapping so playback and package exports include the same music.
-local file = GetVisualStyleMusic(style)
+-- use the style to index the songs table (above)
+-- and get the song associated with this VisualStyle
+local file = songs[ style ]
 
--- If this style has no music mapping,
+-- if a song file wasn't defined in the songs table above
 -- fall back on the song for Hearts as default music
 -- (this sometimes happens when people are experimenting
 -- with making their own custom VisualStyles)
-if not file then file = GetVisualStyleMusic("Hearts") end
+if not file then file = songs.Hearts end
 
 -- annnnnd some EasterEggs
 if PREFSMAN:GetPreference("EasterEggs") and style ~= "Thonk" then

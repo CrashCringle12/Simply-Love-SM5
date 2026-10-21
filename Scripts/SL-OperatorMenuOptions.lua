@@ -82,31 +82,6 @@ end
 -- -----------------------------------------------------------------------
 -- Advanced Options
 
-OperatorMenuOptionRows.ProfileScoresStorageFormat = function()
-	local formats = { "ProfileScoresStorageFormat_xml", "ProfileScoresStorageFormat_protobuf" }
-	return {
-		Name = "ProfileScoresStorageFormat",
-		LayoutType = "ShowAllInRow",
-		SelectType = "SelectOne",
-		OneChoiceForAllPlayers = true,
-		ExportOnChange = false,
-		TranslateChoices = false,
-		Choices = { "XML", "Protobuf" },
-		LoadSelections = function(self, list, pn)
-			local format = PREFSMAN:GetPreference("ProfileScoresStorageFormat")
-			list[FindInTable(format, formats) or 1] = true
-		end,
-		SaveSelections = function(self, list, pn)
-			for i = 1, #formats do
-				if list[i] then
-					PREFSMAN:SetPreference("ProfileScoresStorageFormat", formats[i])
-					break
-				end
-			end
-		end,
-	}
-end
-
 
 OperatorMenuOptionRows.DefaultFailType = function()
 	local failTypes = { "Immediate", "ImmediateContinue", "Off" }
