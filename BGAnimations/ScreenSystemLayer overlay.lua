@@ -199,45 +199,32 @@ local function LoadModules()
 	-- Each entry will then be converted to an ActorFrame with the actors as children.
 	local modules = {}
 	SL.ModuleInfo = {}
-	local files = FILEMAN:GetDirListing(THEME:GetCurrentThemeDirectory().."Modules/")
-	for file in ivalues(files) do
-		file = file:gsub("/$", "")
-		-- Get the file extension (everything past the last period).
-		local filetype = file:match("[^.]+$"):lower()
-		local module_path = THEME:GetCurrentThemeDirectory().."Modules/"..file
-		local full_path
-		if filetype == "lua" then
-			full_path = module_path
-		elseif FILEMAN:DoesFileExist(module_path.."/default.lua") then
-			full_path = module_path.."/default.lua"
-		elseif FILEMAN:DoesFileExist(module_path.."/"..file..".lua") then
-			full_path = module_path.."/"..file..".lua"
-		end
-		if full_path then
-			Trace("Loading module: "..full_path)
+	for _, module in ipairs(GetModuleEntries()) do
+		local file = module.Name
+		local full_path = module.Path
+		Trace("Loading module: "..full_path)
 
-			-- Load the Lua file as proper lua.
-			local loaded_module, error = loadfile(full_path)
-			if loaded_module then
-				local status, ret = pcall(loaded_module)
-				if status then
-					if type(ret) == "table" then
-						SL.ModuleInfo[file] = type(ret.ModuleInfo) == "table" and ret.ModuleInfo or {}
-						for screenName, actor in pairs(ret) do
-							if screenName ~= "ModuleInfo" and type(actor) == "table" then
-								if modules[screenName] == nil then
-									modules[screenName] = {}
-								end
-								modules[screenName][#modules[screenName]+1] = actor
+		-- Load the Lua file as proper lua.
+		local loaded_module, error = loadfile(full_path)
+		if loaded_module then
+			local status, ret = pcall(loaded_module)
+			if status then
+				if type(ret) == "table" then
+					SL.ModuleInfo[file] = type(ret.ModuleInfo) == "table" and ret.ModuleInfo or {}
+					for screenName, actor in pairs(ret) do
+						if screenName ~= "ModuleInfo" and type(actor) == "table" then
+							if modules[screenName] == nil then
+								modules[screenName] = {}
 							end
+							modules[screenName][#modules[screenName]+1] = actor
 						end
 					end
-				else
-					lua.ReportScriptError("Error executing module: "..full_path.." with error:\n    "..ret)
 				end
 			else
-				lua.ReportScriptError("Error loading module: "..full_path.." with error:\n    "..error)
+				lua.ReportScriptError("Error executing module: "..full_path.." with error:\n    "..ret)
 			end
+		else
+			lua.ReportScriptError("Error loading module: "..full_path.." with error:\n    "..error)
 		end
 	end
 
