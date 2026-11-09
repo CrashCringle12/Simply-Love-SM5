@@ -187,3 +187,8 @@ function VisualStyleSound(name)
 end
 
 VisualStyles.Discover()
+
+-- Module styles must be registered before theme preferences are initialized.
+for _, module in ipairs(GetModuleEntries()) do
+	if module.Directory then VisualStyles.Discover(module.Directory .. "VisualStyles/") end
+end

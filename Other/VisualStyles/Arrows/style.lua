@@ -1,5 +1,6 @@
 -- VisualStyle options:
 -- id: saved preference value; use a unique name.
+-- Modules with default.lua or <module>.lua can provide VisualStyles/<style>/style.lua.
 -- name: display name. choice: optional short label or emoji for the options menu.
 -- colorOverBackground: optional; omitted uses Color.White by default and Color.Black in RainbowMode.
 -- colorOverBackground.default: foreground RGBA color; defaults to Color.White.
